@@ -1,0 +1,188 @@
+{
+  "description": "Known legitimate organizations and their IP ranges/domains",
+  "last_updated": "2026-01-28",
+  "organizations": {
+    "google": {
+      "name": "Google LLC",
+      "domains": [
+        "google.com",
+        "googleapis.com",
+        "gstatic.com",
+        "googleusercontent.com",
+        "youtube.com",
+        "googlevideo.com",
+        "gmail.com",
+        "gvt1.com",
+        "gvt2.com",
+        "1e100.net"
+      ],
+      "ip_ranges": [
+        "8.8.8.8/32",
+        "8.8.4.4/32",
+        "142.250.0.0/15",
+        "172.217.0.0/16",
+        "216.58.192.0/19",
+        "172.253.0.0/16",
+        "173.194.0.0/16"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "microsoft": {
+      "name": "Microsoft Corporation",
+      "domains": [
+        "microsoft.com",
+        "windows.com",
+        "live.com",
+        "outlook.com",
+        "office.com",
+        "azure.com",
+        "msn.com",
+        "bing.com",
+        "skype.com",
+        "windowsupdate.com",
+        "update.microsoft.com"
+      ],
+      "ip_ranges": [
+        "13.64.0.0/11",
+        "20.0.0.0/8",
+        "40.64.0.0/10",
+        "52.0.0.0/6",
+        "104.40.0.0/13",
+        "131.253.0.0/16",
+        "157.54.0.0/15",
+        "191.232.0.0/13"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "cloudflare": {
+      "name": "Cloudflare Inc.",
+      "domains": [
+        "cloudflare.com",
+        "cloudflare-dns.com",
+        "one.one.one.one"
+      ],
+      "ip_ranges": [
+        "1.1.1.1/32",
+        "1.0.0.1/32",
+        "104.16.0.0/12",
+        "172.64.0.0/13",
+        "173.245.48.0/20",
+        "103.21.244.0/22",
+        "103.22.200.0/22",
+        "103.31.4.0/22",
+        "141.101.64.0/18",
+        "108.162.192.0/18",
+        "190.93.240.0/20",
+        "188.114.96.0/20",
+        "197.234.240.0/22",
+        "198.41.128.0/17"
+      ],
+      "ports": [443, 80, 53],
+      "trusted": true
+    },
+    "amazon_aws": {
+      "name": "Amazon Web Services",
+      "domains": [
+        "amazonaws.com",
+        "aws.amazon.com",
+        "cloudfront.net",
+        "amazon.com",
+        "awsstatic.com"
+      ],
+      "ip_ranges": [
+        "3.0.0.0/8",
+        "13.32.0.0/15",
+        "18.0.0.0/8",
+        "35.72.0.0/13",
+        "52.0.0.0/11",
+        "54.0.0.0/8",
+        "99.80.0.0/12"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "apple": {
+      "name": "Apple Inc.",
+      "domains": [
+        "apple.com",
+        "icloud.com",
+        "mzstatic.com",
+        "cdn-apple.com",
+        "apple-dns.net"
+      ],
+      "ip_ranges": [
+        "17.0.0.0/8"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "facebook_meta": {
+      "name": "Meta Platforms (Facebook)",
+      "domains": [
+        "facebook.com",
+        "fbcdn.net",
+        "instagram.com",
+        "whatsapp.com",
+        "meta.com"
+      ],
+      "ip_ranges": [
+        "31.13.0.0/16",
+        "66.220.144.0/20",
+        "69.63.176.0/20",
+        "69.171.224.0/19",
+        "74.119.76.0/22",
+        "103.4.96.0/22",
+        "157.240.0.0/16",
+        "173.252.64.0/18",
+        "179.60.192.0/22",
+        "185.60.216.0/22"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "mozilla": {
+      "name": "Mozilla Foundation",
+      "domains": [
+        "mozilla.org",
+        "firefox.com",
+        "getpocket.com",
+        "mozgcp.net"
+      ],
+      "ip_ranges": [],
+      "ports": [443, 80],
+      "trusted": true
+    },
+    "akamai": {
+      "name": "Akamai Technologies",
+      "domains": [
+        "akamai.net",
+        "akamaitechnologies.com",
+        "akamaiedge.net"
+      ],
+      "ip_ranges": [
+        "23.0.0.0/12",
+        "104.64.0.0/10"
+      ],
+      "ports": [443, 80],
+      "trusted": true
+    }
+  },
+  "common_dns_servers": [
+    "8.8.8.8",
+    "8.8.4.4",
+    "1.1.1.1",
+    "1.0.0.1",
+    "9.9.9.9",
+    "149.112.112.112",
+    "208.67.222.222",
+    "208.67.220.220"
+  ],
+  "common_ntp_servers": [
+    "time.google.com",
+    "time.cloudflare.com",
+    "time.windows.com",
+    "pool.ntp.org"
+  ]
+}

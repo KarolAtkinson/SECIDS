@@ -1,0 +1,62 @@
+# Python Cache Files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual Environments
+.venv/
+.venv_test/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*_backup.*
+*_old.*
+*_copy.*
+
+# Project Specific
+TrashDump/
+*.pcap
+logs/
+Logs/*.log
+
+# Model Files (large)
+*.h5
+*.pkl
+
+# Data Files (large)
+*.csv
+Archives/*.csv
+Results/*.csv
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Test Files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build Files
+build/
+dist/
+*.egg-info/

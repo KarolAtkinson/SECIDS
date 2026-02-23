@@ -1,0 +1,8 @@
+[
+  {
+    "timestamp": "2026-01-28T15:51:58.918283",
+    "shortcut": "verify",
+    "command": "python3 tools/verify_setup.py",
+    "success": true
+  }
+]

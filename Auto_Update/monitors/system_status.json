@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-01-28T17:29:00.598342",
+  "disk_space": {
+    "total_gb": 154.36,
+    "used_gb": 29.13,
+    "free_gb": 118.65,
+    "percent_used": 19.7,
+    "needs_cleanup": false
+  },
+  "datasets": {
+    "total_csv_files": 10,
+    "refined_datasets": 8,
+    "result_files": 1,
+    "raw_datasets": 1,
+    "total_size_mb": 4.28,
+    "needs_refinement": false,
+    "needs_cleanup": false
+  },
+  "captures": {
+    "pcap_files": 6,
+    "total_size_mb": 596.48,
+    "needs_processing": true
+  },
+  "blacklist": {
+    "threat_profiles": 1,
+    "needs_cleanup": false
+  },
+  "trashdump": {
+    "files": 14,
+    "size_mb": 0.38,
+    "needs_cleanup": false
+  },
+  "actions_needed": [
+    "capture_processing"
+  ]
+}

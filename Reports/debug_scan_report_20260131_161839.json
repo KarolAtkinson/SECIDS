@@ -1,0 +1,287 @@
+{
+  "timestamp": "2026-01-31T16:18:39.405929",
+  "project_root": "/home/kali/Documents/Code/SECIDS-CNN",
+  "statistics": {
+    "total_files": 63,
+    "scanned_files": 63,
+    "files_with_errors": 16,
+    "total_errors": 38
+  },
+  "errors": {
+    "syntax_errors": [],
+    "import_errors": [],
+    "undefined_variables": [],
+    "unused_imports": [],
+    "type_errors": [],
+    "indentation_errors": [],
+    "encoding_errors": [],
+    "other_errors": [
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/test_enhanced_model.py",
+        "type": "import_error",
+        "line": 14,
+        "message": "Cannot import from unified_wrapper: No module named 'unified_wrapper'",
+        "text": "unified_wrapper"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/interactive_ui_test.py",
+        "type": "import_error",
+        "line": 22,
+        "message": "Cannot import from UI.terminal_ui: No module named 'UI.terminal_ui'",
+        "text": "UI.terminal_ui"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/refine_datasets.py",
+        "type": "import_error",
+        "line": 16,
+        "message": "Cannot import from whitelist_checker: No module named 'whitelist_checker'",
+        "text": "whitelist_checker"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/automated_ui_test.py",
+        "type": "import_error",
+        "line": 54,
+        "message": "Cannot import from UI.terminal_ui: No module named 'UI.terminal_ui'",
+        "text": "UI.terminal_ui"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/live_capture_and_assess.py",
+        "type": "import_error",
+        "line": 34,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/threat_reviewer.py",
+        "type": "import_error",
+        "line": 14,
+        "message": "Cannot import from blacklist_manager: No module named 'blacklist_manager'",
+        "text": "blacklist_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/frontend_test_script.py",
+        "type": "import_error",
+        "line": 47,
+        "message": "Cannot import from UI.terminal_ui: No module named 'UI.terminal_ui'",
+        "text": "UI.terminal_ui"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/csv_workflow_manager.py",
+        "type": "import_error",
+        "line": 176,
+        "message": "Cannot import from run_model: No module named 'run_model'",
+        "text": "run_model"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/csv_workflow_manager.py",
+        "type": "import_error",
+        "line": 287,
+        "message": "Cannot import from run_model: No module named 'run_model'",
+        "text": "run_model"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/csv_workflow_manager.py",
+        "type": "import_error",
+        "line": 127,
+        "message": "Cannot import from train_unified_model: No module named 'train_unified_model'",
+        "text": "train_unified_model"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/csv_workflow_manager.py",
+        "type": "import_error",
+        "line": 140,
+        "message": "Cannot import from train_and_test: No module named 'train_and_test'",
+        "text": "train_and_test"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/test_enhancements.py",
+        "type": "import_error",
+        "line": 31,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/test_enhancements.py",
+        "type": "import_error",
+        "line": 38,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/test_enhancements.py",
+        "type": "import_error",
+        "line": 54,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/test_enhancements.py",
+        "type": "import_error",
+        "line": 80,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/final_test_suite.py",
+        "type": "import_error",
+        "line": 199,
+        "message": "Cannot import from UI.terminal_ui: No module named 'UI.terminal_ui'",
+        "text": "UI.terminal_ui"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 39,
+        "message": "Cannot import from system_checker: No module named 'system_checker'",
+        "text": "system_checker"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 51,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 62,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 85,
+        "message": "Cannot import from ddos_countermeasure: No module named 'ddos_countermeasure'",
+        "text": "ddos_countermeasure"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 97,
+        "message": "Cannot import from whitelist_checker: No module named 'whitelist_checker'",
+        "text": "whitelist_checker"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 111,
+        "message": "Cannot import from blacklist_manager: No module named 'blacklist_manager'",
+        "text": "blacklist_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 122,
+        "message": "Cannot import from vm_scanner: No module named 'vm_scanner'",
+        "text": "vm_scanner"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/comprehensive_test.py",
+        "type": "import_error",
+        "line": 198,
+        "message": "Cannot import continuous_live_capture: No module named 'continuous_live_capture'",
+        "text": "continuous_live_capture"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/continuous_live_capture.py",
+        "type": "import_error",
+        "line": 56,
+        "message": "Cannot import from ddos_countermeasure: No module named 'ddos_countermeasure'",
+        "text": "ddos_countermeasure"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/continuous_live_capture.py",
+        "type": "import_error",
+        "line": 57,
+        "message": "Cannot import from whitelist_checker: No module named 'whitelist_checker'",
+        "text": "whitelist_checker"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/continuous_live_capture.py",
+        "type": "import_error",
+        "line": 58,
+        "message": "Cannot import from blacklist_manager: No module named 'blacklist_manager'",
+        "text": "blacklist_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/continuous_live_capture.py",
+        "type": "import_error",
+        "line": 62,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/continuous_live_capture.py",
+        "type": "import_error",
+        "line": 63,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Countermeasures/test_countermeasure.py",
+        "type": "import_error",
+        "line": 12,
+        "message": "Cannot import from ddos_countermeasure: No module named 'ddos_countermeasure'",
+        "text": "ddos_countermeasure"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Model_Tester/Code/main.py",
+        "type": "import_error",
+        "line": 16,
+        "message": "Cannot import from dataset_creator: No module named 'dataset_creator'",
+        "text": "dataset_creator"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/train_and_test.py",
+        "type": "import_error",
+        "line": 22,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 23,
+        "message": "Cannot import from progress_utils: No module named 'progress_utils'",
+        "text": "progress_utils"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 31,
+        "message": "Cannot import from wireshark_manager: No module named 'wireshark_manager'",
+        "text": "wireshark_manager"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 38,
+        "message": "Cannot import from system_checker: No module named 'system_checker'",
+        "text": "system_checker"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 45,
+        "message": "Cannot import from ddos_countermeasure: No module named 'ddos_countermeasure'",
+        "text": "ddos_countermeasure"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 53,
+        "message": "Cannot import from report_generator: No module named 'report_generator'",
+        "text": "report_generator"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "import_error",
+        "line": 653,
+        "message": "Cannot import from unified_wrapper: No module named 'unified_wrapper'",
+        "text": "unified_wrapper"
+      }
+    ]
+  }
+}

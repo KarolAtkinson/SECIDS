@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# SecIDS-CNN Terminal UI Launcher
+# Quick launcher for the interactive terminal interface
+#
+
+# Resolve symlinks to get actual script location
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+
+# Get actual script directory
+SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Change to project root
+cd "$PROJECT_ROOT" || exit 1
+
+# Source environment configuration
+if [ -f "$PROJECT_ROOT/Config/.env" ]; then
+    source "$PROJECT_ROOT/Config/.env"
+else
+    # Fallback: set defaults if .env not found
+    export TF_CPP_MIN_LOG_LEVEL=2
+    export TF_ENABLE_ONEDNN_OPTS=1
+fi
+
+# Check if virtual environment exists and use it directly
+VENV_PYTHON="$PROJECT_ROOT/.venv_test/bin/python"
+
+if [ ! -f "$VENV_PYTHON" ]; then
+    echo "⚠️  Python virtual environment not found!"
+    echo "   Creating environment and installing dependencies..."
+    python3 -m venv "$PROJECT_ROOT/.venv_test"
+    "$VENV_PYTHON" -m pip install --upgrade pip -q
+    "$VENV_PYTHON" -m pip install tensorflow keras numpy pandas scikit-learn scapy rich -q 2>&1 | grep -v "WARNING:"
+    echo "✓ Environment setup complete"
+fi
+
+# Check for enhanced UI first, fallback to regular
+if [ -f "UI/terminal_ui_enhanced.py" ]; then
+    "$VENV_PYTHON" UI/terminal_ui_enhanced.py "$@"
+elif [ -f "UI/terminal_ui_v2.py" ]; then
+    "$VENV_PYTHON" UI/terminal_ui_v2.py "$@"
+else
+    "$VENV_PYTHON" UI/terminal_ui.py "$@"
+fi

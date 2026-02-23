@@ -1,0 +1,29 @@
+{
+  "last_interface": "eth0",
+  "last_duration": 120,
+  "last_window": 10,
+  "last_interval": 4,
+  "theme": "default",
+  "history": [
+    {
+      "command": "sudo python3 Tools/deep_scan.py --iface eth0 --duration 300 --interval 30",
+      "timestamp": "2026-01-29T19:41:06.586325"
+    },
+    {
+      "command": "python3 Tools/deep_scan.py --file SecIDS-CNN/datasets/Test_Deep_Scan.csv --passes 3",
+      "timestamp": "2026-01-29T15:08:27.840963"
+    },
+    {
+      "command": "python3 Tools/deep_scan.py --file SecIDS-CNN/datasets/Test_Deep_Scan.csv --passes 3",
+      "timestamp": "2026-01-29T15:08:16.550231"
+    },
+    {
+      "command": "sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --window 5 --interval 2",
+      "timestamp": "2026-01-29T14:38:24.949521"
+    },
+    {
+      "command": "sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --window 5 --interval 2",
+      "timestamp": "2026-01-29T14:01:28.646987"
+    }
+  ]
+}

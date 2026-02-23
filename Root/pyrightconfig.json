@@ -1,0 +1,26 @@
+{
+  "include": [
+    "Auto_Update",
+    "Countermeasures",
+    "Model_Tester",
+    "Scripts",
+    "SecIDS-CNN",
+    "Tools",
+    "UI"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportUnnecessaryIsInstance": false,
+  "reportUnnecessaryCast": false,
+  "reportAttributeAccessIssue": false,
+  "reportOperatorIssue": false,
+  "reportIndexIssue": false,
+  "reportCallIssue": false,
+  "reportArgumentType": false,
+  "reportAssignmentType": false
+}

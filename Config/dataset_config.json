@@ -1,0 +1,25 @@
+{
+  "updated": "2026-01-29T13:11:02",
+  "master_dataset": {
+    "path": "SecIDS-CNN/datasets/MD_1.csv",
+    "name": "MD_1.csv",
+    "created": "2026-01-29T13:11:02",
+    "rows": 90105,
+    "columns": 13,
+    "size_mb": 8.94,
+    "description": "Consolidated master dataset from all refined CSV files with whitelist/blacklist application"
+  },
+  "archives": {
+    "path": "Archives",
+    "description": "Historical datasets used for model testing only, not for threat detection"
+  },
+  "fallback_datasets": {
+    "ddos": "Archives/ddos_training_dataset.csv",
+    "combined": "Archives/combined_refined_dataset_20260129.csv"
+  },
+  "usage_notes": [
+    "Use master_dataset for all threat detection operations",
+    "Archived datasets are for Model_Tester training only",
+    "Update this config when creating new master datasets"
+  ]
+}

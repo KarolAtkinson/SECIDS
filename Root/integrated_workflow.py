@@ -1,0 +1,762 @@
+#!/usr/bin/env python3
+"""
+SecIDS-CNN Integrated Workflow System
+======================================
+Automatic end-to-end threat detection and response workflow:
+1. Gather Data from live-traffic
+2. Analyze the data for threats
+3. Deploy Countermeasures
+4. Create/Update model for future threat detection
+
+This script provides systematic and reliable integration of all components.
+
+Usage:
+    # Full automatic workflow (60-second live capture)
+    sudo python3 integrated_workflow.py --mode full --interface eth0 --duration 60
+    
+    # Continuous monitoring mode (runs indefinitely)
+    sudo python3 integrated_workflow.py --mode continuous --interface eth0
+    
+    # Analyze existing capture
+    python3 integrated_workflow.py --mode analyze --pcap-file Captures/capture_*.pcap
+    
+    # Train/retrain models from collected data
+    python3 integrated_workflow.py --mode train
+"""
+
+import sys
+import os
+import time
+import argparse
+import threading
+import queue
+from pathlib import Path
+from datetime import datetime
+from collections import deque
+import signal
+import json
+
+# Setup paths
+PROJECT_ROOT = Path(__file__).parent
+SECIDS_DIR = PROJECT_ROOT / 'SecIDS-CNN'
+TOOLS_DIR = PROJECT_ROOT / 'Tools'
+COUNTERMEASURES_DIR = PROJECT_ROOT / 'Countermeasures'
+CAPTURES_DIR = PROJECT_ROOT / 'Captures'
+RESULTS_DIR = PROJECT_ROOT / 'Results'
+LOGS_DIR = PROJECT_ROOT / 'Logs'
+
+# Add to Python path
+sys.path.insert(0, str(SECIDS_DIR))
+sys.path.insert(0, str(TOOLS_DIR))
+sys.path.insert(0, str(COUNTERMEASURES_DIR))
+sys.path.insert(0, str(PROJECT_ROOT / 'Device_Profile'))
+
+# Create directories
+CAPTURES_DIR.mkdir(exist_ok=True)
+RESULTS_DIR.mkdir(exist_ok=True)
+LOGS_DIR.mkdir(exist_ok=True)
+
+
+class IntegratedWorkflow:
+    """
+    Integrated workflow manager that connects:
+    - Live traffic capture
+    - Threat detection
+    - Automated countermeasures
+    - Model retraining
+    """
+    
+    def __init__(self, interface='eth0', duration=60, continuous=False):
+        """
+        Initialize integrated workflow
+        
+        Args:
+            interface: Network interface to monitor
+            duration: Capture duration in seconds (for single-run mode)
+            continuous: If True, runs indefinitely
+        """
+        self.interface = interface
+        self.duration = duration
+        self.continuous = continuous
+        self.running = False
+        
+        # Components
+        self.model = None
+        self.countermeasure = None
+        self.greylist_manager = None
+        self.capture_thread = None
+        self.detection_thread = None
+        
+        # Data queues
+        self.packet_queue = deque(maxlen=10000)
+        self.threat_queue = queue.Queue()
+        
+        # Statistics
+        self.stats = {
+            'start_time': None,
+            'packets_captured': 0,
+            'flows_analyzed': 0,
+            'threats_detected': 0,
+            'threats_greylisted': 0,
+            'threats_auto_blocked': 0,
+            'countermeasures_deployed': 0,
+            'captures_saved': []
+        }
+        
+        # Logging
+        log_file = LOGS_DIR / f'integrated_workflow_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+        self.log_file = log_file
+        
+        # Handle signals
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
+        
+        self.log("Integrated Workflow System Initialized")
+        self.log(f"Interface: {interface}")
+        self.log(f"Duration: {'Continuous' if continuous else f'{duration}s'}")
+    
+    def log(self, message, level="INFO"):
+        """Write to log file and print"""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] [{level}] {message}"
+        
+        print(log_entry)
+        
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(log_entry + '\n')
+        except Exception:
+            pass
+    
+    def _signal_handler(self, sig, frame):
+        """Handle SIGINT and SIGTERM"""
+        self.log("\nReceived shutdown signal", "INFO")
+        self.stop()
+    
+    def initialize_components(self):
+        """Initialize all system components"""
+        self.log("\n" + "="*80)
+        self.log("STAGE 1: COMPONENT INITIALIZATION")
+        self.log("="*80)
+        
+        # 1. Load detection model
+        try:
+            from secids_cnn import SecIDSModel
+            self.model = SecIDSModel()
+            self.log("✓ SecIDS-CNN model loaded", "SUCCESS")
+        except Exception as e:
+            self.log(f"✗ Failed to load model: {e}", "ERROR")
+            return False
+        
+        # 2. Initialize countermeasure system
+        try:
+            from ddos_countermeasure import DDoSCountermeasure
+            self.countermeasure = DDoSCountermeasure(
+                block_threshold=5,
+                auto_block=True
+            )
+            self.countermeasure.start()
+            self.log("✓ Countermeasure system initialized", "SUCCESS")
+        except Exception as e:
+            self.log(f"⚠️  Countermeasure system not available: {e}", "WARNING")
+            self.countermeasure = None
+        
+        # 3. Initialize greylist manager
+        try:
+            from greylist_manager import GreylistManager
+            self.greylist_manager = GreylistManager()
+            self.log("✓ Greylist manager initialized", "SUCCESS")
+        except Exception as e:
+            self.log(f"⚠️  Greylist manager not available: {e}", "WARNING")
+            self.greylist_manager = None
+        
+        return True
+    
+    def start_live_capture(self):
+        """
+        STAGE 2: Start live traffic capture
+        Continuously captures packets from network interface
+        """
+        self.log("\n" + "="*80)
+        self.log("STAGE 2: LIVE TRAFFIC CAPTURE")
+        self.log("="*80)
+        
+        try:
+            from scapy.all import sniff, IP, wrpcap
+        except ImportError:
+            self.log("✗ Scapy not available. Install: pip install scapy", "ERROR")
+            return False
+        
+        # Start packet capture in background
+        def capture_packets():
+            timestamp = int(time.time())
+            pcap_file = CAPTURES_DIR / f'capture_{timestamp}.pcap'
+            self.stats['captures_saved'].append(str(pcap_file))
+            
+            self.log(f"Starting capture on {self.interface}...")
+            self.log(f"Output: {pcap_file}")
+            
+            packets = []
+            
+            def packet_callback(pkt):
+                if not self.running:
+                    return
+                
+                if pkt.haslayer(IP):
+                    packets.append(pkt)
+                    self.packet_queue.append((time.time(), pkt))
+                    self.stats['packets_captured'] += 1
+            
+            try:
+                # Capture for specified duration or until stopped
+                if self.continuous:
+                    sniff(
+                        iface=self.interface,
+                        prn=packet_callback,
+                        store=False,
+                        stop_filter=lambda x: not self.running
+                    )
+                else:
+                    sniff(
+                        iface=self.interface,
+                        prn=packet_callback,
+                        store=False,
+                        timeout=self.duration,
+                        stop_filter=lambda x: not self.running
+                    )
+                
+                # Save captured packets
+                if packets:
+                    wrpcap(str(pcap_file), packets)
+                    self.log(f"✓ Saved {len(packets)} packets to {pcap_file}", "SUCCESS")
+            
+            except PermissionError:
+                self.log(f"✗ Permission denied. Run with sudo", "ERROR")
+                self.running = False
+            except Exception as e:
+                self.log(f"✗ Capture error: {e}", "ERROR")
+                self.running = False
+        
+        self.capture_thread = threading.Thread(target=capture_packets, daemon=True)
+        self.capture_thread.start()
+        self.log("✓ Capture thread started", "SUCCESS")
+        
+        return True
+    
+    def start_threat_detection(self):
+        """
+        STAGE 3: Analyze traffic for threats in real-time
+        Processes captured packets and detects threats
+        """
+        self.log("\n" + "="*80)
+        self.log("STAGE 3: REAL-TIME THREAT DETECTION")
+        self.log("="*80)
+        
+        from scapy.all import IP, TCP, UDP
+        import pandas as pd
+        import numpy as np
+        from collections import defaultdict
+        
+        def detect_threats():
+            window_size = 60.0  # 60-second windows
+            interval = 30.0     # Analyze every 30 seconds
+            
+            while self.running:
+                time.sleep(interval)
+                
+                # Get packets from current window
+                current_time = time.time()
+                cutoff = current_time - window_size
+                
+                # Extract packets within window
+                packet_list = []
+                while self.packet_queue and self.packet_queue[0][0] < cutoff:
+                    self.packet_queue.popleft()
+                
+                packet_list = list(self.packet_queue)
+                
+                if not packet_list:
+                    continue
+                
+                # Convert packets to flows
+                flows = {}
+                
+                for ts, pkt in packet_list:
+                    if not pkt.haslayer(IP):
+                        continue
+                    
+                    ip_layer = pkt[IP]
+                    sport, dport, proto = None, None, None
+                    
+                    if pkt.haslayer(TCP):
+                        proto = 'TCP'
+                        sport = pkt[TCP].sport
+                        dport = pkt[TCP].dport
+                    elif pkt.haslayer(UDP):
+                        proto = 'UDP'
+                        sport = pkt[UDP].sport
+                        dport = pkt[UDP].dport
+                    else:
+                        continue
+                    
+                    flow_key = (ip_layer.src, ip_layer.dst, sport, dport, proto)
+                    
+                    if flow_key not in flows:
+                        flows[flow_key] = {
+                            'first_ts': ts,
+                            'last_ts': ts,
+                            'fwd_pkts': [],
+                            'bwd_pkts': [],
+                            'dst_port': dport,
+                            'src_ip': ip_layer.src,
+                            'dst_ip': ip_layer.dst,
+                            'fwd_id': (ip_layer.src, sport)
+                        }
+                    
+                    flow = flows[flow_key]
+                    if not isinstance(flow['fwd_pkts'], list):
+                        flow['fwd_pkts'] = []
+                    if not isinstance(flow['bwd_pkts'], list):
+                        flow['bwd_pkts'] = []
+                    flow['last_ts'] = max(flow['last_ts'], ts)
+                    
+                    pkt_len = len(pkt)
+                    flags = pkt[TCP].flags if pkt.haslayer(TCP) else None
+                    
+                    if (ip_layer.src, sport) == flow['fwd_id']:
+                        flow['fwd_pkts'].append((ts, pkt_len, flags))
+                    else:
+                        flow['bwd_pkts'].append((ts, pkt_len, flags))
+                
+                # Extract features and predict
+                rows = []
+                for flow_key, flow in flows.items():
+                    duration_s = max(1e-6, flow['last_ts'] - flow['first_ts'])
+                    fwd_pkts = flow.get('fwd_pkts', [])
+                    if not isinstance(fwd_pkts, list):
+                        fwd_pkts = []
+                    
+                    total_fwd_packets = len(fwd_pkts)
+                    total_length_fwd = sum(p[1] for p in fwd_pkts) if fwd_pkts else 0
+                    
+                    flow_bytes_per_s = total_length_fwd / duration_s
+                    flow_pkts_per_s = total_fwd_packets / duration_s
+                    avg_pkt_size = (total_length_fwd / total_fwd_packets) if total_fwd_packets > 0 else 0
+                    
+                    pkt_lengths = [p[1] for p in fwd_pkts] if fwd_pkts else [0]
+                    pkt_len_std = float(np.std(pkt_lengths)) if len(pkt_lengths) > 1 else 0.0
+                    
+                    fin_count = sum(1 for (_, _, f) in fwd_pkts if f and 'F' in str(f))
+                    ack_count = sum(1 for (_, _, f) in fwd_pkts if f and 'A' in str(f))
+                    
+                    rows.append({
+                        'Destination Port': int(flow['dst_port']),
+                        'Flow Duration': int((flow['last_ts'] - flow['first_ts']) * 1e6),
+                        'Total Fwd Packets': int(total_fwd_packets),
+                        'Total Length of Fwd Packets': int(total_length_fwd),
+                        'Flow Bytes/s': float(flow_bytes_per_s),
+                        'Flow Packets/s': float(flow_pkts_per_s),
+                        'Average Packet Size': float(avg_pkt_size),
+                        'Packet Length Std': float(pkt_len_std),
+                        'FIN Flag Count': int(fin_count),
+                        'ACK Flag Count': int(ack_count),
+                        '_src_ip': flow['src_ip'],
+                        '_dst_ip': flow['dst_ip']
+                    })
+                
+                if not rows:
+                    continue
+                
+                df = pd.DataFrame(rows)
+                self.stats['flows_analyzed'] += len(df)
+                
+                # Extract IP info
+                ip_info = df[['_src_ip', '_dst_ip']].copy()
+                prediction_df = df.drop(columns=['_src_ip', '_dst_ip'])
+                
+                # Make predictions
+                try:
+                    if self.model is None:
+                        self.log("Model not loaded, skipping predictions", "WARNING")
+                        continue
+                    probs = self.model.predict_proba(prediction_df)
+                    if isinstance(probs, np.ndarray) and probs.ndim == 2 and probs.shape[1] == 2:
+                        prediction_df['probability'] = probs[:, 1]
+                    else:
+                        prediction_df['probability'] = probs
+                except Exception as e:
+                    self.log(f"Prediction error: {e}", "WARNING")
+                    continue
+                
+                prediction_df['prediction'] = prediction_df['probability'].apply(
+                    lambda p: 'ATTACK' if float(p) > 0.5 else 'Benign'
+                )
+                
+                # Add IP info back
+                prediction_df['_src_ip'] = ip_info['_src_ip'].values
+                prediction_df['_dst_ip'] = ip_info['_dst_ip'].values
+                
+                # Process threats
+                attacks = prediction_df[prediction_df['prediction'] == 'ATTACK']
+                
+                if len(attacks) > 0:
+                    self.stats['threats_detected'] += len(attacks)
+                    self.log(f"🚨 THREATS DETECTED: {len(attacks)} malicious flows", "ALERT")
+                    
+                    # Process each threat through greylist system
+                    for idx, row in attacks.iterrows():
+                        threat_data = {
+                            'timestamp': datetime.now().isoformat(),
+                            'src_ip': row['_src_ip'],
+                            'dst_ip': row['_dst_ip'],
+                            'dst_port': int(row['Destination Port']),
+                            'probability': float(row['probability']),
+                            'flow_packets': int(row['Total Fwd Packets']),
+                            'flow_bytes': int(row['Total Length of Fwd Packets'])
+                        }
+                        
+                        # Use greylist classification if available
+                        if self.greylist_manager:
+                            classification, needs_decision = self.greylist_manager.process_threat(threat_data)
+                            
+                            if classification == 'greylist':
+                                self.stats['threats_greylisted'] += 1
+                                self.log(f"  ⚠️  GREYLIST: {row['_src_ip']} → Port {row['Destination Port']} (Risk: {row['probability']*100:.1f}%) - User decision required", "WARNING")
+                                # Don't add to countermeasure queue - will be handled by user decision
+                            elif classification == 'blacklist':
+                                self.stats['threats_auto_blocked'] += 1
+                                self.threat_queue.put(threat_data)
+                                self.log(f"  🚫 BLACKLIST: {row['_src_ip']} → Port {row['Destination Port']} (Risk: {row['probability']*100:.1f}%) - Auto-blocking", "ALERT")
+                            else:  # whitelist
+                                self.log(f"  ✓ WHITELIST: {row['_src_ip']} → Port {row['Destination Port']} (Risk: {row['probability']*100:.1f}%) - Benign", "INFO")
+                        else:
+                            # No greylist manager - send all threats to countermeasures
+                            self.threat_queue.put(threat_data)
+                            self.log(f"  ⚠️  Threat from {row['_src_ip']} → Port {row['Destination Port']} (Risk: {row['probability']*100:.1f}%)", "ALERT")
+        
+        self.detection_thread = threading.Thread(target=detect_threats, daemon=True)
+        self.detection_thread.start()
+        self.log("✓ Detection thread started", "SUCCESS")
+        
+        return True
+    
+    def process_countermeasures(self):
+        """
+        STAGE 4: Deploy countermeasures against detected threats
+        Automatically blocks malicious IPs and ports (blacklist only)
+        """
+        self.log("\n" + "="*80)
+        self.log("STAGE 4: AUTOMATED COUNTERMEASURES")
+        self.log("="*80)
+        
+        if not self.countermeasure:
+            self.log("⚠️  Countermeasures disabled", "WARNING")
+            return
+        
+        while self.running:
+            try:
+                # Get threat from queue (with timeout)
+                threat_data = self.threat_queue.get(timeout=1)
+                
+                # Double-check not greylisted (safety check)
+                src_ip = threat_data.get('src_ip', 'unknown')
+                if self.greylist_manager and self.greylist_manager.is_greylisted(src_ip):
+                    self.log(f"⚠️  Skipping countermeasure for greylisted IP: {src_ip}", "WARNING")
+                    self.threat_queue.task_done()
+                    continue
+                
+                # Send to countermeasure system
+                self.countermeasure.process_threat(threat_data)
+                self.stats['countermeasures_deployed'] += 1
+                
+                self.log(f"✓ Countermeasure deployed for {threat_data['src_ip']}", "ACTION")
+                
+                self.threat_queue.task_done()
+            
+            except queue.Empty:
+                continue
+            except Exception as e:
+                self.log(f"Countermeasure error: {e}", "ERROR")
+    
+    def process_greylist_decisions(self):
+        """
+        STAGE 4b: Handle greylist decisions interactively
+        Prompts user for action on potential threats
+        """
+        self.log("\n" + "="*80)
+        self.log("STAGE 4b: GREYLIST DECISION PROCESSOR")
+        self.log("="*80)
+        
+        if not self.greylist_manager:
+            self.log("⚠️  Greylist manager not available", "WARNING")
+            return
+        
+        from greylist_manager import prompt_user_decision
+        
+        while self.running:
+            try:
+                # Check for pending decisions
+                pending = self.greylist_manager.get_pending_decision(timeout=5)
+                
+                if pending:
+                    # Prompt user for decision
+                    action = prompt_user_decision(self.greylist_manager, pending)
+                    
+                    self.log(f"✓ Decision recorded: {action['message']}", "INFO")
+                    
+                    # If user chose to blacklist, deploy countermeasures
+                    if action.get('decision') == 'blacklist':
+                        threat_data = pending['threat_data']
+                        self.threat_queue.put(threat_data)
+                        self.log(f"→ Queued for countermeasures: {action['ip']}", "ACTION")
+            
+            except Exception as e:
+                self.log(f"Greylist decision error: {e}", "ERROR")
+                time.sleep(1)
+    
+    def retrain_model_periodic(self, interval_hours=24):
+        """
+        STAGE 5: Periodically retrain model with new threat data
+        Updates detection model to adapt to new attack patterns
+        """
+        self.log("\n" + "="*80)
+        self.log(f"STAGE 5: PERIODIC MODEL RETRAINING (Every {interval_hours}h)")
+        self.log("="*80)
+        
+        last_train_time = time.time()
+        
+        while self.running:
+            current_time = time.time()
+            elapsed_hours = (current_time - last_train_time) / 3600
+            
+            if elapsed_hours >= interval_hours:
+                self.log("🔄 Starting model retraining...", "INFO")
+                
+                try:
+                    # Run training script
+                    import subprocess
+                    result = subprocess.run(
+                        [sys.executable, str(SECIDS_DIR / 'train_and_test.py')],
+                        capture_output=True,
+                        text=True,
+                        timeout=1800  # 30 minute timeout
+                    )
+                    
+                    if result.returncode == 0:
+                        self.log("✓ Model retrained successfully", "SUCCESS")
+                        
+                        # Reload model
+                        from secids_cnn import SecIDSModel
+                        self.model = SecIDSModel()
+                        self.log("✓ New model loaded", "SUCCESS")
+                    else:
+                        self.log(f"⚠️  Model retraining failed: {result.stderr[:200]}", "WARNING")
+                    
+                    last_train_time = current_time
+                
+                except Exception as e:
+                    self.log(f"✗ Retraining error: {e}", "ERROR")
+            
+            # Sleep for 1 hour between checks
+            time.sleep(3600)
+    
+    def run(self):
+        """Run integrated workflow"""
+        self.running = True
+        self.stats['start_time'] = datetime.now().isoformat()
+        
+        print("\n" + "="*80)
+        print("  SecIDS-CNN INTEGRATED WORKFLOW SYSTEM")
+        print("="*80)
+        print(f"  Mode: {'Continuous Monitoring' if self.continuous else f'Single Run ({self.duration}s)'}")
+        print(f"  Interface: {self.interface}")
+        print("="*80 + "\n")
+        
+        # Initialize all components
+        if not self.initialize_components():
+            self.log("✗ Initialization failed", "ERROR")
+            return False
+        
+        # Start all stages
+        if not self.start_live_capture():
+            self.log("✗ Capture failed", "ERROR")
+            return False
+        
+        if not self.start_threat_detection():
+            self.log("✗ Detection failed", "ERROR")
+            return False
+        
+        # Start countermeasure processor
+        countermeasure_thread = threading.Thread(target=self.process_countermeasures, daemon=True)
+        countermeasure_thread.start()
+        
+        # Start greylist decision processor
+        if self.greylist_manager:
+            greylist_thread = threading.Thread(target=self.process_greylist_decisions, daemon=True)
+            greylist_thread.start()
+            self.log("✓ Greylist decision processor started", "SUCCESS")
+        
+        # Start periodic retraining (in continuous mode only)
+        if self.continuous:
+            retrain_thread = threading.Thread(target=self.retrain_model_periodic, daemon=True)
+            retrain_thread.start()
+        
+        # Monitor status
+        try:
+            if self.continuous:
+                self.log("\n✓ All systems operational - Running continuously (Ctrl+C to stop)\n")
+                
+                # Print status every minute
+                while self.running:
+                    time.sleep(60)
+                    self.print_status()
+            else:
+                self.log(f"\n✓ All systems operational - Running for {self.duration} seconds\n")
+                
+                # Wait for duration
+                for i in range(self.duration):
+                    if not self.running:
+                        break
+                    time.sleep(1)
+                
+                self.stop()
+        
+        except KeyboardInterrupt:
+            self.log("\nShutdown requested", "INFO")
+            self.stop()
+        
+        return True
+    
+    def print_status(self):
+        """Print current system status"""
+        print("\n" + "="*80)
+        print("  SYSTEM STATUS")
+        print("="*80)
+        print(f"  Packets Captured: {self.stats['packets_captured']:,}")
+        print(f"  Flows Analyzed: {self.stats['flows_analyzed']:,}")
+        print(f"  Threats Detected: {self.stats['threats_detected']}")
+        print(f"    ├─ Auto-blocked (Blacklist): {self.stats['threats_auto_blocked']}")
+        print(f"    ├─ Pending Decision (Greylist): {self.stats['threats_greylisted']}")
+        print(f"    └─ False Positives (Whitelist): {self.stats['threats_detected'] - self.stats['threats_auto_blocked'] - self.stats['threats_greylisted']}")
+        print(f"  Countermeasures Deployed: {self.stats['countermeasures_deployed']}")
+        
+        if self.greylist_manager:
+            greylist_stats = self.greylist_manager.get_statistics()
+            print(f"  Greylist Status:")
+            print(f"    ├─ Current size: {greylist_stats['current_greylist_size']}")
+            print(f"    ├─ Pending decisions: {greylist_stats['pending_decisions']}")
+            print(f"    ├─ Moved to blacklist: {greylist_stats['moved_to_blacklist']}")
+            print(f"    ├─ Moved to whitelist: {greylist_stats['moved_to_whitelist']}")
+            print(f"    └─ Kept monitoring: {greylist_stats['kept_on_greylist']}")
+        
+        print("="*80 + "\n")
+    
+    def stop(self):
+        """Stop integrated workflow"""
+        self.log("\n" + "="*80)
+        self.log("SHUTTING DOWN INTEGRATED WORKFLOW")
+        self.log("="*80)
+        
+        self.running = False
+        
+        # Wait for threads to finish
+        if self.capture_thread and self.capture_thread.is_alive():
+            self.log("Stopping capture thread...")
+            self.capture_thread.join(timeout=5)
+        
+        if self.detection_thread and self.detection_thread.is_alive():
+            self.log("Stopping detection thread...")
+            self.detection_thread.join(timeout=5)
+        
+        # Stop countermeasure system
+        if self.countermeasure:
+            self.countermeasure.stop()
+            self.countermeasure.print_statistics()
+            
+            # Ask to clear blocks
+            try:
+                response = input("\nClear all IP/port blocks? (y/n): ")
+                if response.lower() == 'y':
+                    self.countermeasure.clear_all_blocks()
+            except:
+                pass
+        
+        # Show greylist statistics and export report
+        if self.greylist_manager:
+            self.greylist_manager.print_statistics()
+            self.greylist_manager.export_report()
+        
+        # Save final statistics
+        self.save_statistics()
+        
+        self.log("✓ Shutdown complete", "SUCCESS")
+    
+    def save_statistics(self):
+        """Save workflow statistics"""
+        stats_file = RESULTS_DIR / f'workflow_stats_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        
+        with open(stats_file, 'w') as f:
+            json.dump(self.stats, f, indent=2)
+        
+        self.log(f"✓ Statistics saved to {stats_file}", "SUCCESS")
+        
+        # Print summary
+        print("\n" + "="*80)
+        print("  WORKFLOW SUMMARY")
+        print("="*80)
+        print(f"  Start Time: {self.stats['start_time']}")
+        print(f"  Packets Captured: {self.stats['packets_captured']:,}")
+        print(f"  Flows Analyzed: {self.stats['flows_analyzed']:,}")
+        print(f"  Threats Detected: {self.stats['threats_detected']}")
+        print(f"  Countermeasures Deployed: {self.stats['countermeasures_deployed']}")
+        print(f"  Captures Saved: {len(self.stats['captures_saved'])}")
+        print("="*80 + "\n")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='SecIDS-CNN Integrated Workflow System',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Full automatic workflow (60-second capture)
+  sudo python3 integrated_workflow.py --mode full --interface eth0 --duration 60
+  
+  # Continuous monitoring mode
+  sudo python3 integrated_workflow.py --mode continuous --interface eth0
+  
+  # Quick test (30 seconds)
+  sudo python3 integrated_workflow.py --mode full --interface eth0 --duration 30
+        """
+    )
+    
+    parser.add_argument('--mode', choices=['full', 'continuous'], required=True,
+                       help='Workflow mode: full (single run) or continuous (runs indefinitely)')
+    parser.add_argument('--interface', '-i', required=True,
+                       help='Network interface to monitor (e.g., eth0, wlan0)')
+    parser.add_argument('--duration', '-d', type=int, default=60,
+                       help='Capture duration in seconds (for full mode, default: 60)')
+    
+    args = parser.parse_args()
+    
+    # Check for root privileges
+    if os.geteuid() != 0:
+        print("⚠️  WARNING: Root privileges required for packet capture")
+        print("Please run with: sudo python3 integrated_workflow.py ...")
+        sys.exit(1)
+    
+    # Create workflow
+    workflow = IntegratedWorkflow(
+        interface=args.interface,
+        duration=args.duration,
+        continuous=(args.mode == 'continuous')
+    )
+    
+    # Run workflow
+    success = workflow.run()
+    
+    sys.exit(0 if success else 1)
+
+
+if __name__ == '__main__':
+    main()

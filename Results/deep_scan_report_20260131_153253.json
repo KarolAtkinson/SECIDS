@@ -1,0 +1,27 @@
+{
+  "scan_type": "file",
+  "timestamp": "20260131_153253",
+  "source_file": "SecIDS-CNN/datasets/Test_Deep_Scan.csv",
+  "total_records": 1000,
+  "scan_duration": 1.6282079219818115,
+  "classification_counts": {
+    "Suspicious": 392,
+    "Attack": 533,
+    "High Risk": 75
+  },
+  "statistics": {
+    "avg_threat_score": 0.5440583259761734,
+    "max_threat_score": 1.0,
+    "threat_percentage": 60.8
+  },
+  "multi_pass_details": [
+    {
+      "pass": 1,
+      "threats": 1000
+    },
+    {
+      "pass": 2,
+      "threats": 1000
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "threat_id": "0be1f43dc668",
+    "timestamp": "2026-01-28T17:28:54.544735",
+    "dst_port": 80,
+    "protocol": "TCP",
+    "packets": 1500,
+    "bytes": 500000,
+    "probability": 0.95
+  },
+  {
+    "threat_id": "e6892dd3bad6",
+    "timestamp": "2026-01-29T12:36:57.350854",
+    "dst_port": 443,
+    "protocol": "TCP",
+    "packets": 0,
+    "bytes": 0,
+    "probability": 0.943
+  },
+  {
+    "threat_id": "9f97d0d01a92",
+    "timestamp": "2026-01-29T12:45:35.304891",
+    "dst_port": 22,
+    "protocol": "TCP",
+    "packets": 0,
+    "bytes": 0,
+    "probability": 0.87
+  }
+]

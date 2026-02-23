@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-01-28T15:53:44.766689",
+  "summary": {
+    "total_tests": 4,
+    "passed": 4,
+    "failed": 0,
+    "success_rate": 100.0,
+    "total_duration": 0
+  },
+  "categories": {
+    "integrity": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "models": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "results": [
+    {
+      "name": "Project Structure",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 9.298324584960938e-05,
+      "details": {
+        "total_paths": 9,
+        "missing_paths": []
+      }
+    },
+    {
+      "name": "Python Imports",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 3.245539426803589,
+      "details": {
+        "required_modules": [
+          "numpy",
+          "pandas",
+          "sklearn",
+          "tensorflow",
+          "scapy"
+        ],
+        "failed_imports": []
+      }
+    },
+    {
+      "name": "Model Files",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 9.083747863769531e-05,
+      "details": {
+        "file_size": 342584,
+        "model_files_checked": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ],
+        "existing_models": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ]
+      }
+    },
+    {
+      "name": "SecIDS Model Loading",
+      "category": "models",
+      "passed": true,
+      "error": null,
+      "duration": 0.22529220581054688,
+      "details": {
+        "model_loaded": true,
+        "model_type": "SecIDSModel"
+      }
+    }
+  ],
+  "failed_tests": []
+}

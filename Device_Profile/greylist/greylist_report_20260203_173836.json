@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-02-03T17:38:36.789456",
+  "statistics": {
+    "total_greylist_alerts": 0,
+    "moved_to_blacklist": 0,
+    "moved_to_whitelist": 0,
+    "kept_on_greylist": 0,
+    "auto_expired": 0,
+    "current_greylist_size": 0,
+    "pending_decisions": 0,
+    "total_history": 0
+  },
+  "current_greylist": {},
+  "recent_history": []
+}

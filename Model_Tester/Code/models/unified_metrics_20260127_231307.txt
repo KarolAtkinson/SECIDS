@@ -1,0 +1,34 @@
+UNIFIED THREAT DETECTION MODEL - METRICS SUMMARY
+================================================================================
+Timestamp: 20260127_231307
+Training Samples: 12035
+Test Samples: 3009
+Features Used: 19
+
+Features:
+  1. Destination Port
+  2. Flow Duration
+  3. Total Fwd Packets
+  4. Total Length of Fwd Packets
+  5. Flow Bytes/s
+  6. Flow Packets/s
+  7. Average Packet Size
+  8. Packet Length Std
+  9. FIN Flag Count
+  10. ACK Flag Count
+  11. Source Is Private
+  12. Destination Is Private
+  13. Source Is Known Provider
+  14. Destination Is Known Provider
+  15. Is Bidirectional Flow
+  16. Destination Port Is Legitimate
+  17. IAT Mean
+  18. IAT Std
+  19. Legitimacy Score
+
+Performance Metrics:
+  accuracy: 0.9997
+  precision: 0.9990
+  recall: 1.0000
+  f1: 0.9995
+  roc_auc: 1.0000

@@ -1,0 +1,233 @@
+{
+  "updated": "2026-01-29T13:09:58.372530",
+  "source": "vm_scanner + manual (Verified all blacklist items as non-threats)",
+  "tools": [
+    {
+      "name": "wireshark",
+      "path": "/usr/bin/wireshark",
+      "reason": "Required network/security tool"
+    },
+    {
+      "name": "tshark",
+      "path": "/usr/bin/tshark",
+      "reason": "Required network/security tool"
+    },
+    {
+      "name": "dumpcap",
+      "path": "/usr/bin/dumpcap",
+      "reason": "Required network/security tool"
+    },
+    {
+      "name": "tcpdump",
+      "path": "/usr/bin/tcpdump",
+      "reason": "Required network/security tool"
+    },
+    {
+      "name": "nmap",
+      "path": "/usr/bin/nmap",
+      "reason": "Required network/security tool"
+    },
+    {
+      "name": "malwarebytes",
+      "path": "external_host",
+      "reason": "Security scanning tool - Host machine deep scan"
+    },
+    {
+      "name": "mbam",
+      "path": "external_host",
+      "reason": "Malwarebytes Anti-Malware process"
+    },
+    {
+      "name": "mbamservice",
+      "path": "external_host",
+      "reason": "Malwarebytes service process"
+    }
+  ],
+  "processes": [
+    {
+      "name": "[kworker/r-slub_flushwq]",
+      "command": "[kworker/R-slub_flushwq]",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "[kworker/u514:31-flush-8:0]",
+      "command": "[kworker/u514:31-flush-8:0]",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd-journald",
+      "command": "/usr/lib/systemd/systemd-journald",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd-userdbd",
+      "command": "/usr/lib/systemd/systemd-userdbd",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd-udevd",
+      "command": "/usr/lib/systemd/systemd-udevd",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd-logind",
+      "command": "/usr/lib/systemd/systemd-logind",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/sbin/networkmanager",
+      "command": "/usr/sbin/NetworkManager --no-daemon",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "sshd:",
+      "command": "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/sbin/cron",
+      "command": "/usr/sbin/cron -f",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd",
+      "command": "/usr/lib/systemd/systemd --user",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/ssh-agent",
+      "command": "/usr/bin/ssh-agent -D",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/zsh",
+      "command": "/usr/bin/zsh",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code --type=zygote --no-zygote-sandbox",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code --type=zygote",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code --type=zygote",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/chrome_crashpad_handler",
+      "command": "/usr/share/code/chrome_crashpad_handler --monitor-self-annotation=ptype=crashpad-handler --no-rate-l",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code --type=zygote --no-zygote-sandbox",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code --type=zygote",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/zsh",
+      "command": "/usr/bin/zsh",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/zsh",
+      "command": "/usr/bin/zsh -i",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code /usr/share/code/resources/app/extensions/markdown-language-features/dist/server",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/home/kali/.vscode/extensions/ms-python.python-2026.0.0-linux-x64/python-env-tools/bin/pet",
+      "command": "/home/kali/.vscode/extensions/ms-python.python-2026.0.0-linux-x64/python-env-tools/bin/pet server",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code /usr/share/code/resources/app/extensions/json-language-features/server/dist/nod",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/zsh",
+      "command": "/usr/bin/zsh -i",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "[kworker/u514:1-flush-8:0]",
+      "command": "[kworker/u514:1-flush-8:0]",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "/usr/bin/zsh",
+      "command": "/usr/bin/zsh -i",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "systemd-userwork:",
+      "command": "systemd-userwork: waiting...",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "systemd-userwork:",
+      "command": "systemd-userwork: waiting...",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "systemd-userwork:",
+      "command": "systemd-userwork: waiting...",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "python3",
+      "command": "python3 Tools/vm_scanner.py",
+      "reason": "Known security/network tool"
+    },
+    {
+      "name": "[kworker/r-sync_wq]",
+      "command": "[kworker/R-sync_wq]",
+      "reason": "Verified non-threat - kernel worker process"
+    },
+    {
+      "name": "/usr/lib/systemd/systemd-timesyncd",
+      "command": "/usr/lib/systemd/systemd-timesyncd",
+      "reason": "Verified non-threat - system time sync service"
+    },
+    {
+      "name": "/usr/libexec/at-spi-bus-launcher",
+      "command": "/usr/libexec/at-spi-bus-launcher",
+      "reason": "Verified non-threat - accessibility service"
+    },
+    {
+      "name": "/usr/bin/plasmashell",
+      "command": "/usr/bin/plasmashell --no-respawn",
+      "reason": "Verified non-threat - KDE desktop shell"
+    },
+    {
+      "name": "/proc/self/exe",
+      "command": "/proc/self/exe --type=utility --utility-sub-type=network.mojom.NetworkService",
+      "reason": "Verified non-threat - VS Code network service"
+    },
+    {
+      "name": "/usr/share/code/code",
+      "command": "/usr/share/code/code /home/kali/.vscode/extensions/ms-python.vscode-pylance",
+      "reason": "Verified non-threat - VS Code Pylance extension"
+    }
+  ]
+}

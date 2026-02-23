@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-02-03T17:52:28.962364",
+  "statistics": {
+    "total_greylist_alerts": 1,
+    "moved_to_blacklist": 0,
+    "moved_to_whitelist": 0,
+    "kept_on_greylist": 0,
+    "auto_expired": 0,
+    "current_greylist_size": 1,
+    "pending_decisions": 1,
+    "total_history": 0
+  },
+  "current_greylist": {
+    "20.20.20.20": {
+      "ip": "20.20.20.20",
+      "first_seen": "2026-02-03T17:52:28.959327",
+      "last_seen": "2026-02-03T17:52:28.959334",
+      "occurrences": 1,
+      "threat_data": [
+        {
+          "src_ip": "20.20.20.20",
+          "probability": 0.65,
+          "dst_port": 443,
+          "timestamp": "2026-02-03T17:00:01"
+        }
+      ],
+      "status": "pending_decision"
+    }
+  },
+  "recent_history": []
+}

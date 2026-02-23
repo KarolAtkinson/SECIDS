@@ -1,0 +1,152 @@
+{
+  "timestamp": "2026-01-28T15:49:19.428085",
+  "summary": {
+    "total_tests": 22,
+    "passed": 21,
+    "failed": 1,
+    "success_rate": 95.45454545454545,
+    "total_duration": 7.862144470214844
+  },
+  "categories": {
+    "integrity": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "processing": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "models": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "pipeline": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "error": {
+      "total": 3,
+      "passed": 2,
+      "failed": 1
+    },
+    "edge": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "concurrency": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "results": [
+    {
+      "name": "Project Structure",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 0.00011467933654785156,
+      "details": {
+        "total_paths": 9,
+        "missing_paths": []
+      }
+    },
+    {
+      "name": "Python Imports",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 3.682316780090332,
+      "details": {
+        "required_modules": [
+          "numpy",
+          "pandas",
+          "sklearn",
+          "tensorflow",
+          "scapy"
+        ],
+        "failed_imports": []
+      }
+    },
+    {
+      "name": "Model Files",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 7.224082946777344e-05,
+      "details": {
+        "file_size": 342584,
+        "model_files_checked": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ],
+        "existing_models": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ]
+      }
+    },
+    {
+      "name": "Dataset Availability",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 0.0001590251922607422,
+      "details": {
+        "dataset_count": 4,
+        "datasets": [
+          "ddos_training_dataset.csv",
+          "Test2.csv",
+          "Test1.csv",
+          "Test3.csv"
+        ]
+      }
+    },
+    {
+      "name": "CSV Loading",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.00633549690246582,
+      "details": {
+        "rows": 3,
+        "columns": 10,
+        "columns_list": [
+          "Destination Port",
+          "Flow Duration",
+          "Total Fwd Packets",
+          "Total Length of Fwd Packets",
+          "Flow Bytes/s",
+          "Flow Packets/s",
+          "Average Packet Size",
+          "Packet Length Std",
+          "FIN Flag Count",
+          "ACK Flag Count"
+        ]
+      }
+    },
+    {
+      "name": "Feature Extraction",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.003525257110595703,
+      "details": {
+        "mean_packet_size": 750.8189050463433,
+        "max_flow_duration": 9953,
+        "min_flow_duration": 138
+      }
+    },
+    {
+      "name": "Data Normalization",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.03500199317932129,
+      "details": {
+        "mean_check": 

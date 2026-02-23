@@ -1,0 +1,4 @@
+#!/bin/bash
+# Quick launcher - CSV Workflow
+cd "$(dirname "$0")"
+./Launchers/csv_workflow.sh "$@"

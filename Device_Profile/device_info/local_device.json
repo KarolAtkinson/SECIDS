@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-01-29T13:02:29.322735",
+  "hostname": "kali",
+  "local_ips": [
+    "127.0.0.1",
+    "192.168.112.143",
+    "::1",
+    "fe80::20c:29ff:fea7:343c",
+    "localhost"
+  ],
+  "mac_addresses": [
+    {
+      "interface": "eth0",
+      "mac": "00:0c:29:a7:34:3c"
+    }
+  ],
+  "default_gateway": "192.168.112.2",
+  "dns_servers": [
+    "192.168.112.2"
+  ],
+  "description": "Local device profile for traffic whitelisting"
+}

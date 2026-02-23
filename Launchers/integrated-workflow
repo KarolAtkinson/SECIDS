@@ -1,0 +1,87 @@
+#!/bin/bash
+# Quick launcher for SecIDS-CNN Integrated Workflow System
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Color codes
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}╔══════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║  SecIDS-CNN Integrated Workflow System - Quick Launcher         ║${NC}"
+echo -e "${BLUE}╚══════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}✗ This script requires root privileges for packet capture${NC}"
+    echo -e "${YELLOW}  Please run: sudo $0 $@${NC}"
+    exit 1
+fi
+
+# Show menu if no arguments
+if [ $# -eq 0 ]; then
+    echo -e "${YELLOW}Select Mode:${NC}"
+    echo "  1) Full Automatic Workflow (60-second capture)"
+    echo "  2) Continuous Monitoring (runs indefinitely)"
+    echo "  3) Quick Test (30-second capture)"
+    echo "  4) Custom duration"
+    echo ""
+    read -p "Enter choice [1-4]: " choice
+    
+    # Get interface
+    echo ""
+    echo -e "${YELLOW}Available Network Interfaces:${NC}"
+    ip link show | grep -E "^[0-9]+:" | awk '{print $2}' | tr -d ':'
+    echo ""
+    read -p "Enter interface (e.g., eth0, wlan0): " interface
+    
+    case $choice in
+        1)
+            mode="full"
+            duration=60
+            ;;
+        2)
+            mode="continuous"
+            duration=60  # Not used in continuous mode
+            ;;
+        3)
+            mode="full"
+            duration=30
+            ;;
+        4)
+            mode="full"
+            read -p "Enter duration in seconds: " duration
+            ;;
+        *)
+            echo -e "${RED}Invalid choice${NC}"
+            exit 1
+            ;;
+    esac
+else
+    # Parse command line arguments
+    mode="${1:-full}"
+    interface="${2:-eth0}"
+    duration="${3:-60}"
+fi
+
+echo ""
+echo -e "${GREEN}Starting Integrated Workflow...${NC}"
+echo "  Mode: $mode"
+echo "  Interface: $interface"
+if [ "$mode" != "continuous" ]; then
+    echo "  Duration: ${duration}s"
+fi
+echo ""
+
+# Run the integrated workflow
+cd "$PROJECT_ROOT"
+python3 integrated_workflow.py --mode "$mode" --interface "$interface" --duration "$duration"
+
+echo ""
+echo -e "${GREEN}✓ Workflow Complete${NC}"

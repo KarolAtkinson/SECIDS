@@ -1,0 +1,7 @@
+tensorflow==2.11.0       # Use TensorFlow compatible with Python 3.10
+pandas==1.5.2            # For handling data in DataFrames (compatible with Python 3.10)
+numpy==1.23.5            # Compatible numpy for Python 3.10 and TF
+scikit-learn==1.1.3      # For preprocessing and model utilities
+tqdm>=4.65.0             # Progress bars for operations
+psutil>=5.9.0            # System and process utilities for Wireshark management
+scapy>=2.5.0             # Packet manipulation for live capture

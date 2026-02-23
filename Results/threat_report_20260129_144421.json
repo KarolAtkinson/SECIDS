@@ -1,0 +1,9 @@
+{
+  "scan_info": {
+    "timestamp": "2026-01-29T14:44:21.774120",
+    "results_file": "detection_results_20260129_144420.csv",
+    "total_records": 90105
+  },
+  "summary": {
+    "total_analyzed": 90105,
+    "threats_detected": 

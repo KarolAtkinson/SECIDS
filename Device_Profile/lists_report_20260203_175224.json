@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-02-03T17:52:24.436439",
+  "summary": {
+    "whitelist_count": 0,
+    "blacklist_count": 0,
+    "greylist_count": 0,
+    "total_tracked": 0
+  },
+  "whitelist": {},
+  "blacklist": {},
+  "greylist": {}
+}

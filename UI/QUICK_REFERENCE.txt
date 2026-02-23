@@ -1,0 +1,194 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    SecIDS-CNN Terminal UI Quick Reference                   ║
+║                          Version 3.0 - January 2026                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ LAUNCH COMMANDS                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  sudo SECIDS                        Launch from anywhere (recommended)      │
+│  bash Launchers/secids-ui           Launch from project directory           │
+│  python3 UI/terminal_ui.py          Direct launch                           │
+│  python3 Scripts/verify_paths.py    Verify all paths                        │
+│                                                                              │
+│  SYSTEM-WIDE SETUP (one-time):                                              │
+│    cd /path/to/SECIDS-CNN                                                   │
+│    sudo ln -sf "$(pwd)/Launchers/secids-ui" /usr/local/bin/SECIDS          │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ KEYBOARD SHORTCUTS - MAIN MENU                                               │
+├─────────┬────────────────────────────────────────────────────────────────────┤
+│  Key 1  │ 🔍 Live Detection & Monitoring                                     │
+│         │    • Default (5s window, 2s interval)                              │
+│         │    • Fast (3s window, 1s interval)                                 │
+│         │    • Slow (10s window, 5s interval)                                │
+│         │    • Custom settings                                               │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 2  │ 📡 Network Capture Operations                                      │
+│         │    • Quick (30s), Standard (60s), Long (300s)                      │
+│         │    • Custom duration                                               │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 3  │ 📊 File-Based Analysis                                             │
+│         │    • Test datasets (Test1, Test2)                                  │
+│         │    • Master dataset                                                │
+│         │    • Custom CSV file                                               │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 4  │ 🎓 Model Training & Testing                                        │
+│         │    • Full pipeline training                                        │
+│         │    • Unified/SecIDS model training                                 │
+│         │    • Quick/Smoke/Full tests                                        │
+│         │    • Stress testing                                                │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 5  │ ⚙️  System Configuration & Setup                                   │
+│         │    • Verify system setup                                           │
+│         │    • Install/update dependencies                                   │
+│         │    • Check network interfaces                                      │
+│         │    • View system info                                              │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 6  │ 📈 View Reports & Results                                          │
+│         │    • Latest detection results                                      │
+│         │    • Training history                                              │
+│         │    • Model performance                                             │
+│         │    • Threat analysis                                               │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 7  │ 🔧 Utilities & Tools                                               │
+│         │    • Create master dataset                                         │
+│         │    • Clean temporary files                                         │
+│         │    • PCAP to CSV conversion                                        │
+│         │    • Dataset enhancement                                           │
+│         │    • List datasets/models                                          │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 8  │ 📚 Command History                                                 │
+│         │    • View last 20 commands                                         │
+│         │    • Re-execute previous commands                                  │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 9  │ ⚙️  Settings & Configuration                                       │
+│         │    • Change default interface                                      │
+│         │    • Set capture duration                                          │
+│         │    • Set window/interval                                           │
+│         │    • View/edit config                                              │
+├─────────┼────────────────────────────────────────────────────────────────────┤
+│  Key 0  │ 🚪 Exit                                                            │
+│         │    • Save configuration and exit                                   │
+└─────────┴────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CONFIGURATION FILES                                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  UI/ui_config.json                  UI settings & history                   │
+│  Config/command_shortcuts.json      Command library shortcuts               │
+│  Config/command_history.json        Global command history                  │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DEFAULT SETTINGS                                                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Network Interface:    eth0                                                 │
+│  Capture Duration:     60 seconds                                           │
+│  Window Size:          5 seconds                                            │
+│  Detection Interval:   2 seconds                                            │
+│  History Retention:    Last 20 commands                                     │
+│                                                                              │
+│  All settings persist between sessions and can be changed in Settings (9)   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ QUICK START WORKFLOW                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  1. Launch UI:           bash Launchers/secids-ui                           │
+│  2. Press 5:             System Configuration & Setup                       │
+│  3. Press 1:             Verify System Setup                                │
+│  4. Press 1:             Live Detection & Monitoring                        │
+│  5. Press 1:             Default Detection                                  │
+│  6. Enter interface:     eth0 (or your interface)                           │
+│  7. Watch results!       Real-time threat detection                         │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SUDO REQUIRED OPERATIONS                                                     │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  • Live Detection (Key 1) - Requires packet capture privileges              │
+│  • Network Capture (Key 2) - Requires interface access                      │
+│  • Some utilities may require elevated privileges                           │
+│                                                                              │
+│  The UI will prompt for sudo password when needed.                          │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  UI won't launch:                                                            │
+│    → Check Python 3.7+ installed: python3 --version                         │
+│    → Install Rich library: pip install rich                                 │
+│    → Verify paths: python3 Scripts/verify_paths.py                          │
+│                                                                              │
+│  Command failed:                                                             │
+│    → Check command history (Key 8) for error messages                       │
+│    → Verify system setup (Key 5 → 1)                                        │
+│    → Check network interface (Key 5 → 3)                                    │
+│                                                                              │
+│  Permission denied:                                                          │
+│    → Some operations require sudo                                           │
+│    → Check script executable: chmod +x Launchers/secids-ui                  │
+│                                                                              │
+│  Configuration not saving:                                                   │
+│    → Check UI/ui_config.json exists and is writable                         │
+│    → Verify file permissions: ls -la UI/ui_config.json                      │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PATH VERIFICATION                                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Run comprehensive path check:                                              │
+│    python3 Scripts/verify_paths.py                                          │
+│                                                                              │
+│  Expected result: 98.1% pass rate (52/53 checks)                            │
+│  Note: TensorFlow warning is expected if not in current env                 │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DOCUMENTATION                                                                │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Master-Manual.md Section 5     Complete UI documentation                   │
+│  UI/README.md                   UI-specific guide                           │
+│  Reports/TERMINAL_UI_INTEGRATION.md    Integration report                   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TIPS & TRICKS                                                                │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  • Press Enter at prompts to accept default values                          │
+│  • Use command history (Key 8) to re-run previous commands                  │
+│  • Configuration auto-saves, no need to manually save                       │
+│  • UI integrates with all existing command-line tools                       │
+│  • Can still use bash Launchers/secids.sh for CLI access                    │
+│  • Settings (Key 9) persist between sessions                                │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║  For complete documentation, see Master-Manual.md Section 5                 ║
+║  For UI-specific details, see UI/README.md                                  ║
+║                                                                              ║
+║  Need help? Launch UI and explore menus with numbered keys!                 ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝

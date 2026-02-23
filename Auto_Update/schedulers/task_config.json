@@ -1,0 +1,38 @@
+{
+  "tasks": {
+    "dataset_cleanup": {
+      "enabled": true,
+      "interval_hours": 24,
+      "script": "Launchers/project_cleanup.sh",
+      "description": "Clean up and organize files"
+    },
+    "whitelist_update": {
+      "enabled": true,
+      "interval_hours": 168,
+      "script": "Device_Profile/device_info/capture_device_info.py",
+      "description": "Update device profile"
+    },
+    "dataset_refinement": {
+      "enabled": true,
+      "interval_hours": 72,
+      "script": "Scripts/refine_datasets.py",
+      "description": "Refine datasets with whitelist rules"
+    },
+    "model_validation": {
+      "enabled": true,
+      "interval_hours": 48,
+      "script": "Scripts/test_enhanced_model.py",
+      "description": "Validate model performance"
+    },
+    "blacklist_cleanup": {
+      "enabled": true,
+      "interval_hours": 168,
+      "description": "Remove old blacklist entries"
+    }
+  },
+  "thresholds": {
+    "max_csv_files": 50,
+    "max_refined_age_days": 30,
+    "max_blacklist_age_days": 90
+  }
+}

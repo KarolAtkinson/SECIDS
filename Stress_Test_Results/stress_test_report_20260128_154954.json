@@ -1,0 +1,326 @@
+{
+  "timestamp": "2026-01-28T15:49:54.156183",
+  "summary": {
+    "total_tests": 22,
+    "passed": 22,
+    "failed": 0,
+    "success_rate": 100.0,
+    "total_duration": 6.4776771068573
+  },
+  "categories": {
+    "integrity": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "processing": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "models": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "pipeline": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "error": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "edge": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "concurrency": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "results": [
+    {
+      "name": "Project Structure",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 0.00010418891906738281,
+      "details": {
+        "total_paths": 9,
+        "missing_paths": []
+      }
+    },
+    {
+      "name": "Python Imports",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 3.2456002235412598,
+      "details": {
+        "required_modules": [
+          "numpy",
+          "pandas",
+          "sklearn",
+          "tensorflow",
+          "scapy"
+        ],
+        "failed_imports": []
+      }
+    },
+    {
+      "name": "Model Files",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 0.00011301040649414062,
+      "details": {
+        "file_size": 342584,
+        "model_files_checked": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ],
+        "existing_models": [
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/SecIDS-CNN.h5",
+          "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN.h5"
+        ]
+      }
+    },
+    {
+      "name": "Dataset Availability",
+      "category": "integrity",
+      "passed": true,
+      "error": null,
+      "duration": 0.00019669532775878906,
+      "details": {
+        "dataset_count": 4,
+        "datasets": [
+          "ddos_training_dataset.csv",
+          "Test2.csv",
+          "Test1.csv",
+          "Test3.csv"
+        ]
+      }
+    },
+    {
+      "name": "CSV Loading",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.00431370735168457,
+      "details": {
+        "rows": 3,
+        "columns": 10,
+        "columns_list": [
+          "Destination Port",
+          "Flow Duration",
+          "Total Fwd Packets",
+          "Total Length of Fwd Packets",
+          "Flow Bytes/s",
+          "Flow Packets/s",
+          "Average Packet Size",
+          "Packet Length Std",
+          "FIN Flag Count",
+          "ACK Flag Count"
+        ]
+      }
+    },
+    {
+      "name": "Feature Extraction",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.0010128021240234375,
+      "details": {
+        "mean_packet_size": 736.8726876178873,
+        "max_flow_duration": 9985,
+        "min_flow_duration": 248
+      }
+    },
+    {
+      "name": "Data Normalization",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.011504411697387695,
+      "details": {
+        "mean_check": true,
+        "std_check": true
+      }
+    },
+    {
+      "name": "PCAP Conversion Script",
+      "category": "processing",
+      "passed": true,
+      "error": null,
+      "duration": 0.00012540817260742188,
+      "details": {
+        "has_main": true,
+        "has_argparse": true
+      }
+    },
+    {
+      "name": "SecIDS Model Loading",
+      "category": "models",
+      "passed": true,
+      "error": null,
+      "duration": 0.26235079765319824,
+      "details": {
+        "model_loaded": true,
+        "model_type": "SecIDSModel"
+      }
+    },
+    {
+      "name": "SecIDS Model Prediction",
+      "category": "models",
+      "passed": true,
+      "error": null,
+      "duration": 0.5664772987365723,
+      "details": {
+        "predictions_count": 4,
+        "unique_predictions": 2
+      }
+    },
+    {
+      "name": "Unified Model Import",
+      "category": "models",
+      "passed": true,
+      "error": null,
+      "duration": 0.09533572196960449,
+      "details": {
+        "import_success": true
+      }
+    },
+    {
+      "name": "Model Performance",
+      "category": "models",
+      "passed": true,
+      "error": null,
+      "duration": 0.5042614936828613,
+      "details": {
+        "samples": 1000,
+        "inference_time": 0.3823692798614502,
+        "samples_per_second": 2615.2728596877487,
+        "ms_per_sample": 0.3823692798614502
+      }
+    },
+    {
+      "name": "Pipeline Orchestrator",
+      "category": "pipeline",
+      "passed": true,
+      "error": null,
+      "duration": 0.00017309188842773438,
+      "details": {
+        "has_main": true,
+        "has_argparse": true,
+        "has_modes": true
+      }
+    },
+    {
+      "name": "Command Library",
+      "category": "pipeline",
+      "passed": true,
+      "error": null,
+      "duration": 7.677078247070312e-05,
+      "details": {
+        "has_commandlibrary": true,
+        "has_execute": true,
+        "has_shortcuts": true
+      }
+    },
+    {
+      "name": "Run Model Script",
+      "category": "pipeline",
+      "passed": true,
+      "error": null,
+      "duration": 0.0002117156982421875,
+      "details": {
+        "has_file_mode": true,
+        "has_live_mode": true,
+        "has_argparse": true
+      }
+    },
+    {
+      "name": "Missing File Handling",
+      "category": "error",
+      "passed": true,
+      "error": null,
+      "duration": 0.00024008750915527344,
+      "details": {
+        "error_raised": true,
+        "error_type": "FileNotFoundError"
+      }
+    },
+    {
+      "name": "Invalid Data Handling",
+      "category": "error",
+      "passed": true,
+      "error": null,
+      "duration": 0.27311158180236816,
+      "details": {
+        "handled_gracefully": true,
+        "prediction_made": true
+      }
+    },
+    {
+      "name": "Empty Dataset Handling",
+      "category": "error",
+      "passed": true,
+      "error": null,
+      "duration": 0.0024633407592773438,
+      "details": {
+        "handled": false,
+        "error": "No columns to parse from file"
+      }
+    },
+    {
+      "name": "Single Row Prediction",
+      "category": "edge",
+      "passed": true,
+      "error": null,
+      "duration": 0.2715473175048828,
+      "details": {
+        "prediction_count": 1
+      }
+    },
+    {
+      "name": "Large Values",
+      "category": "edge",
+      "passed": true,
+      "error": null,
+      "duration": 0.27867865562438965,
+      "details": {
+        "handled_large_values": true
+      }
+    },
+    {
+      "name": "Zero Values",
+      "category": "edge",
+      "passed": true,
+      "error": null,
+      "duration": 0.30954670906066895,
+      "details": {
+        "handled_zeros": true
+      }
+    },
+    {
+      "name": "Concurrent Predictions",
+      "category": "concurrency",
+      "passed": true,
+      "error": null,
+      "duration": 0.6496841907501221,
+      "details": {
+        "threads": 5,
+        "errors": [],
+        "error_count": 0,
+        "thread_safe": true
+      }
+    }
+  ],
+  "failed_tests": []
+}

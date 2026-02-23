@@ -1,0 +1,25 @@
+UNIFIED THREAT DETECTION MODEL - METRICS SUMMARY
+================================================================================
+Timestamp: 20260127_103014
+Training Samples: 12000
+Test Samples: 3000
+Features Used: 10
+
+Features:
+  1. Destination Port
+  2. Flow Duration
+  3. Total Fwd Packets
+  4. Total Length of Fwd Packets
+  5. Flow Bytes/s
+  6. Flow Packets/s
+  7. Average Packet Size
+  8. Packet Length Std
+  9. FIN Flag Count
+  10. ACK Flag Count
+
+Performance Metrics:
+  accuracy: 0.9997
+  precision: 0.9990
+  recall: 1.0000
+  f1: 0.9995
+  roc_auc: 1.0000

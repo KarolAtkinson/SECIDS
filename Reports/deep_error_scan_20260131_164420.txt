@@ -1,0 +1,260 @@
+DEEP ERROR SCAN REPORT
+======================================================================
+Scan Date: 2026-01-31 16:44:20
+
+STATISTICS:
+  Files Scanned: 73
+  Files with Issues: 54
+  Errors: 32
+  Warnings: 71
+  Info: 4732
+
+ERRORS:
+======================================================================
+
+Auto_Update/task_scheduler.py:
+  [SyntaxError] Line 49: expected an indented block after 'except' statement on line 47 (<unknown>, line 49)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 47 (task_scheduler.py, line 49)
+
+Countermeasures/ddos_countermeasure.py:
+  [SyntaxError] Line 89: expected an indented block after 'except' statement on line 87 (<unknown>, line 89)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 87 (ddos_countermeasure.py, line 89)
+
+Scripts/comprehensive_debug_scan.py:
+  [SyntaxError] Line 137: expected an indented block after 'except' statement on line 135 (<unknown>, line 137)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 135 (comprehensive_debug_scan.py, line 137)
+
+Scripts/optimize_system.py:
+  [SyntaxError] Line 41: expected an indented block after 'except' statement on line 39 (<unknown>, line 41)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 39 (optimize_system.py, line 41)
+
+Scripts/organize_files.py:
+  [SyntaxError] Line 492: expected an indented block after 'except' statement on line 490 (<unknown>, line 492)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 490 (organize_files.py, line 492)
+
+SecIDS-CNN/run_model.py:
+  [SyntaxError] Line 470: expected an indented block after 'except' statement on line 468 (<unknown>, line 470)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 468 (run_model.py, line 470)
+
+SecIDS-CNN/train_and_test.py:
+  [SyntaxError] Line 214: expected an indented block after 'except' statement on line 212 (<unknown>, line 214)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 212 (train_and_test.py, line 214)
+
+Tools/continuous_live_capture.py:
+  [SyntaxError] Line 224: expected an indented block after 'except' statement on line 222 (<unknown>, line 224)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 222 (continuous_live_capture.py, line 224)
+
+Tools/create_enhanced_dataset.py:
+  [SyntaxError] Line 173: expected an indented block after 'except' statement on line 171 (<unknown>, line 173)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 171 (create_enhanced_dataset.py, line 173)
+
+Tools/live_capture_and_assess.py:
+  [SyntaxError] Line 208: expected an indented block after 'except' statement on line 206 (<unknown>, line 208)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 206 (live_capture_and_assess.py, line 208)
+
+Tools/system_checker.py:
+  [SyntaxError] Line 121: expected an indented block after 'except' statement on line 119 (<unknown>, line 121)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 119 (system_checker.py, line 121)
+
+Tools/threat_reviewer.py:
+  [SyntaxError] Line 190: expected an indented block after 'except' statement on line 188 (<unknown>, line 190)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 188 (threat_reviewer.py, line 190)
+
+Tools/vm_scanner.py:
+  [SyntaxError] Line 126: expected an indented block after 'except' statement on line 124 (<unknown>, line 126)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 124 (vm_scanner.py, line 126)
+
+Tools/wireshark_manager.py:
+  [SyntaxError] Line 118: expected an indented block after 'except' statement on line 116 (<unknown>, line 118)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 116 (wireshark_manager.py, line 118)
+
+UI/terminal_ui_enhanced.py:
+  [SyntaxError] Line 93: expected an indented block after 'except' statement on line 91 (<unknown>, line 93)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 91 (terminal_ui_enhanced.py, line 93)
+
+UI/terminal_ui_v2.py:
+  [SyntaxError] Line 304: expected an indented block after 'except' statement on line 302 (<unknown>, line 304)
+  [CompilationError] Sorry: IndentationError: expected an indented block after 'except' statement on line 302 (terminal_ui_v2.py, line 304)
+
+
+WARNINGS:
+======================================================================
+
+Auto_Update/monitors/system_monitor.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Auto_Update/task_scheduler.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 47 (<unknown>, line 49)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Countermeasures/ddos_countermeasure.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 87 (<unknown>, line 89)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Countermeasures/test_countermeasure.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Model_Tester/Code/run_and_save_model.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Model_Tester/Code/test_unified_model.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Model_Tester/Code/train_unified_model.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/analyze_threat_origins.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/automated_quality_fixer.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/automated_ui_test.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/automatic_bug_fixer.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/comprehensive_debug_scan.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 135 (<unknown>, line 137)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/create_master_dataset.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/debug_demo.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/interactive_ui_test.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/optimize_system.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 39 (<unknown>, line 41)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/organize_files.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 490 (<unknown>, line 492)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/production_debug_scan.py:
+  [EmptyExcept] Line 156: Empty except block - errors are silently ignored
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/redundancy_detector.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/refine_datasets.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/setup_tensorflow.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/stress_test.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/test_deep_scan.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/test_enhanced_model.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/test_ui_system.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Scripts/verify_paths.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+SecIDS-CNN/run_model.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 468 (<unknown>, line 470)
+
+SecIDS-CNN/train_and_test.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 212 (<unknown>, line 214)
+
+SecIDS-CNN/train_master_model.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/add_ip_source.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/command_library.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/comprehensive_test.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/continuous_live_capture.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 222 (<unknown>, line 224)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/create_enhanced_dataset.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 171 (<unknown>, line 173)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/csv_workflow_manager.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/dataset_path_helper.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/deep_scan.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/final_test_suite.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/frontend_test_script.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/interactive_test.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/live_capture_and_assess.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 206 (<unknown>, line 208)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/pcap_to_secids_csv.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/pipeline_orchestrator.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/progress_utils.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/report_generator.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/system_checker.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 119 (<unknown>, line 121)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/test_enhancements.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/threat_reviewer.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 188 (<unknown>, line 190)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/update_lists.py:
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/verify_setup.py:
+  [EmptyExcept] Line 28: Empty except block - errors are silently ignored
+  [EmptyExcept] Line 43: Empty except block - errors are silently ignored
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/vm_scanner.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 124 (<unknown>, line 126)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+Tools/wireshark_manager.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 116 (<unknown>, line 118)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+UI/terminal_ui_enhanced.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 91 (<unknown>, line 93)
+  [ShebangWarning] Line 1: Using system Python instead of venv
+
+UI/terminal_ui_v2.py:
+  [ASTParseWarning] Could not fully analyze: expected an indented block after 'except' statement on line 302 (<unknown>, line 304)
+  [ShebangWarning] Line 1: Using system Python instead of venv

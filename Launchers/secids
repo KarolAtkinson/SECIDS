@@ -1,0 +1,12 @@
+#!/bin/bash
+# Quick launcher - SecIDS main launcher with system integration
+cd "$(dirname "$0")" || exit 1
+cd .. || exit 1
+
+# Use integrated launcher if available
+if [ -f "secids_main.py" ] && [ -f ".venv_test/bin/python" ]; then
+    .venv_test/bin/python secids_main.py "$@"
+else
+    # Fallback to old launcher
+    ./Launchers/secids.sh "$@"
+fi

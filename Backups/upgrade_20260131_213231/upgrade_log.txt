@@ -1,0 +1,31 @@
+[2026-01-31 21:32:31] [INFO] Starting system upgrade (Safe Mode: True)
+[2026-01-31 21:32:31] [INFO] Creating backup of critical files...
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: requirements.txt
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: pyrightconfig.json
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: secids_main.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: system_integrator.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: Auto_Update/__init__.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: Scripts/__init__.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: UI/__init__.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: Tools/__init__.py
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Backed up: Countermeasures/__init__.py
+[2026-01-31 21:32:31] [SUCCESS] Backup completed: /home/kali/Documents/Code/SECIDS-CNN/Backups/upgrade_20260131_213231
+[2026-01-31 21:32:31] [INFO] Checking Python version...
+[2026-01-31 21:32:31] [SUCCESS]   ✓ Python 3.10.13 is compatible
+[2026-01-31 21:32:31] [INFO] Updating pip...
+[2026-01-31 21:32:33] [SUCCESS]   ✓ pip updated successfully
+[2026-01-31 21:32:33] [INFO] Upgrading Python packages...
+[2026-01-31 21:32:33] [INFO]   Installing packages from requirements.txt (safe mode)...
+[2026-01-31 21:32:45] [SUCCESS]   ✓ Packages upgraded successfully
+[2026-01-31 21:32:45] [INFO] Verifying critical imports...
+[2026-01-31 21:32:55] [ERROR]   ✗ TensorFlow: Command '['/home/kali/Documents/Code/SECIDS-CNN/.venv_test/bin/python', '-c', 'import tensorflow; print(tensorflow.__version__)']' timed out after 10 seconds
+[2026-01-31 21:33:04] [SUCCESS]   ✓ Keras: 3.12.1
+[2026-01-31 21:33:04] [SUCCESS]   ✓ NumPy: 2.2.6
+[2026-01-31 21:33:05] [SUCCESS]   ✓ Pandas: 2.3.3
+[2026-01-31 21:33:05] [SUCCESS]   ✓ scikit-learn: 1.7.2
+[2026-01-31 21:33:05] [SUCCESS]   ✓ Scapy: 2.7.0
+[2026-01-31 21:33:05] [ERROR]   ✗ Rich: Import failed
+[2026-01-31 21:33:05] [INFO] Checking model files...
+[2026-01-31 21:33:05] [SUCCESS]   ✓ SecIDS-CNN.h5: 0.33 MB
+[2026-01-31 21:33:05] [INFO] Running syntax checks...
+[2026-01-31 21:33:10] [SUCCESS]   ✓ All 50 files passed syntax check

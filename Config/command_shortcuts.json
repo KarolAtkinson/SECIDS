@@ -1,0 +1,275 @@
+{
+  "verify": {
+    "cmd": "python3 tools/verify_setup.py",
+    "description": "Verify system setup and dependencies",
+    "category": "setup",
+    "sudo": false
+  },
+  "install-deps": {
+    "cmd": "pip install -r SecIDS-CNN/requirements.txt && pip install scapy",
+    "description": "Install all required dependencies",
+    "category": "setup",
+    "sudo": false
+  },
+  "check-iface": {
+    "cmd": "ip link show",
+    "description": "List available network interfaces",
+    "category": "setup",
+    "sudo": false
+  },
+  "pipeline-full": {
+    "cmd": "python3 pipeline_orchestrator.py --mode full",
+    "description": "Run complete pipeline (capture, train, detect)",
+    "category": "pipeline",
+    "sudo": true
+  },
+  "pipeline-capture": {
+    "cmd": "python3 pipeline_orchestrator.py --mode capture --iface {iface} --duration {duration}",
+    "description": "Capture and analyze traffic",
+    "category": "pipeline",
+    "sudo": true,
+    "params": [
+      "iface",
+      "duration"
+    ]
+  },
+  "pipeline-train": {
+    "cmd": "python3 pipeline_orchestrator.py --mode train",
+    "description": "Train all models",
+    "category": "pipeline",
+    "sudo": false
+  },
+  "pipeline-detect-live": {
+    "cmd": "python3 pipeline_orchestrator.py --mode detect-live --iface {iface} --duration {duration}",
+    "description": "Live threat detection",
+    "category": "pipeline",
+    "sudo": true,
+    "params": [
+      "iface",
+      "duration"
+    ]
+  },
+  "pipeline-detect-batch": {
+    "cmd": "python3 pipeline_orchestrator.py --mode detect-batch --input {input_file}",
+    "description": "Batch threat detection on CSV file",
+    "category": "pipeline",
+    "sudo": false,
+    "params": [
+      "input_file"
+    ]
+  },
+  "live-detect": {
+    "cmd": "python3 SecIDS-CNN/run_model.py live --iface {iface}",
+    "description": "Live detection with default settings",
+    "category": "detection",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "live-detect-fast": {
+    "cmd": "python3 SecIDS-CNN/run_model.py live --iface {iface} --window 6 --interval 4",
+    "description": "Live detection with fast processing (6s window, 4s interval)",
+    "category": "detection",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "live-detect-slow": {
+    "cmd": "python3 SecIDS-CNN/run_model.py live --iface {iface} --window 20 --interval 10",
+    "description": "Live detection with slower processing (20s window, 10s interval)",
+    "category": "detection",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "live-detect-unified": {
+    "cmd": "python3 SecIDS-CNN/run_model.py live --iface {iface} --backend unified",
+    "description": "Live detection using unified model backend",
+    "category": "detection",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "detect-file": {
+    "cmd": "python3 SecIDS-CNN/run_model.py file {csv_file}",
+    "description": "Detect threats in CSV file",
+    "category": "detection",
+    "sudo": false,
+    "params": [
+      "csv_file"
+    ]
+  },
+  "detect-multiple": {
+    "cmd": "python3 SecIDS-CNN/run_model.py file {csv_files}",
+    "description": "Detect threats in multiple CSV files",
+    "category": "detection",
+    "sudo": false,
+    "params": [
+      "csv_files"
+    ]
+  },
+  "capture-quick": {
+    "cmd": "dumpcap -i {iface} -a duration:60 -w captures/capture_$(date +%s).pcap",
+    "description": "Quick 60-second capture",
+    "category": "capture",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "capture-custom": {
+    "cmd": "dumpcap -i {iface} -a duration:{duration} -w captures/capture_$(date +%s).pcap",
+    "description": "Custom duration capture",
+    "category": "capture",
+    "sudo": true,
+    "params": [
+      "iface",
+      "duration"
+    ]
+  },
+  "capture-continuous": {
+    "cmd": "python3 tools/continuous_live_capture.py --iface {iface}",
+    "description": "Continuous capture with auto-processing",
+    "category": "capture",
+    "sudo": true,
+    "params": [
+      "iface"
+    ]
+  },
+  "pcap-to-csv": {
+    "cmd": "python3 tools/pcap_to_secids_csv.py -i {pcap_file} -o {output_csv}",
+    "description": "Convert PCAP to SecIDS CSV format",
+    "category": "processing",
+    "sudo": false,
+    "params": [
+      "pcap_file",
+      "output_csv"
+    ]
+  },
+  "enhance-dataset": {
+    "cmd": "python3 tools/create_enhanced_dataset.py {input_csv} {output_csv}",
+    "description": "Add enhanced features to dataset",
+    "category": "processing",
+    "sudo": false,
+    "params": [
+      "input_csv",
+      "output_csv"
+    ]
+  },
+  "train-secids": {
+    "cmd": "python3 SecIDS-CNN/train_and_test.py",
+    "description": "Train SecIDS-CNN model",
+    "category": "training",
+    "sudo": false
+  },
+  "train-unified": {
+    "cmd": "python3 'Master ML_AI/Code/train_unified_model.py'",
+    "description": "Train unified threat model",
+    "category": "training",
+    "sudo": false
+  },
+  "train-master": {
+    "cmd": "python3 'Master ML_AI/Code/main.py'",
+    "description": "Run complete Master ML/AI pipeline",
+    "category": "training",
+    "sudo": false
+  },
+  "test-unified": {
+    "cmd": "python3 'Master ML_AI/Code/test_unified_model.py'",
+    "description": "Test unified model",
+    "category": "testing",
+    "sudo": false
+  },
+  "test-enhanced": {
+    "cmd": "python3 test_enhanced_model.py",
+    "description": "Test enhanced model features",
+    "category": "testing",
+    "sudo": false
+  },
+  "analyze-threats": {
+    "cmd": "python3 analyze_threat_origins.py",
+    "description": "Analyze threat origins from detection results",
+    "category": "analysis",
+    "sudo": false
+  },
+  "analyze-results": {
+    "cmd": "python3 tools/live_capture_and_assess.py --iface {iface} --window {window}",
+    "description": "Live capture and assessment",
+    "category": "analysis",
+    "sudo": true,
+    "params": [
+      "iface",
+      "window"
+    ]
+  },
+  "list-captures": {
+    "cmd": "ls -lh captures/",
+    "description": "List captured PCAP files",
+    "category": "utility",
+    "sudo": false
+  },
+  "list-datasets": {
+    "cmd": "ls -lh SecIDS-CNN/datasets/ 'Master ML_AI/Code/datasets/'",
+    "description": "List available datasets",
+    "category": "utility",
+    "sudo": false
+  },
+  "list-models": {
+    "cmd": "ls -lh SecIDS-CNN/*.h5 'Master ML_AI/Code/models/'",
+    "description": "List trained models",
+    "category": "utility",
+    "sudo": false
+  },
+  "clean-temp": {
+    "cmd": "rm -f captures/capture_temp_*.pcap && rm -f /tmp/secids_*",
+    "description": "Clean temporary files",
+    "category": "utility",
+    "sudo": false
+  },
+  "quick-test": {
+    "cmd": "python3 SecIDS-CNN/run_model.py file SecIDS-CNN/datasets/Test1.csv",
+    "description": "Quick test with Test1 dataset",
+    "category": "testing",
+    "sudo": false
+  },
+  "full-test": {
+    "cmd": "python3 SecIDS-CNN/run_model.py file SecIDS-CNN/datasets/Test1.csv SecIDS-CNN/datasets/Test2.csv SecIDS-CNN/datasets/Test3.csv",
+    "description": "Full test with all test datasets",
+    "category": "testing",
+    "sudo": false
+  },
+  "csv-status": {
+    "cmd": "python3 csv_workflow_manager.py --action status",
+    "description": "Show CSV workflow status",
+    "category": "workflow",
+    "sudo": false
+  },
+  "csv-full": {
+    "cmd": "python3 csv_workflow_manager.py --action full",
+    "description": "Run full CSV workflow pipeline",
+    "category": "workflow",
+    "sudo": false
+  },
+  "csv-organize": {
+    "cmd": "python3 csv_workflow_manager.py --action organize",
+    "description": "Organize CSV files to training directory",
+    "category": "workflow",
+    "sudo": false
+  },
+  "csv-train": {
+    "cmd": "python3 csv_workflow_manager.py --action train --model unified",
+    "description": "Train models and generate results",
+    "category": "workflow",
+    "sudo": false
+  },
+  "cleanup": {
+    "cmd": "./project_cleanup.sh",
+    "description": "Run project organization and cleanup",
+    "category": "maintenance",
+    "sudo": false
+  }
+}

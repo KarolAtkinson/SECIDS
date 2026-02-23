@@ -1,0 +1,215 @@
+{
+  "timestamp": "2026-01-31T16:20:28.595540",
+  "project_root": "/home/kali/Documents/Code/SECIDS-CNN",
+  "statistics": {
+    "total_files": 65,
+    "scanned_files": 65,
+    "files_with_errors": 22,
+    "total_errors": 36
+  },
+  "errors": {
+    "syntax_errors": [],
+    "indentation_errors": [],
+    "encoding_errors": [],
+    "compilation_errors": [],
+    "undefined_names": [
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/redundancy_detector.py",
+        "type": "undefined_names",
+        "line": 62,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/analyze_threat_origins.py",
+        "type": "undefined_names",
+        "line": 15,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/optimize_system.py",
+        "type": "undefined_names",
+        "line": 39,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/optimize_system.py",
+        "type": "undefined_names",
+        "line": 236,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/organize_files.py",
+        "type": "undefined_names",
+        "line": 439,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/organize_files.py",
+        "type": "undefined_names",
+        "line": 452,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/organize_files.py",
+        "type": "undefined_names",
+        "line": 516,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/organize_files.py",
+        "type": "undefined_names",
+        "line": 543,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Scripts/organize_files.py",
+        "type": "undefined_names",
+        "line": 471,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/UI/terminal_ui_enhanced.py",
+        "type": "undefined_names",
+        "line": 91,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/UI/terminal_ui_v2.py",
+        "type": "undefined_names",
+        "line": 302,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Device_Profile/device_info/blacklist_manager.py",
+        "type": "undefined_names",
+        "line": 367,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Device_Profile/device_info/blacklist_manager.py",
+        "type": "undefined_names",
+        "line": 417,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/threat_reviewer.py",
+        "type": "undefined_names",
+        "line": 188,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/create_enhanced_dataset.py",
+        "type": "undefined_names",
+        "line": 38,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/create_enhanced_dataset.py",
+        "type": "undefined_names",
+        "line": 49,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/create_enhanced_dataset.py",
+        "type": "undefined_names",
+        "line": 170,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 67,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 149,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 165,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 180,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 208,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/system_checker.py",
+        "type": "undefined_names",
+        "line": 119,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/vm_scanner.py",
+        "type": "undefined_names",
+        "line": 311,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Tools/vm_scanner.py",
+        "type": "undefined_names",
+        "line": 124,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/Countermeasures/ddos_countermeasure.py",
+        "type": "undefined_names",
+        "line": 87,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/secids_cnn.py",
+        "type": "undefined_names",
+        "line": 88,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      },
+      {
+        "file": "/home/kali/Documents/Code/SECIDS-CNN/SecIDS-CNN/run_model.py",
+        "type": "undefined_names",
+        "line": 583,
+        "message": "Bare except: catches all exceptions (bad practice)",
+        "text": "except:"
+      }
+    ],
+    "unused_imports": []
+  }
+}
