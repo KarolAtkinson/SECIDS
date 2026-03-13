@@ -97,8 +97,8 @@ def assess_csv(csv_path: Path, model_path: str = None):
     # Use predict_proba if available
     try:
         probs = model.predict_proba(df)
-    except Exception:
-        # fallback: use predict
+    except AttributeError:
+        # Model doesn't have predict_proba - fallback to predict
         labels = model.predict(df)
         probs = None
 
@@ -203,8 +203,8 @@ def main():
             if not args.keep_pcap:
                 try:
                     pcap.unlink()
-                except Exception as e:
-                    pass  # Skip on error
+                except OSError as exc:
+                    print(f'Failed to delete pcap file {pcap}: {exc}')
             if args.once:
                 break
 

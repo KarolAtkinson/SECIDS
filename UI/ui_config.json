@@ -1,29 +1,57 @@
 {
   "last_interface": "eth0",
-  "last_duration": 120,
-  "last_window": 10,
-  "last_interval": 4,
+  "last_duration": 60,
+  "last_window": 5,
+  "last_interval": 2,
+  "countermeasure_mode": "active",
+  "live_model_mode": "auto",
+  "live_model_path": "ServerDB/modelDB/artifacts/Models/SecIDS-CNN_rf.pkl",
+  "live_backend": "unified",
   "theme": "default",
+  "ws_theme": "Dark",
+  "ws_language": "en-US",
+  "ws_layout_profile": "Wireshark Classic",
+  "ws_packet_list_visible": true,
+  "ws_packet_details_visible": true,
+  "ws_packet_bytes_visible": true,
+  "ws_show_column_number": true,
+  "ws_show_column_time": true,
+  "ws_show_column_source": true,
+  "ws_show_column_destination": true,
+  "ws_show_column_protocol": true,
+  "ws_show_column_length": true,
+  "ws_show_column_info": false,
+  "ws_font_family": "Monospace",
+  "ws_font_size": 14,
+  "ws_colorize_packet_list": true,
+  "ws_resolve_mac": true,
+  "ws_resolve_network": false,
+  "ws_resolve_transport": false,
+  "ws_capture_promisc_mode": true,
+  "ws_capture_monitor_mode": false,
+  "ws_capture_update_realtime": true,
+  "ws_enable_filter_buttons": true,
+  "ws_filter_profile": "Default",
+  "ws_protocols_enabled_profile": "All",
+  "ws_expert_custom_enabled": false,
+  "ws_expert_severity_policy": "Default",
+  "ws_rsa_keys_profile": "Default",
+  "ws_advanced_show_changed_only": false,
+  "ws_advanced_search_text": "",
+  "ws_statistics_auto_update": true,
+  "ws_statistics_interval": 4,
   "history": [
     {
-      "command": "sudo python3 Tools/deep_scan.py --iface eth0 --duration 300 --interval 30",
-      "timestamp": "2026-01-29T19:41:06.586325"
+      "command": "python3 Tools/simulate_ddos_workflow.py --architecture-type school --attacker-profile mixed --defender-profile adaptive-ai --countermeasure-mode active --intensity low --attackers 1 --duration 10 --seed 101",
+      "timestamp": "2026-03-10T20:30:08.848156"
     },
     {
-      "command": "python3 Tools/deep_scan.py --file SecIDS-CNN/datasets/Test_Deep_Scan.csv --passes 3",
-      "timestamp": "2026-01-29T15:08:27.840963"
+      "command": "sudo /home/kali/Documents/Code/SECIDS-CNN/.venv_test/bin/python Tools/deep_scan.py --iface eth0 --duration 600 --interval 60",
+      "timestamp": "2026-03-11T11:49:00.664077"
     },
     {
-      "command": "python3 Tools/deep_scan.py --file SecIDS-CNN/datasets/Test_Deep_Scan.csv --passes 3",
-      "timestamp": "2026-01-29T15:08:16.550231"
-    },
-    {
-      "command": "sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --window 5 --interval 2",
-      "timestamp": "2026-01-29T14:38:24.949521"
-    },
-    {
-      "command": "sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --window 5 --interval 2",
-      "timestamp": "2026-01-29T14:01:28.646987"
+      "command": "python3 Tools/simulate_ddos_workflow.py --architecture-type library --attacker-profile mixed --defender-profile adaptive-ai --countermeasure-mode active --intensity high --attackers 118 --duration 1800 --seed 50 --retrain",
+      "timestamp": "2026-03-13T13:41:07.289959"
     }
   ]
 }

@@ -185,8 +185,9 @@ class ThreatReviewer:
                     port = profile.get('network', {}).get('dst_port', 0)
                     if port > 0:
                         port_counts[port] += 1
-            except Exception as e:
-                pass  # Skip on error
+            except (json.JSONDecodeError, OSError):
+                # Cannot read threat file
+                continue
         # Sort by count
         top_ports = sorted(port_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         for port, count in top_ports:

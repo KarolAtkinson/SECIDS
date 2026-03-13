@@ -52,18 +52,20 @@ except Exception as e:
     all_installed = False
 
 try:
-    from tensorflow import keras
-    print("✓ from tensorflow import keras")
+    import tensorflow as tf
+    _ = tf.keras
+    print("✓ tensorflow.keras available")
 except Exception as e:
-    print("✗ from tensorflow import keras")
+    print("✗ tensorflow.keras available")
     print(f"  Error: {e}")
     all_installed = False
 
 try:
-    from tensorflow.keras import layers
-    print("✓ from tensorflow.keras import layers")
+    import tensorflow as tf
+    _ = tf.keras.layers
+    print("✓ tensorflow.keras.layers available")
 except Exception as e:
-    print("✗ from tensorflow.keras import layers")
+    print("✗ tensorflow.keras.layers available")
     print(f"  Error: {e}")
     all_installed = False
 

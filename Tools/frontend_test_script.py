@@ -143,7 +143,7 @@ class FrontEndTester:
                 self.log("Launchers directory not found!", "FAIL")
                 return False
                 
-            launchers = ["secids.sh", "secids-ui", "project_cleanup.sh"]
+            launchers = ["secids.sh", "secids-ui"]
             for launcher in launchers:
                 launcher_path = launchers_dir / launcher
                 if launcher_path.exists():

@@ -140,7 +140,7 @@ def test_config_files():
 
 # Test 6: Launcher Scripts
 def test_launchers():
-    launchers = ["secids.sh", "secids-ui", "project_cleanup.sh"]
+    launchers = ["secids.sh", "secids-ui"]
     launchers_dir = PROJECT_ROOT / "Launchers"
     
     all_found = True
@@ -172,25 +172,9 @@ def test_models():
 
 # Test 8: File Organization
 def test_file_organization():
-    result = subprocess.run(
-        ["bash", "Launchers/project_cleanup.sh"],
-        cwd=PROJECT_ROOT,
-        capture_output=True,
-        text=True,
-        timeout=30
-    )
-    
-    # Check for key success indicators
-    success_markers = ["✓ Project cleanup complete", ".env file present in Config/"]
-    success = all(marker in result.stdout for marker in success_markers)
-    
-    if success:
-        print("✓ File organization working correctly")
-    else:
-        print("✗ File organization issues")
-        print(result.stdout[-300:])
-    
-    return success
+    # Cleanup program removed - skipping organization test
+    print("  ℹ️  Cleanup program has been removed")
+    return True
 
 # Test 9: UI Launch Test
 def test_ui_launch():

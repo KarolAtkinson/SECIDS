@@ -21,6 +21,10 @@ from sklearn.metrics import (
 import warnings
 warnings.filterwarnings('ignore')
 
+from path_config import DATASETS_DIR, MODELS_DIR, TRAINING_DATA_DIR, ensure_model_tester_dirs
+
+ensure_model_tester_dirs()
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -110,10 +114,9 @@ class UnifiedThreatModel:
         
         # Default dataset directories
         if dataset_dirs is None:
-            base_path = Path(__file__).parent.parent
             dataset_dirs = [
-                base_path / "Code" / "datasets",  # New SecIDS-CNN datasets
-                base_path / "Threat_Detection_Model_1"  # Existing datasets
+                DATASETS_DIR,
+                TRAINING_DATA_DIR,
             ]
         
         self.dataset_dirs = [Path(d) for d in dataset_dirs]
@@ -130,6 +133,7 @@ class UnifiedThreatModel:
         self.X_test = None
         self.y_train = None
         self.y_test = None
+        self.y_pred = None  # Predictions from ensemble model
         
         # Feature tracking
         self.numeric_features = []
@@ -352,6 +356,10 @@ class UnifiedThreatModel:
         logger.info("MODEL EVALUATION")
         logger.info("="*80)
         
+        # Ensure y_test and y_pred are set (they should be from training)
+        assert self.y_test is not None, "y_test not initialized"
+        assert self.y_pred is not None, "y_pred not initialized"
+        
         # Calculate metrics
         accuracy = accuracy_score(self.y_test, self.y_pred)
         precision = precision_score(self.y_test, self.y_pred, zero_division=0)
@@ -381,7 +389,8 @@ class UnifiedThreatModel:
         
         # Classification report
         logger.info(f"\nDetailed Classification Report:")
-        logger.info("\n" + classification_report(self.y_test, self.y_pred, zero_division=0))
+        report = classification_report(self.y_test, self.y_pred, zero_division=0)
+        logger.info("\n" + str(report))  # Ensure string concatenation works
         
         # Confusion matrix
         cm = confusion_matrix(self.y_test, self.y_pred)
@@ -422,6 +431,8 @@ class UnifiedThreatModel:
         logger.info(f"  ✓ Scaler saved: {scaler_path}")
         
         # Save metadata
+        assert self.X_train is not None and self.X_test is not None, "Training/test data not initialized"
+        
         metadata = {
             'timestamp': timestamp,
             'feature_names': feature_names,

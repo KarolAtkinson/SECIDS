@@ -1,0 +1,22 @@
+[Unit]
+Description=SecIDS-CNN WebUI (Database Server Hosted)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=secids
+Group=secids
+WorkingDirectory=/opt/secids/SECIDS-CNN
+Environment=SECIDS_WEB_HOST=127.0.0.1
+Environment=SECIDS_WEB_PORT=8080
+Environment=SECIDS_WEB_OPEN_BROWSER=0
+Environment=SECIDS_WEB_SECRET=change-me-to-a-strong-secret
+Environment=SECIDS_SERVER_DB_ROOT=/srv/secids/ServerDB
+ExecStart=/opt/secids/SECIDS-CNN/.venv_test/bin/python WebUI/production_server.py
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

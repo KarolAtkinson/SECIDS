@@ -60,3 +60,16 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+# Auto-Update Logs
+Auto_Update/logs/*.log
+Auto_Update/logs/*.txt
+
+# Sensitive Configuration
+Config/*.env
+Config/webui_users.json
+Config/webui_runtime.json
+**/credentials.json
+**/.env
+
+# Runtime Database (contains user credentials and live data)
+ServerDB/

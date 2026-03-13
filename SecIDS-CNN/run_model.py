@@ -13,6 +13,8 @@ from collections import deque
 from datetime import datetime
 import glob
 
+from ml_feature_utils import build_feature_frame, align_feature_dimension
+
 # Add Tools and Countermeasures to path
 tools_path = Path(__file__).parent.parent / 'Tools'
 countermeasures_path = Path(__file__).parent.parent / 'Countermeasures'
@@ -84,6 +86,21 @@ def print_progress_bar(iteration, total, prefix='', suffix='', length=50):
     if iteration == total:
         print()
 
+
+def get_model_expected_feature_dim(model):
+    """Best-effort extraction of model input feature dimension."""
+    try:
+        base_model = getattr(model, 'model', model)
+        input_shape = getattr(base_model, 'input_shape', None)
+        if isinstance(input_shape, list) and input_shape:
+            input_shape = input_shape[0]
+        if isinstance(input_shape, tuple) and len(input_shape) >= 2:
+            dim = input_shape[1]
+            return int(dim) if dim is not None else None
+    except Exception:
+        return None
+    return None
+
 def run_file_based_detection(data_paths, model, scaler):
     """Process static CSV files with threat detection."""
     print("="*80)
@@ -126,17 +143,20 @@ def run_file_based_detection(data_paths, model, scaler):
         # Step 3: Preprocess data
         print("🔧 Preprocessing network traffic data...")
         
-        # Drop the is_ddos label column if it exists (for prediction purposes)
-        X = df.drop(columns=["is_ddos"], errors="ignore")
+        # Build robust feature frame (drops label/meta fields and normalizes dtypes)
+        X = build_feature_frame(df, target_col=None, drop_targets=True, prefer_core_columns=True)
         print(f"  Features shape: {X.shape}")
         
         # Fill missing values
         print("  Filling missing values...")
         X = X.fillna(X.mean(numeric_only=True))
-        
-        # Select only numeric columns
+
+        # Select only numeric columns and align to model dimension if known
         numeric_cols = X.select_dtypes(include=[np.number]).columns
         X = X[numeric_cols]
+        expected_dim = get_model_expected_feature_dim(model)
+        X = align_feature_dimension(X, expected_dim)
+        numeric_cols = X.columns
         print(f"  Selected {len(numeric_cols)} numeric features")
         
         # Normalize/Scale the features
@@ -161,8 +181,9 @@ def run_file_based_detection(data_paths, model, scaler):
             try:
                 batch_probs = model.predict_proba(batch_X)
                 all_probs.append(batch_probs)
-            except Exception:
+            except Exception as e:
                 # Fallback if predict_proba not available
+                print(f"Warning: predict_proba failed, using predict: {e}", file=sys.stderr)
                 raw = model.predict(batch_X)
                 if hasattr(raw, '__iter__'):
                     all_probs.append(np.array([float(r) if not isinstance(r, str) else (1.0 if r == 'Attack' else 0.0) for r in raw]))
@@ -467,7 +488,8 @@ def run_continuous_detection(iface, window_size=5.0, interval=2.0, model=None):
                         if 'A' in flag_str:
                             ack_count += 1
                     except Exception as e:
-                        pass  # Skip on error
+                        # Skip malformed flag parsing
+                        continue
                 rows.append({
                     'Destination Port': int(flow['dst_port']),
                     'Flow Duration': int(duration_us),
@@ -493,6 +515,9 @@ def run_continuous_detection(iface, window_size=5.0, interval=2.0, model=None):
             # Extract IP info before prediction (remove from features)
             ip_info = df[['_src_ip', '_dst_ip']].copy()
             prediction_df = df.drop(columns=['_src_ip', '_dst_ip'], errors='ignore')
+            prediction_df = build_feature_frame(prediction_df, target_col=None, drop_targets=True, prefer_core_columns=True)
+            expected_dim = get_model_expected_feature_dim(model)
+            prediction_df = align_feature_dimension(prediction_df, expected_dim)
             
             # Make predictions
             result = prediction_df.copy()
@@ -541,11 +566,9 @@ def run_continuous_detection(iface, window_size=5.0, interval=2.0, model=None):
                     
                     # Send threat to countermeasure system
                     if countermeasure:
-                        # Extract flow info (we need to map back to original flow)
-                        # For now, use generic threat data
                         threat_data = {
-                            'src_ip': 'unknown',  # Would need to track from flow_key
-                            'dst_ip': 'unknown',
+                            'src_ip': str(row.get('_src_ip', 'unknown')),
+                            'dst_ip': str(row.get('_dst_ip', 'unknown')),
                             'dst_port': int(row['Destination Port']),
                             'protocol': 'TCP',
                             'probability': float(row['probability']),
@@ -580,8 +603,9 @@ def run_continuous_detection(iface, window_size=5.0, interval=2.0, model=None):
                 response = input("\nClear all IP/port blocks? (y/n): ")
                 if response.lower() == 'y':
                     countermeasure.clear_all_blocks()
-            except Exception as e:
-                pass  # Skip on error
+            except (KeyboardInterrupt, EOFError):
+                # User cancelled input
+                print("\nSkipped clearing blocks")
         print("="*80)
 
 
@@ -593,11 +617,15 @@ def main():
         if not all_passed:
             print("\n⚠️  WARNING: Some system checks failed. Continue anyway? (y/n): ", end='')
             try:
-                response = input().strip().lower()
-                if response != 'y':
-                    print("Exiting...")
-                    sys.exit(1)
-            except KeyboardInterrupt:
+                if not sys.stdin or not sys.stdin.isatty():
+                    print("y")
+                    print("[non-interactive] Continuing despite failed system checks")
+                else:
+                    response = input().strip().lower()
+                    if response != 'y':
+                        print("Exiting...")
+                        sys.exit(1)
+            except (KeyboardInterrupt, EOFError):
                 print("\nExiting...")
                 sys.exit(1)
     
@@ -632,17 +660,26 @@ def main():
     # Initialize model
     print("Initializing the model...")
     backend = getattr(args, 'backend', 'tf') if hasattr(args, 'backend') else 'tf'
+    selected_model_arg = getattr(args, 'model', str(script_dir / 'SecIDS-CNN.h5')) if hasattr(args, 'model') else str(script_dir / 'SecIDS-CNN.h5')
     model = None
     scaler = StandardScaler()
 
     if backend == 'tf':
-        model = SecIDSModel()
-        print("✓ TensorFlow SecIDS model loaded successfully\n")
+        model = SecIDSModel(model_path=selected_model_arg)
+        print(f"✓ TensorFlow SecIDS model loaded successfully: {selected_model_arg}\n")
     else:
         # Try to load unified model wrapper from Model_Tester
         try:
             master_code = script_dir.parent / 'Model_Tester' / 'Code'
             unified_wrapper_path = script_dir / 'unified_wrapper.py'
+            selected_model_path = Path(selected_model_arg)
+            if not selected_model_path.is_absolute():
+                selected_model_path = (script_dir / selected_model_path).resolve()
+
+            model_dir = master_code / 'models'
+            if selected_model_path.exists():
+                model_dir = selected_model_path.parent if selected_model_path.is_file() else selected_model_path
+
             # Add Model_Tester code dir to sys.path so wrapper can import if needed
             if str(master_code) not in sys.path:
                 sys.path.insert(0, str(master_code))
@@ -650,7 +687,7 @@ def main():
             # Import wrapper from local SecIDS-CNN folder if present
             try:
                 from unified_wrapper import UnifiedModelWrapper  # type: ignore
-            except Exception:
+            except (ImportError, ModuleNotFoundError):
                 # Fallback: try to import from Model_Tester/Code
                 from importlib import util
                 wrapper_file = master_code / 'unified_threat_model.py'
@@ -668,14 +705,14 @@ def main():
                         pass
 
             # Instantiate wrapper and load latest model files
-            wrapper = UnifiedModelWrapper(model_dir=str(master_code / 'models'))
+            wrapper = UnifiedModelWrapper(model_dir=str(model_dir))
             # wrapper should provide predict_proba and predict methods
             model = wrapper
-            print("✓ Unified model backend selected (Model_Tester). Ensure models exist in Model_Tester/Code/models\n")
+            print(f"✓ Unified model backend selected (Model_Tester): {model_dir}\n")
         except Exception as e:
             print(f"ERROR: Failed to initialize unified model backend: {e}")
             print("Falling back to TensorFlow SecIDS model")
-            model = SecIDSModel()
+            model = SecIDSModel(model_path=selected_model_arg)
     
     if args.mode == 'file':
         # Auto-detect CSV files from datasets folder if none specified

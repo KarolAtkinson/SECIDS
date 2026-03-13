@@ -1,0 +1,69 @@
+{
+  "started_at": "2026-03-11T13:25:18.418172",
+  "execute": true,
+  "scanned": 9098,
+  "synced": 9016,
+  "skipped": 82,
+  "errors": 0,
+  "by_tag": {
+    "datasetDB": {
+      "synced": 45,
+      "skipped": 50
+    },
+    "captureDB": {
+      "synced": 0,
+      "skipped": 6
+    },
+    "webuiVersionsDB": {
+      "synced": 19,
+      "skipped": 0
+    },
+    "resultDB": {
+      "synced": 4,
+      "skipped": 0
+    },
+    "reportDB": {
+      "synced": 5,
+      "skipped": 9
+    },
+    "logDB": {
+      "synced": 3,
+      "skipped": 16
+    },
+    "settingsDB": {
+      "synced": 6,
+      "skipped": 0
+    },
+    "userDB": {
+      "synced": 1,
+      "skipped": 0
+    },
+    "modelDB": {
+      "synced": 29,
+      "skipped": 1
+    },
+    "miscDB": {
+      "synced": 8812,
+      "skipped": 0
+    },
+    "actionDB": {
+      "synced": 19,
+      "skipped": 0
+    },
+    "NIST-CSW": {
+      "synced": 13,
+      "skipped": 0
+    },
+    "historyDB": {
+      "synced": 1,
+      "skipped": 0
+    },
+    "profileDB": {
+      "synced": 59,
+      "skipped": 0
+    }
+  },
+  "error_samples": [],
+  "finished_at": "2026-03-11T13:25:19.891275",
+  "db_root": "ServerDB"
+}

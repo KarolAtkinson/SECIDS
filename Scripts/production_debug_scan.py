@@ -10,13 +10,13 @@ import ast
 import json
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from datetime import datetime
 
 class ProductionDebugScanner:
     """Production-grade debug scanner with compilation checks"""
     
-    def __init__(self, project_root: str):
+    def __init__(self, project_root: Union[str, Path]):
         self.project_root = Path(project_root)
         self.errors = {
             'syntax_errors': [],
@@ -154,9 +154,8 @@ class ProductionDebugScanner:
                                 'text': 'except:'
                             })
         
-        except Exception:
-            # If we can't parse, syntax error will catch it
-            pass
+        except SyntaxError:
+            return errors
         
         return errors
     

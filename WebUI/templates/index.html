@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecIDS-CNN Web UI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="toolbar">
+      <div class="tool-icons">
+        <span>🧭</span><span>🔍</span><span>🖧</span><span>⚙️</span><span>📊</span><span>🧪</span><span>🛰️</span>
+      </div>
+      <div class="toolbar-status">
+        <span id="system-time">--:--:--</span>
+        <div class="toolbar-time-controls">
+          <span id="uptime">Time: 00:00:00</span>
+        </div>
+        <div class="zoom-controls">
+          <button id="zoom-out" class="btn btn-compact" title="Zoom out">−</button>
+          <span id="zoom-label" class="pill">100%</span>
+          <button id="zoom-in" class="btn btn-compact" title="Zoom in">+</button>
+          <button id="zoom-auto" class="btn btn-compact" title="Auto fit window">Auto Adjust</button>
+          <a id="repo-download-link" class="pill" href="https://github.com/KarolAtkinson/SECIDS" target="_blank" rel="noopener noreferrer">Download: GitHub Repository</a>
+        </div>
+        <span id="user-pill" class="pill">user: --</span>
+        <span id="role-pill" class="pill">role: --</span>
+        <span id="scheduler-pill" class="pill">scheduler: --</span>
+        <span id="queue-pill" class="pill">queue: --</span>
+        <button id="auth-logout" class="btn btn-compact">Logout</button>
+        <button id="scheduler-start" class="btn btn-compact">Start Scheduler</button>
+        <button id="scheduler-stop" class="btn btn-compact">Stop Scheduler</button>
+        <button id="queue-pause" class="btn btn-compact">Pause Queue</button>
+        <button id="queue-resume" class="btn btn-compact">Resume Queue</button>
+        <button id="queue-clear" class="btn btn-compact">Clear Queue</button>
+        <input id="api-token" class="token-input" placeholder="API token (optional)" />
+        <button id="save-token" class="btn btn-compact">Save Token</button>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <section class="scene-panel">
+        <div class="scene-canvas">
+          <div class="scene-overlay">SECIDS-CNN LIVE CONTROL SURFACE</div>
+          <div id="topology-layer" class="topology-layer">
+            <svg id="topology-links" class="topology-links" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div id="topology-nodes" class="topology-nodes"></div>
+            <div id="topology-tooltip" class="topology-tooltip hidden"></div>
+          </div>
+          <div id="control-surface-status" class="control-surface-status" aria-label="Control surface status"></div>
+          <div class="topology-color-legend" aria-label="Node colour key">
+            <div class="topology-legend-item"><span class="topology-legend-dot intruder"></span>Intruder (active)</div>
+            <div class="topology-legend-item"><span class="topology-legend-dot blacklist"></span>Blacklisted</div>
+            <div class="topology-legend-item"><span class="topology-legend-dot whitelist"></span>Whitelisted</div>
+            <div class="topology-legend-item"><span class="topology-legend-dot greylist"></span>Greylisted</div>
+            <div class="topology-legend-item"><span class="topology-legend-dot unknown"></span>Unidentified</div>
+          </div>
+        </div>
+        <div class="timeline">
+          <button id="refresh-system" class="btn btn-muted">⟳</button>
+          <div class="mode-switch">
+            <button id="mode-realtime" class="mode-btn active">Realtime</button>
+            <button id="mode-simulation" class="mode-btn">Simulation</button>
+          </div>
+        </div>
+        <div id="simulation-panel" class="simulation-panel hidden">
+          <div class="jobs-header">
+            <h3>Simulation Lab (Safe)</h3>
+            <span class="pill">No real attack traffic</span>
+          </div>
+          <div class="simulation-grid">
+            <label for="sim-architecture-type">Architecture Type</label>
+            <select id="sim-architecture-type" class="token-input role-select">
+              <option value="school" selected>School (Simple)</option>
+              <option value="library">Library (Simple)</option>
+              <option value="restaurant">Restaurant (Simple)</option>
+            </select>
+
+            <label for="sim-attacker-profile">Attacker Profile</label>
+            <select id="sim-attacker-profile" class="token-input role-select">
+              <option value="mixed">Mixed</option>
+              <option value="botnet">Botnet</option>
+              <option value="syn-flood">SYN Flood</option>
+              <option value="udp-flood">UDP Flood</option>
+            </select>
+
+            <label for="sim-defender-profile">Defender Profile</label>
+            <select id="sim-defender-profile" class="token-input role-select">
+              <option value="adaptive-ai">Adaptive AI</option>
+              <option value="edge-firewall">Edge Firewall</option>
+              <option value="baseline">Baseline</option>
+            </select>
+
+            <label for="sim-countermeasure-mode">Countermeasure Mode</label>
+            <select id="sim-countermeasure-mode" class="token-input role-select">
+              <option value="active">Active</option>
+              <option value="passive">Passive</option>
+            </select>
+
+            <label for="sim-intensity">Attack Intensity</label>
+            <select id="sim-intensity" class="token-input role-select">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+
+            <label for="sim-attackers">Attackers</label>
+            <input id="sim-attackers" type="number" min="1" value="25" />
+
+            <label for="sim-duration">Duration (seconds)</label>
+            <input id="sim-duration" type="number" min="10" value="90" />
+
+            <label for="sim-seed">Random Seed</label>
+            <input id="sim-seed" type="number" min="1" value="42" />
+
+            <label for="sim-retrain">Create New Model</label>
+            <select id="sim-retrain" class="token-input role-select">
+              <option value="true" selected>Yes (Train + Model Testing)</option>
+              <option value="false">No (Simulation only)</option>
+            </select>
+          </div>
+          <div id="simulation-architecture-summary" class="simulation-architecture-summary">Select an architecture type to view baseline hardware/software.</div>
+          <button id="launch-simulation" class="btn btn-run">Launch Simulation</button>
+        </div>
+        <div class="device-strip" id="device-strip"></div>
+        <section id="identification-list-panel" class="identification-list-panel hidden" aria-live="polite">
+          <div class="identification-list-header">
+            <h4>Identification Listing</h4>
+            <span id="identification-list-summary" class="pill">total: 0</span>
+          </div>
+          <div class="identification-list-tools">
+            <label class="settings-checkbox-row identification-deep-toggle">
+              <input id="identification-deep-identify" type="checkbox" /> Deep Identify (model testing)
+            </label>
+            <span id="identification-status-chip" class="identification-status-chip neutral">Ready</span>
+          </div>
+          <div id="identification-list-body" class="identification-list-body"></div>
+          <div id="identification-editor" class="identification-editor hidden">
+            <div class="identification-editor-title" id="identification-editor-title">Identification Editor</div>
+            <div class="identification-editor-grid">
+              <label for="identification-editor-ip">IP</label>
+              <input id="identification-editor-ip" class="token-input" placeholder="192.168.1.20" />
+              <label for="identification-editor-tag">Tag</label>
+              <select id="identification-editor-tag" class="token-input role-select">
+                <option value="whitelist">Whitelist</option>
+                <option value="blacklist">Blacklist</option>
+                <option value="greylist">Greylist</option>
+                <option value="intruder">Intruder</option>
+                <option value="unidentified">Unidentified</option>
+              </select>
+              <label for="identification-editor-notes">Notes</label>
+              <input id="identification-editor-notes" class="token-input" placeholder="Optional note" />
+            </div>
+            <div class="identification-editor-actions">
+              <button id="identification-editor-save" class="btn btn-compact">Save</button>
+              <button id="identification-editor-cancel" class="btn btn-compact">Cancel</button>
+            </div>
+          </div>
+        </section>
+        <div class="model-chooser hidden" id="model-chooser-panel">
+          <span id="live-model-current" class="pill">live model: auto-default</span>
+          <div class="model-mode-group" role="group" aria-label="Live model mode">
+            <button id="live-model-mode-auto" class="btn btn-compact active-switch" type="button">Auto</button>
+            <button id="live-model-mode-manual" class="btn btn-compact" type="button">Manual</button>
+          </div>
+          <select id="live-model-select" class="token-input role-select"></select>
+          <button id="live-model-save" class="btn btn-compact" type="button">Apply</button>
+        </div>
+        <div class="surface-popup-controls">
+          <button id="popup-mode-toggle" class="btn btn-compact">Popup Mode: New User</button>
+          <span id="popup-mode-pill" class="pill">mode: onboarding</span>
+        </div>
+        <section id="context-popup-panel" class="context-popup-panel" aria-live="polite">
+          <h4 id="context-popup-title">Guided Popup: New User</h4>
+          <p id="context-popup-body">Hover over any control, panel, or topology node. This popup explains what it is, how it works, and why SecIDS-CNN is doing that action.</p>
+        </section>
+      </section>
+
+      <aside class="control-panel">
+        <div class="menu-list" id="menu-list"></div>
+        <div class="action-box">
+          <h3 id="action-title">Select an action</h3>
+          <div id="action-description">Choose a menu on the left to load controls.</div>
+          <form id="params-form"></form>
+          <button id="run-action" class="btn btn-run" disabled>Run Action</button>
+        </div>
+      </aside>
+    </main>
+
+    <section class="jobs-panel">
+      <div class="jobs-header">
+        <h3>Execution Logs</h3>
+        <div>
+          <button id="job-pause" class="btn btn-compact">Pause</button>
+          <button id="job-resume" class="btn btn-compact">Resume</button>
+          <button id="job-cancel" class="btn btn-compact">Cancel</button>
+          <button id="job-retry" class="btn btn-compact">Retry</button>
+          <span id="job-status" class="pill">idle</span>
+        </div>
+      </div>
+      <div class="operation-progress" id="operation-progress" aria-label="Current operation progress">
+        <div class="operation-progress-fill" id="operation-progress-fill"></div>
+        <span id="operation-progress-label">Idle • 0%</span>
+      </div>
+      <pre id="logs-output">No job running.</pre>
+      <div class="sudo-inline-panel" id="sudo-inline-panel">
+        <div class="jobs-header">
+          <h3>Sudo Password Validation</h3>
+          <span class="pill">Required for privileged actions</span>
+        </div>
+        <form id="sudo-form" class="sudo-form" autocomplete="off">
+          <input id="sudo-password" class="token-input" type="password" placeholder="Enter sudo password" />
+          <button id="save-sudo-password" type="submit" class="btn btn-compact">Enter</button>
+          <label class="sudo-remember">
+            <input id="sudo-remember" type="checkbox" checked />
+            Remember for this session
+          </label>
+        </form>
+        <ul class="sudo-requirements">
+          <li>Must be logged in to submit sudo password.</li>
+          <li>Password cannot be empty.</li>
+          <li>Saved only in the active session cache (not permanent).</li>
+          <li>Execution logs will show validation result for this input.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="insights-grid">
+      <div class="insight-panel">
+        <div class="jobs-header">
+          <h3>Settings</h3>
+          <button id="settings-save" class="btn btn-compact">Save</button>
+        </div>
+        <form id="settings-form" class="settings-form">
+          <h4 class="settings-section-title">Appearance</h4>
+          <div class="settings-section-grid">
+            <label for="ws-theme">Theme</label>
+            <select id="ws-theme" name="ws_theme" class="token-input role-select">
+              <option value="Default">Default</option>
+              <option value="Dark">Dark</option>
+              <option value="Light">Light</option>
+            </select>
+            <label for="ws-language">Language</label>
+            <select id="ws-language" name="ws_language" class="token-input role-select">
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+            </select>
+          </div>
+
+          <h4 class="settings-section-title">Layout</h4>
+          <div class="settings-section-grid">
+            <label for="ws-layout-profile">Layout Profile</label>
+            <select id="ws-layout-profile" name="ws_layout_profile" class="token-input role-select">
+              <option value="Wireshark Classic">Wireshark Classic</option>
+              <option value="Stacked">Stacked</option>
+              <option value="Packet-First">Packet-First</option>
+            </select>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_packet_list_visible" data-setting-type="bool" /> Packet List Pane</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_packet_details_visible" data-setting-type="bool" /> Packet Details Pane</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_packet_bytes_visible" data-setting-type="bool" /> Packet Bytes Pane</label>
+          </div>
+
+          <h4 class="settings-section-title">Columns</h4>
+          <div class="settings-section-grid settings-checkbox-grid">
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_number" data-setting-type="bool" /> No.</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_time" data-setting-type="bool" /> Time</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_source" data-setting-type="bool" /> Source</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_destination" data-setting-type="bool" /> Destination</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_protocol" data-setting-type="bool" /> Protocol</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_length" data-setting-type="bool" /> Length</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_show_column_info" data-setting-type="bool" /> Info</label>
+          </div>
+
+          <h4 class="settings-section-title">Font and Colors</h4>
+          <div class="settings-section-grid">
+            <label for="ws-font-family">Font Family</label>
+            <select id="ws-font-family" name="ws_font_family" class="token-input role-select">
+              <option value="Monospace">Monospace</option>
+              <option value="Sans Serif">Sans Serif</option>
+            </select>
+            <label for="ws-font-size">Font Size</label>
+            <input id="ws-font-size" name="ws_font_size" type="number" min="8" max="24" />
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_colorize_packet_list" data-setting-type="bool" /> Colorize Packet List</label>
+          </div>
+
+          <h4 class="settings-section-title">Name Resolution</h4>
+          <div class="settings-section-grid settings-checkbox-grid">
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_resolve_mac" data-setting-type="bool" /> Resolve MAC Addresses</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_resolve_network" data-setting-type="bool" /> Resolve Network Addresses</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_resolve_transport" data-setting-type="bool" /> Resolve Transport Names</label>
+          </div>
+
+          <h4 class="settings-section-title">Capture</h4>
+          <div class="settings-section-grid">
+            <label for="setting-interface">Default Interface</label>
+            <input id="setting-interface" name="last_interface" />
+            <label for="setting-duration">Default Duration</label>
+            <input id="setting-duration" name="last_duration" type="number" />
+            <label for="setting-window">Default Window</label>
+            <input id="setting-window" name="last_window" type="number" />
+            <label for="setting-interval">Default Interval</label>
+            <input id="setting-interval" name="last_interval" type="number" />
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_capture_promisc_mode" data-setting-type="bool" /> Promiscuous Mode</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_capture_monitor_mode" data-setting-type="bool" /> Monitor Mode</label>
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_capture_update_realtime" data-setting-type="bool" /> Update List in Realtime</label>
+            <label for="setting-countermeasure-mode">Countermeasure Mode</label>
+            <select id="setting-countermeasure-mode" name="countermeasure_mode" class="token-input role-select">
+              <option value="active">active</option>
+              <option value="passive">passive</option>
+            </select>
+          </div>
+
+          <h4 class="settings-section-title">Filter Buttons</h4>
+          <div class="settings-section-grid">
+            <label class="settings-checkbox-row"><input type="checkbox" name="ws_enable_filter_buttons" data-setting-type="bool" /> Enable Filter Buttons</label>
+            <label for="ws-filter-profile">Filter Profile</label>
+            <select id="ws-filter-profile" name="ws_filter_profile" class="token-input role-select">
+              <option value="Default">Default</option>
+              <option value="Security">Security</option>
+              <option value="Performance">Performance</option>
+            </select>
+          </div>
+
+          <h4 class="settings-section-title">Protocols</h4>
+          <div class="settings-section-grid">
+            <label for="ws-protocols-profile">Enabled Protocol Set</label>
+            <select id="ws-protocols-profile" name="ws_protocols_enabled_profile" class="token-input role-select">
+              <option value="All">All</option>
+              <option value="Common">Common</option>
+              <option value="Minimal">Minimal</option>
+            </select>
+            <label for="setting-live-backend">Live Backend</label>
+            <select id="setting-live-backend" name="live_backend" class="token-input role-select">
+              <option value="">auto</option>
+              <option value="tf">tf</option>
+              <option value="unified">unified</option>
+            </select>
+            <label for="setting-live-model">Live Model Path</label>
+            <input id="setting-live-model" name="live_model_path" />
+          </div>
+
+          <h4 class="settings-section-title">Expert Items</h4>
+          <div class="settings-section-grid">
+            <label><input type="checkbox" name="ws_expert_custom_enabled" data-setting-type="bool" /> Enable Custom Expert Severities</label>
+            <label for="ws-expert-policy">Severity Policy</label>
+            <select id="ws-expert-policy" name="ws_expert_severity_policy" class="token-input role-select">
+              <option value="Default">Default</option>
+              <option value="Strict">Strict</option>
+              <option value="Relaxed">Relaxed</option>
+            </select>
+          </div>
+
+          <h4 class="settings-section-title">RSA Keys</h4>
+          <div class="settings-section-grid">
+            <label for="ws-rsa-profile">RSA Key Profile</label>
+            <select id="ws-rsa-profile" name="ws_rsa_keys_profile" class="token-input role-select">
+              <option value="Default">Default</option>
+              <option value="Lab">Lab</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+          </div>
+
+          <h4 class="settings-section-title">Statistics</h4>
+          <div class="settings-section-grid">
+            <label><input type="checkbox" name="ws_statistics_auto_update" data-setting-type="bool" /> Auto Update Statistics</label>
+            <label for="ws-stat-interval">Statistics Refresh (sec)</label>
+            <input id="ws-stat-interval" name="ws_statistics_interval" type="number" min="1" max="60" />
+          </div>
+
+          <h4 class="settings-section-title">Advanced</h4>
+          <div class="settings-section-grid">
+            <label><input type="checkbox" name="ws_advanced_show_changed_only" data-setting-type="bool" /> Show Changed Values Only</label>
+            <label for="ws-advanced-search">Preference Search Text</label>
+            <input id="ws-advanced-search" name="ws_advanced_search_text" />
+          </div>
+        </form>
+      </div>
+
+      <div class="insight-panel">
+        <div class="jobs-header">
+          <h3>First-Time WebUI Guide</h3>
+          <a id="open-manual" class="btn btn-compact" href="/manual" target="_blank">Open Manual</a>
+        </div>
+        <div class="guide-scroll">
+          <ol class="quick-guide">
+            <li>Download or clone the project from <a href="https://github.com/KarolAtkinson/SECIDS" target="_blank" rel="noopener noreferrer"><strong>GitHub: KarolAtkinson/SECIDS</strong></a>.</li>
+            <li>Windows setup: install Python 3.10+ and Npcap, then run <code>python -m venv .venv_test</code>, <code>.venv_test\Scripts\activate</code>, and <code>pip install -r requirements.txt</code>.</li>
+            <li>Linux/Kali setup: run <code>python3 -m venv .venv_test</code>, <code>source .venv_test/bin/activate</code>, and <code>pip install -r requirements.txt</code>.</li>
+            <li>Start WebUI: <code>python3 WebUI/production_server.py</code> (Linux/Kali) or <code>python WebUI/production_server.py</code> (Windows), then open <code>http://127.0.0.1:8080/login</code>.</li>
+            <li>Login steps: enter your username/password on the login page and press <strong>Login</strong>; on first sign-in, change password if prompted.</li>
+            <li>Enter sudo password in <strong>Sudo Password Validation</strong> and press <strong>Enter</strong>.</li>
+            <li>Use <strong>Start/Stop Scheduler</strong> and <strong>Queue Pause/Resume/Clear</strong> controls in the top toolbar when needed.</li>
+            <li>Set an API token (optional) with <strong>Save Token</strong> for token-auth requests.</li>
+            <li>Select a mode: <strong>Realtime</strong> or <strong>Simulation</strong>.</li>
+            <li>In Simulation mode, select architecture type (school/library/restaurant), then configure attacker/defender/countermeasure profile, intensity, attackers, duration, seed, and retrain flag.</li>
+            <li>Use the <strong>Models</strong> device tile to open live model selection and click <strong>Choose Model</strong>.</li>
+            <li>Pick an action from the left command menu, set parameters, and click <strong>Run Action</strong>.</li>
+            <li>Track execution in <strong>Execution Logs</strong>, unified operation progress, and toast event updates.</li>
+            <li>Use <strong>Settings</strong> to persist default interface, duration, window, and interval preferences.</li>
+            <li>Use <strong>History</strong> to review and rerun prior operations.</li>
+            <li>Use <strong>Audit</strong> filters and export to validate events, roles, and statuses.</li>
+            <li>Use <strong>Users</strong> management actions (admin role) to create/update/reset users when not in restricted mode.</li>
+            <li>Use <strong>Model Registry</strong> to refresh/sync/register models and verify DB status.</li>
+            <li>Use <strong>Packet Log</strong> taskbar tabs: <strong>Action Log</strong> and <strong>Packet Log</strong>.</li>
+            <li>Use packet capture controls: <strong>Start</strong>, <strong>Pause</strong>, and <strong>Stop</strong> with live status pill.</li>
+            <li>Open the <strong>Server</strong> tile to access ServerDB controls, file view, import/export, and tagged data sync.</li>
+            <li>Review color-coded packet rows and fallback data behavior when live rows are unavailable.</li>
+            <li>Use <strong>Logout</strong> when finished to close the active authenticated session.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="insight-panel">
+        <div class="jobs-header">
+          <h3>History</h3>
+          <button id="history-refresh" class="btn btn-compact">Refresh</button>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr><th>Time</th><th>Source</th><th>Command</th><th>Action</th></tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-panel">
+        <div class="jobs-header">
+          <h3>Audit</h3>
+          <div>
+            <button id="audit-refresh" class="btn btn-compact">Refresh</button>
+            <button id="audit-export" class="btn btn-compact">Export</button>
+          </div>
+        </div>
+        <div class="audit-filters">
+          <select id="audit-role-filter" class="token-input role-select">
+            <option value="all">role: all</option>
+            <option value="guest">guest</option>
+            <option value="viewer">viewer</option>
+            <option value="operator">operator</option>
+            <option value="admin">admin</option>
+          </select>
+          <select id="audit-status-filter" class="token-input role-select">
+            <option value="all">status: all</option>
+            <option value="ok">ok</option>
+            <option value="failed">failed</option>
+            <option value="denied">denied</option>
+          </select>
+          <input id="audit-event-filter" class="token-input" placeholder="event filter" />
+          <input id="audit-search" class="token-input" placeholder="search" />
+          <button id="audit-apply" class="btn btn-compact">Apply</button>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr><th>Time</th><th>Event</th><th>Status</th><th>Role</th></tr>
+            </thead>
+            <tbody id="audit-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-panel" data-access="admin">
+        <div class="jobs-header">
+          <h3>Users</h3>
+          <button id="users-refresh" class="btn btn-compact">Refresh</button>
+        </div>
+        <div class="audit-filters">
+          <input id="user-create-name" class="token-input" placeholder="new username" />
+          <select id="user-create-role" class="token-input role-select">
+            <option value="guest">guest</option>
+            <option value="viewer">viewer</option>
+            <option value="operator">operator</option>
+            <option value="admin">admin</option>
+          </select>
+          <input id="user-create-pass" class="token-input" type="password" placeholder="temp password (optional)" />
+          <button id="user-create-btn" class="btn btn-compact">Create</button>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr><th>User</th><th>Role</th><th>Age(d)</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-panel">
+        <div class="jobs-header">
+          <h3>Model Registry</h3>
+        </div>
+        <div class="audit-filters">
+          <button id="models-refresh" class="btn btn-compact">Refresh</button>
+          <button id="models-sync" class="btn btn-compact">Sync</button>
+          <input id="model-register-path" class="token-input" placeholder="path e.g. Models/model.h5" />
+          <button id="model-register-btn" class="btn btn-compact">Register</button>
+          <span id="models-db-pill" class="pill">db: --</span>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr><th>Name</th><th>Path</th><th>Format</th><th>Modified</th></tr>
+            </thead>
+            <tbody id="models-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-panel packetlogs-panel">
+        <div class="jobs-header">
+          <h3>Packet Log</h3>
+          <div>
+            <button id="show-action-log" class="btn btn-compact active-switch">Action Log</button>
+            <button id="show-packet-log" class="btn btn-compact">Packet Log</button>
+          </div>
+        </div>
+        <div class="audit-filters">
+          <button id="packetlogs-refresh" class="btn btn-compact">Refresh Logs</button>
+          <button id="packet-capture-start" class="btn btn-compact">Start</button>
+          <button id="packet-capture-pause" class="btn btn-compact">Pause</button>
+          <button id="packet-capture-stop" class="btn btn-compact">Stop</button>
+          <span id="packet-capture-status" class="pill">capture: stopped</span>
+        </div>
+        <div id="actionlogs-wrap" class="history-table-wrap packetlog-wrap">
+          <table id="actionlogs-table" class="history-table packetlog-table">
+            <thead>
+              <tr><th>Time</th><th>Action</th><th>Status</th><th>Operator</th><th>Mode</th><th>Activity</th><th>Details</th></tr>
+            </thead>
+            <tbody id="actionlog-body"></tbody>
+          </table>
+        </div>
+        <div id="packetflow-wrap" class="history-table-wrap packetlog-wrap hidden">
+          <table id="packetflow-table" class="history-table packetlog-table">
+            <thead>
+              <tr><th>Time</th><th>No.</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Length</th><th>Flags</th><th>Model Flags</th><th>Info</th></tr>
+            </thead>
+            <tbody id="packetflow-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

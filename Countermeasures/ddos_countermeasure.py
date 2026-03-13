@@ -49,6 +49,16 @@ class DDoSCountermeasure:
         self.block_threshold = block_threshold
         self.time_window = time_window
         self.auto_block = auto_block
+
+        # Configure logging first because startup paths emit log lines.
+        if log_file is None:
+            log_dir = Path(__file__).parent / "logs"
+            log_dir.mkdir(exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_file = log_dir / f"countermeasures_{timestamp}.log"
+
+        self.log_file = Path(log_file)
+        self.log_file.parent.mkdir(parents=True, exist_ok=True)
         
         # Initialize list manager for whitelist/blacklist/greylist integration
         if LIST_MANAGER_AVAILABLE:
@@ -80,16 +90,6 @@ class DDoSCountermeasure:
             'start_time': datetime.now()
         }
         
-        # Logging
-        if log_file is None:
-            log_dir = Path(__file__).parent / "logs"
-            log_dir.mkdir(exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_file = log_dir / f"countermeasures_{timestamp}.log"
-        
-        self.log_file = Path(log_file)
-        self.log_file.parent.mkdir(parents=True, exist_ok=True)
-        
         # Worker thread
         self.running = False
         self.worker_thread = None
@@ -108,8 +108,10 @@ class DDoSCountermeasure:
         try:
             with open(self.log_file, 'a') as f:
                 f.write(log_entry + '\n')
-        except Exception as e:
-            pass  # Skip on error
+        except (OSError, IOError) as e:
+            # Log file write failed - print to stderr
+            import sys
+            print(f"Warning: Could not write to log: {e}", file=sys.stderr)
     def start(self):
         """Start the countermeasure worker thread"""
         if self.running:

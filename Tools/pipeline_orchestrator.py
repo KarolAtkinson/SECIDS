@@ -43,10 +43,10 @@ import json
 import shutil
 
 # Setup project paths
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SECIDS_DIR = PROJECT_ROOT / 'SecIDS-CNN'
 MASTER_ML_DIR = PROJECT_ROOT / 'Model_Tester'
-TOOLS_DIR = PROJECT_ROOT / 'tools'
+TOOLS_DIR = PROJECT_ROOT / 'Tools'
 CAPTURES_DIR = PROJECT_ROOT / 'Captures'
 DATASETS_DIR = PROJECT_ROOT / 'SecIDS-CNN' / 'datasets'
 
@@ -56,7 +56,8 @@ sys.path.insert(0, str(MASTER_ML_DIR / 'Code'))
 sys.path.insert(0, str(TOOLS_DIR))
 
 # Setup logging
-log_file = PROJECT_ROOT / f'pipeline_run_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+log_file = PROJECT_ROOT / 'Logs' / f'pipeline_run_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+log_file.parent.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

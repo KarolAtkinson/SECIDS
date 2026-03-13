@@ -1,0 +1,6 @@
+[2026-03-10 17:45:22] [INFO] Starting system upgrade (Safe Mode: True)
+[2026-03-10 17:45:22] [INFO] Creating backup of critical files...
+[2026-03-10 17:45:22] [SUCCESS]   ✓ Backed up: requirements.txt
+[2026-03-10 17:45:22] [SUCCESS]   ✓ Backed up: pyrightconfig.json
+[2026-03-10 17:45:22] [ERROR] Backup failed: [Errno 2] No such file or directory: '/home/kali/Documents/Code/SECIDS-CNN/Backups/upgrade_20260310_174522/Root/secids_main.py'
+[2026-03-10 17:45:22] [ERROR] Critical step 'Backup' failed. Aborting upgrade.

@@ -63,6 +63,12 @@ class CommandLibrary:
                 "category": "setup",
                 "sudo": False
             },
+            "WSEC": {
+                "cmd": "bash Launchers/WSEC",
+                "description": "Start/open WebUI at dynamic login URL",
+                "category": "setup",
+                "sudo": False
+            },
             
             # Pipeline Operations
             "pipeline-full": {
@@ -192,13 +198,13 @@ class CommandLibrary:
                 "sudo": False
             },
             "train-unified": {
-                "cmd": "python3 'Master ML_AI/Code/train_unified_model.py'",
+                "cmd": "python3 'Model_Tester/Code/train_unified_model.py'",
                 "description": "Train unified threat model",
                 "category": "training",
                 "sudo": False
             },
             "train-master": {
-                "cmd": "python3 'Master ML_AI/Code/main.py'",
+                "cmd": "python3 'Model_Tester/Code/main.py'",
                 "description": "Run complete Master ML/AI pipeline",
                 "category": "training",
                 "sudo": False
@@ -241,13 +247,13 @@ class CommandLibrary:
                 "sudo": False
             },
             "list-datasets": {
-                "cmd": "ls -lh SecIDS-CNN/datasets/ 'Master ML_AI/Code/datasets/'",
+                "cmd": "ls -lh SecIDS-CNN/datasets/ 'Model_Tester/datasets/' 'Model_Tester/Threat_Detection_Model_1/'",
                 "description": "List available datasets",
                 "category": "utility",
                 "sudo": False
             },
             "list-models": {
-                "cmd": "ls -lh SecIDS-CNN/*.h5 'Master ML_AI/Code/models/'",
+                "cmd": "ls -lh SecIDS-CNN/*.h5 'Model_Tester/models/'",
                 "description": "List trained models",
                 "category": "utility",
                 "sudo": False

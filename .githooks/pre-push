@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+remote_url="$(git remote get-url origin 2>/dev/null || true)"
+if [[ -z "$remote_url" ]]; then
+  echo "[pre-push] Blocked: origin remote not configured."
+  exit 1
+fi
+
+slug=""
+if [[ "$remote_url" =~ github\.com[:/]+([^/]+)/([^/.]+)(\.git)?$ ]]; then
+  slug="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+else
+  echo "[pre-push] Blocked: non-GitHub remote is not allowed by SECIDS private-only policy."
+  exit 1
+fi
+
+api_url="https://api.github.com/repos/${slug}"
+response="$(curl -fsSL -H 'Accept: application/vnd.github+json' "$api_url" 2>/dev/null || true)"
+if [[ -z "$response" ]]; then
+  echo "[pre-push] Blocked: cannot verify repository visibility from GitHub API."
+  echo "[pre-push] Policy requires private visibility before any push."
+  exit 1
+fi
+
+visibility="$(printf '%s' "$response" | sed -n 's/.*"visibility"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
+is_private="$(printf '%s' "$response" | sed -n 's/.*"private"[[:space:]]*:[[:space:]]*\(true\|false\).*/\1/p' | head -n1)"
+
+if [[ "$visibility" != "private" || "$is_private" != "true" ]]; then
+  echo "[pre-push] Blocked: ${slug} is not private (visibility=${visibility:-unknown}, private=${is_private:-unknown})."
+  echo "[pre-push] Set repository visibility to Private in GitHub settings, then push again."
+  exit 1
+fi
+
+echo "[pre-push] Privacy check passed for ${slug} (private)."
+exit 0

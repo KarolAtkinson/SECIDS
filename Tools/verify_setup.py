@@ -26,7 +26,7 @@ def get_network_interfaces():
                         interfaces.append(iface)
             return interfaces
     except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
+        result = None
     
     try:
         # Fallback to ifconfig (BSD/macOS)
@@ -41,7 +41,7 @@ def get_network_interfaces():
                         interfaces.append(iface)
             return list(set(interfaces))
     except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
+        result = None
     
     return []
 

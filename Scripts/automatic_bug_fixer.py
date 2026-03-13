@@ -182,7 +182,7 @@ def main():
     latest_report = debug_reports[0]
     print(f"Using debug report: {latest_report.name}\n")
     
-    fixer = BugFixer(project_root)
+    fixer = BugFixer(str(project_root))
     fixer.analyze_and_fix(latest_report)
 
 

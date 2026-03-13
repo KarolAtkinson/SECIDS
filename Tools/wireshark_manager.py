@@ -113,8 +113,8 @@ class WiresharkManager:
                 # Send SIGTERM to the process group
                 try:
                     os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
-                except ProcessLookupError as e:
-                    pass  # Skip on error
+                except ProcessLookupError:
+                    print("ℹ️  Wireshark process already stopped")
                 # Wait for graceful shutdown
                 try:
                     self.process.wait(timeout=5)
@@ -123,8 +123,8 @@ class WiresharkManager:
                     print("⚠️  Forcing Wireshark to close...")
                     try:
                         os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
-                    except ProcessLookupError as e:
-                        pass  # Skip on error
+                    except ProcessLookupError:
+                        print("ℹ️  Wireshark process already stopped")
             # Also kill any remaining Wireshark/dumpcap processes
             self._kill_remaining_processes()
             
@@ -161,8 +161,8 @@ class WiresharkManager:
                     time.sleep(0.5)
                     try:
                         os.kill(proc.info['pid'], signal.SIGKILL)
-                    except ProcessLookupError as e:
-                        pass  # Skip on error
+                    except ProcessLookupError:
+                        continue
             except (psutil.NoSuchProcess, psutil.AccessDenied, ProcessLookupError):
                 continue
     

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecIDS-CNN Project UML (High-Level Interactive)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071122;
+      --panel: #0d1c35;
+      --line: #2a4d7d;
+      --text: #dceaff;
+      --muted: #9bb8df;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .viewer {
+      overflow: hidden;
+      position: relative;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .viewer.dragging {
+      cursor: grabbing;
+    }
+
+    .canvas {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: 0 0;
+      width: 1700px;
+      height: 980px;
+      background: radial-gradient(circle at 20% 20%, #122b4f 0%, #08172d 60%, #071122 100%);
+      border: 1px solid #1f3f67;
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .node {
+      position: absolute;
+      padding: 10px 12px;
+      border: 1px solid #3e73b8;
+      background: rgba(19, 45, 84, 0.92);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.25;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+    }
+
+    .node.small {
+      font-size: 12px;
+      border-color: #5f91cf;
+      background: rgba(18, 37, 68, 0.92);
+    }
+
+    .node em {
+      color: #95bbff;
+      font-style: normal;
+      font-size: 11px;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .note {
+      position: absolute;
+      border: 1px dashed #547db2;
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(10, 24, 44, 0.65);
+      max-width: 310px;
+      line-height: 1.35;
+    }
+
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .edge {
+      stroke: #6aa2ef;
+      stroke-width: 2;
+      fill: none;
+      marker-end: url(#arrow);
+      opacity: 0.92;
+    }
+
+    .edge.secondary {
+      stroke: #7dc8a2;
+      stroke-dasharray: 6 4;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>SECIDS-CNN Project UML (High-Level)</h1>
+      <div class="subtitle">Mouse drag to move • Mouse wheel to zoom • Double-click to reset</div>
+    </div>
+    <span class="pill">Aligned with Master-Manual §4.1</span>
+    <span class="pill">Launcher + Direct + Pipeline + Output</span>
+  </div>
+
+  <div id="viewer" class="viewer">
+    <div id="canvas" class="canvas">
+      <svg viewBox="0 0 1700 980" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,4 L0,8 z" fill="#6aa2ef" />
+          </marker>
+        </defs>
+
+        <path class="edge" d="M850,120 C850,150 850,170 600,170" />
+        <path class="edge" d="M850,120 C850,150 850,170 1100,170" />
+
+        <path class="edge" d="M600,245 C600,275 740,300 850,300" />
+        <path class="edge" d="M1100,245 C1100,275 960,300 850,300" />
+
+        <path class="edge" d="M850,385 C850,420 850,450 850,480" />
+        <path class="edge" d="M850,570 C850,610 520,660 380,660" />
+        <path class="edge" d="M850,570 C850,610 850,660 850,660" />
+        <path class="edge" d="M850,570 C850,610 1180,660 1320,660" />
+
+        <path class="edge" d="M380,745 C380,790 760,830 850,830" />
+        <path class="edge" d="M850,745 C850,790 850,830 850,830" />
+        <path class="edge" d="M1320,745 C1320,790 940,830 850,830" />
+
+        <path class="edge secondary" d="M850,830 C850,880 1560,900 1560,700 C1560,540 1220,540 1090,540" />
+      </svg>
+
+      <div class="node" style="left:690px; top:56px; width:320px;">User Input / Command</div>
+
+      <div class="node" style="left:420px; top:170px; width:360px;">Bash Launcher (secids.sh)</div>
+      <div class="node" style="left:920px; top:170px; width:360px;">Direct Execution</div>
+
+      <div class="node" style="left:640px; top:300px; width:420px;">Command Library<em>JSON-based • 40+ shortcuts • history • favorites</em></div>
+
+      <div class="node" style="left:620px; top:480px; width:460px;">Pipeline Orchestrator<em>10 integrated stages</em></div>
+
+      <div class="node small" style="left:260px; top:660px; width:240px;">Capture Tools</div>
+      <div class="node small" style="left:720px; top:660px; width:260px;">Train Models</div>
+      <div class="node small" style="left:1200px; top:660px; width:240px;">Detect Engine</div>
+
+      <div class="node" style="left:690px; top:830px; width:320px;">Results & Reports<em>JSON, CSV, charts, logs</em></div>
+
+      <div class="note" style="left:130px; top:120px;">
+        High-level command entry supports launcher shortcuts and direct command execution.
+      </div>
+
+      <div class="note" style="left:1260px; top:300px;">
+        Command Library centralizes reusable commands and parameterized workflows.
+      </div>
+
+      <div class="note" style="left:1250px; top:500px;">
+        Orchestrator distributes execution into capture, training, and detection branches.
+      </div>
+
+      <div class="note" style="left:1330px; top:810px;">
+        Feedback from reports influences next run configuration and model improvement loops.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const viewer = document.getElementById("viewer");
+      const canvas = document.getElementById("canvas");
+
+      const state = {
+        scale: 0.78,
+        tx: -850,
+        ty: -480,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function applyTransform() {
+        canvas.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
+      }
+
+      function zoomAt(clientX, clientY, deltaY) {
+        const rect = viewer.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        const nextScale = clamp(state.scale * (deltaY < 0 ? 1.12 : 0.88), 0.4, 2.4);
+        const ratio = nextScale / state.scale;
+
+        state.tx = x - (x - state.tx) * ratio;
+        state.ty = y - (y - state.ty) * ratio;
+        state.scale = nextScale;
+        applyTransform();
+      }
+
+      viewer.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        zoomAt(event.clientX, event.clientY, event.deltaY);
+      }, { passive: false });
+
+      viewer.addEventListener("mousedown", (event) => {
+        state.dragging = true;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        viewer.classList.add("dragging");
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        if (!state.dragging) return;
+        state.tx += event.clientX - state.lastX;
+        state.ty += event.clientY - state.lastY;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        applyTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        state.dragging = false;
+        viewer.classList.remove("dragging");
+      });
+
+      viewer.addEventListener("dblclick", () => {
+        state.scale = 0.78;
+        state.tx = -850;
+        state.ty = -480;
+        applyTransform();
+      });
+
+      applyTransform();
+    })();
+  </script>
+</body>
+</html>

@@ -274,8 +274,11 @@ class DatasetCreator:
 
 # Example usage
 if __name__ == "__main__":
-    dataset_dir = r"c:\Users\karol\OneDrive\Pulpit\Master ML_AI\Threat_Detection_Model_1"
-    output_dir = r"c:\Users\karol\OneDrive\Pulpit\Master ML_AI\Code\datasets"
+    from path_config import DATASETS_DIR, TRAINING_DATA_DIR, ensure_model_tester_dirs
+
+    ensure_model_tester_dirs()
+    dataset_dir = str(TRAINING_DATA_DIR)
+    output_dir = str(DATASETS_DIR)
     
     creator = DatasetCreator(dataset_dir, output_dir)
     datasets = creator.create_all_datasets()

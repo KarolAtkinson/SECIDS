@@ -18,10 +18,11 @@ show_menu() {
     echo "  5) Launch Terminal UI"
     echo "  6) Run System Check"
     echo "  7) View Backup Location"
-    echo "  8) Exit"
+    echo "  8) Refresh Workflow Chart"
+    echo "  9) Exit"
     echo ""
     echo "═══════════════════════════════════════════════════════════════════"
-    echo -n "Enter choice [1-8]: "
+    echo -n "Enter choice [1-9]: "
 }
 
 while true; do
@@ -103,11 +104,16 @@ print('  Both packages loaded successfully!')
             fi
             ;;
         8)
+            echo "Refreshing workflow chart via Auto-Update..."
+            cd "$PROJECT_ROOT"
+            $VENV_PYTHON Auto_Update/task_scheduler.py --run workflow_chart_update
+            ;;
+        9)
             echo "Goodbye!"
             exit 0
             ;;
         *)
-            echo "  ⚠️  Invalid choice. Please select 1-8."
+            echo "  ⚠️  Invalid choice. Please select 1-9."
             ;;
     esac
     

@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-02-27T15:10:17.258223",
+  "summary": {
+    "whitelist_count": 0,
+    "blacklist_count": 0,
+    "greylist_count": 1,
+    "total_tracked": 1
+  },
+  "whitelist": {},
+  "blacklist": {},
+  "greylist": {
+    "20.0.0.2": {
+      "ip": "20.0.0.2",
+      "first_seen": "2026-02-27T15:09:58.070149",
+      "last_seen": "2026-02-27T15:09:58.070156",
+      "occurrences": 1,
+      "threat_data": [
+        {
+          "src_ip": "20.0.0.2",
+          "probability": 0.6,
+          "dst_port": 443,
+          "timestamp": "2026-02-03T17:00:01"
+        }
+      ],
+      "status": "pending_decision"
+    }
+  }
+}

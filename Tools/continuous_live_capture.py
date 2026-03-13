@@ -219,8 +219,9 @@ def packets_to_dataframe(packet_tuples):
                     fin_count += 1
                 if 'A' in flag_str:
                     ack_count += 1
-            except Exception as e:
-                pass  # Skip on error
+            except (ValueError, TypeError):
+                # Cannot convert flags to string
+                continue
         rows.append({
             'Destination Port': int(flow['dst_port']),
             'Flow Duration': int(duration_us),

@@ -1,0 +1,421 @@
+"""Web UI action definitions mapped to terminal UI behavior."""
+
+from __future__ import annotations
+
+from typing import Dict, List
+
+
+def _param(name: str, label: str, default: str = "", required: bool = True) -> Dict:
+    return {"name": name, "label": label, "default": default, "required": required}
+
+
+def get_menu_actions() -> List[Dict]:
+    """Return the web menu/action model with command execution metadata."""
+    return [
+        {
+            "id": "detection",
+            "title": "Live Detection & Monitoring",
+            "icon": "🔍",
+            "actions": [
+                {
+                    "id": "live-detect-fast",
+                    "title": "Live Detection (Quick)",
+                    "description": "6s window / 4s interval",
+                    "executor": {"kind": "shortcut", "value": "live-detect-fast"},
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "live-detect-standard",
+                    "title": "Live Detection (Standard)",
+                    "description": "10s window / 4s interval",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 SecIDS-CNN/run_model.py live --iface {iface} --window 10 --interval 4",
+                    },
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "live-detect-slow",
+                    "title": "Live Detection (Slow)",
+                    "description": "20s window / 10s interval",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 SecIDS-CNN/run_model.py live --iface {iface} --window 20 --interval 10",
+                    },
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "live-detect-custom",
+                    "title": "Live Detection (Custom)",
+                    "description": "Custom window / interval / backend",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 SecIDS-CNN/run_model.py live --iface {iface} --window {window} --interval {interval} --backend {backend}",
+                    },
+                    "params": [
+                        _param("iface", "Network Interface", "eth0"),
+                        _param("window", "Window (seconds)", "10"),
+                        _param("interval", "Interval (seconds)", "4"),
+                        _param("backend", "Backend (tf/unified)", "tf"),
+                    ],
+                },
+                {
+                    "id": "deep-scan-live",
+                    "title": "Deep Scan (Live)",
+                    "description": "600s duration / 60s interval",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 Tools/deep_scan.py --iface {iface} --duration 600 --interval 60",
+                    },
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "deep-scan-file",
+                    "title": "Deep Scan (File)",
+                    "description": "Multi-pass deep scan on CSV",
+                    "executor": {"kind": "shell", "value": "python3 Tools/deep_scan.py --file {file_path} --passes 10"},
+                    "params": [_param("file_path", "CSV File Path")],
+                },
+                {
+                    "id": "integrated-adaptive-workflow",
+                    "title": "Integrated Adaptive Workflow",
+                    "description": "A→B→C→D loop (intelligence, detection, countermeasure, improvement)",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 Root/integrated_workflow.py --mode full --interface {iface} --duration {duration}",
+                    },
+                    "params": [
+                        _param("iface", "Network Interface", "eth0"),
+                        _param("duration", "Capture Duration (seconds)", "120"),
+                    ],
+                },
+                {
+                    "id": "integrated-adaptive-workflow-continuous",
+                    "title": "Integrated Adaptive Workflow (Continuous)",
+                    "description": "Continuous A→B→C→D loop with ongoing improvement",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 Root/integrated_workflow.py --mode continuous --interface {iface}",
+                    },
+                    "params": [
+                        _param("iface", "Network Interface", "eth0"),
+                    ],
+                },
+                {
+                    "id": "integrated-adaptive-workflow-stop",
+                    "title": "Stop Integrated Workflow",
+                    "description": "Stop running continuous integrated workflow process",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo pkill -f 'Root/integrated_workflow.py --mode continuous'",
+                    },
+                    "params": [],
+                },
+                {
+                    "id": "detect-file-default",
+                    "title": "File-Based Detection",
+                    "description": "Analyze one CSV file",
+                    "executor": {"kind": "shell", "value": ".venv_test/bin/python SecIDS-CNN/run_model.py file {file_path}"},
+                    "params": [_param("file_path", "CSV Path", "SecIDS-CNN/datasets/MD_20260129_145407.csv")],
+                },
+                {
+                    "id": "stop-detection-processes",
+                    "title": "Stop Detection Processes",
+                    "description": "Stop active live/detection scans",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "pkill -f 'SecIDS-CNN/run_model.py live' || true; pkill -f 'Tools/deep_scan.py --iface' || true",
+                    },
+                    "params": [],
+                },
+            ],
+        },
+        {
+            "id": "capture",
+            "title": "Network Capture Operations",
+            "icon": "📡",
+            "actions": [
+                {
+                    "id": "capture-60",
+                    "title": "Quick Capture (60s)",
+                    "description": "Capture for 60 seconds",
+                    "executor": {"kind": "shortcut", "value": "capture-custom"},
+                    "params": [_param("iface", "Network Interface", "eth0"), _param("duration", "Duration (seconds)", "60")],
+                },
+                {
+                    "id": "capture-quick",
+                    "title": "Quick Capture (120s)",
+                    "description": "Capture for 120 seconds",
+                    "executor": {"kind": "shortcut", "value": "capture-quick"},
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "capture-300",
+                    "title": "Extended Capture (300s)",
+                    "description": "Capture for 300 seconds",
+                    "executor": {"kind": "shortcut", "value": "capture-custom"},
+                    "params": [_param("iface", "Network Interface", "eth0"), _param("duration", "Duration (seconds)", "300")],
+                },
+                {
+                    "id": "capture-custom",
+                    "title": "Custom Duration Capture",
+                    "description": "Capture with custom duration",
+                    "executor": {"kind": "shortcut", "value": "capture-custom"},
+                    "params": [_param("iface", "Network Interface", "eth0"), _param("duration", "Duration (seconds)", "120")],
+                },
+                {
+                    "id": "capture-continuous",
+                    "title": "Continuous Live Capture",
+                    "description": "Continuous capture and processing",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "sudo python3 Tools/continuous_live_capture.py --iface {iface} --window 120 --interval 120",
+                    },
+                    "params": [_param("iface", "Network Interface", "eth0")],
+                },
+                {
+                    "id": "capture-list",
+                    "title": "List Captures",
+                    "description": "Show captured PCAP files",
+                    "executor": {"kind": "shortcut", "value": "list-captures"},
+                    "params": [],
+                },
+                {
+                    "id": "capture-list-interfaces",
+                    "title": "List Interfaces",
+                    "description": "Show available network interfaces",
+                    "executor": {"kind": "shell", "value": "ip -br link show"},
+                    "params": [],
+                },
+                {
+                    "id": "pipeline-capture",
+                    "title": "Pipeline Capture & Analyze",
+                    "description": "Capture and analyze pipeline",
+                    "executor": {
+                        "kind": "shell",
+                        "value": "python3 Tools/pipeline_orchestrator.py --mode capture --iface {iface} --duration {duration}",
+                    },
+                    "params": [_param("iface", "Network Interface", "eth0"), _param("duration", "Duration (seconds)", "240")],
+                },
+            ],
+        },
+        {
+            "id": "analysis",
+            "title": "File-Based Analysis",
+            "icon": "📊",
+            "actions": [
+                {
+                    "id": "analyze-csv",
+                    "title": "Analyze CSV File",
+                    "description": "Run threat detection on CSV",
+                    "executor": {"kind": "shortcut", "value": "detect-file"},
+                    "params": [_param("csv_file", "CSV Path", "SecIDS-CNN/datasets/MD_20260129_145407.csv")],
+                },
+                {
+                    "id": "analyze-test1",
+                    "title": "Analyze Test1 Dataset",
+                    "description": "Run detection on Archives/Test1.csv",
+                    "executor": {"kind": "shell", "value": "python3 SecIDS-CNN/run_model.py file Archives/Test1.csv"},
+                    "params": [],
+                },
+                {
+                    "id": "analyze-test2",
+                    "title": "Analyze Test2 Dataset",
+                    "description": "Run detection on Archives/Test2.csv",
+                    "executor": {"kind": "shell", "value": "python3 SecIDS-CNN/run_model.py file Archives/Test2.csv"},
+                    "params": [],
+                },
+                {
+                    "id": "analyze-pcap",
+                    "title": "Analyze PCAP File",
+                    "description": "Convert and analyze PCAP",
+                    "executor": {"kind": "shell", "value": "python3 Tools/pcap_to_csv.py {pcap_file}"},
+                    "params": [_param("pcap_file", "PCAP Path")],
+                },
+                {
+                    "id": "batch-analysis",
+                    "title": "Batch Analysis (All CSV)",
+                    "description": "Analyze all project CSV datasets",
+                    "executor": {"kind": "shell", "value": "python3 SecIDS-CNN/run_model.py file SecIDS-CNN/datasets/*.csv"},
+                    "params": [],
+                },
+                {
+                    "id": "batch-analysis-custom",
+                    "title": "Batch Analysis (Custom)",
+                    "description": "Analyze one or more CSV files (space-separated)",
+                    "executor": {"kind": "shell", "value": "python3 SecIDS-CNN/run_model.py file {csv_targets}"},
+                    "params": [_param("csv_targets", "CSV target(s)", "Archives/Test1.csv")],
+                },
+                {
+                    "id": "pcap-to-csv",
+                    "title": "PCAP to CSV Conversion",
+                    "description": "Convert PCAP to output CSV",
+                    "executor": {"kind": "shell", "value": "python3 Tools/pcap_to_csv.py {pcap_file} -o {output_csv}"},
+                    "params": [_param("pcap_file", "PCAP Path"), _param("output_csv", "Output CSV", "Results/converted.csv")],
+                },
+                {
+                    "id": "refine-dataset",
+                    "title": "Enhance Dataset Features",
+                    "description": "Refine and enhance dataset features",
+                    "executor": {"kind": "shell", "value": "python3 Scripts/refine_datasets.py {dataset}"},
+                    "params": [_param("dataset", "Dataset Path")],
+                },
+                {
+                    "id": "threat-reviewer",
+                    "title": "Threat Reviewer",
+                    "description": "Review threat profiles and patterns",
+                    "executor": {"kind": "shell", "value": "python3 Tools/threat_reviewer.py"},
+                    "params": [],
+                },
+            ],
+        },
+        {
+            "id": "training",
+            "title": "Model Training & Testing",
+            "icon": "🎓",
+            "actions": [
+                {"id": "train-secids", "title": "Train SecIDS-CNN Model", "description": "Train and test SecIDS model", "executor": {"kind": "shell", "value": "python3 SecIDS-CNN/train_and_test.py"}, "params": []},
+                {"id": "train-unified", "title": "Train Unified Model", "description": "Train unified model", "executor": {"kind": "shell", "value": "python3 Model_Tester/Code/train_unified_model.py"}, "params": []},
+                {"id": "train-all-pipeline", "title": "Train All Models (Pipeline)", "description": "Run full training pipeline", "executor": {"kind": "shell", "value": "python3 Tools/pipeline_orchestrator.py --mode train"}, "params": []},
+                {"id": "test-model", "title": "Test Model", "description": "Run unified model tests", "executor": {"kind": "shell", "value": "python3 Model_Tester/Code/test_unified_model.py"}, "params": []},
+                {"id": "run-smoke-tests", "title": "Run Smoke Tests", "description": "Run smoke stress tests", "executor": {"kind": "shell", "value": "python3 Scripts/stress_test.py --mode smoke"}, "params": []},
+                {"id": "run-full-stress-tests", "title": "Run Full Stress Test Suite", "description": "Run comprehensive stress tests", "executor": {"kind": "shell", "value": "python3 Scripts/stress_test.py --mode comprehensive"}, "params": []},
+                {"id": "run-performance-stress", "title": "Run Performance Stress Test", "description": "Run performance-focused stress test", "executor": {"kind": "shell", "value": "python3 Scripts/stress_test.py --mode performance"}, "params": []},
+                {"id": "compare-models", "title": "Compare Models", "description": "Compare trained models", "executor": {"kind": "shell", "value": "python3 Model_Tester/Code/compare_models.py"}, "params": []},
+                {"id": "view-model-info", "title": "View Model Info", "description": "List available model files", "executor": {"kind": "shell", "value": "ls -lh SecIDS-CNN/*.h5 Model_Tester/models/"}, "params": []},
+                {"id": "pipeline-train", "title": "Full Training Pipeline", "description": "Run orchestrated training workflow", "executor": {"kind": "shell", "value": "python3 Tools/pipeline_orchestrator.py --mode train"}, "params": []},
+            ],
+        },
+        {
+            "id": "setup",
+            "title": "System Configuration & Setup",
+            "icon": "⚙️",
+            "actions": [
+                {"id": "check-iface", "title": "Check Network Interfaces", "description": "List available network interfaces", "executor": {"kind": "shell", "value": "ip link show"}, "params": []},
+                {"id": "verify-system-setup", "title": "Verify System Setup", "description": "Run setup verification script", "executor": {"kind": "shell", "value": "python3 Tools/verify_setup.py"}, "params": []},
+                {"id": "verify-tf", "title": "Verify TensorFlow", "description": "Check TensorFlow installation", "executor": {"kind": "shell", "value": "python3 -c 'import tensorflow as tf; print(f\"TensorFlow: {tf.__version__}\")'"}, "params": []},
+                {"id": "install-deps", "title": "Install Dependencies", "description": "Install requirements", "executor": {"kind": "shell", "value": "pip install -r requirements.txt"}, "params": []},
+                {"id": "create-master-dataset", "title": "Create Master Dataset", "description": "Build master training dataset", "executor": {"kind": "shell", "value": "python3 Scripts/create_master_dataset.py"}, "params": []},
+                {"id": "organize-cleanup-files", "title": "Organize/Cleanup Files", "description": "Run file organizer cleanup", "executor": {"kind": "shell", "value": "python3 Scripts/organize_files.py"}, "params": []},
+                {"id": "deployment-conflict-guard-dryrun", "title": "Deployment Conflict Guard (Dry Run)", "description": "Scan and report legacy deployment conflicts", "executor": {"kind": "shell", "value": "python3 Scripts/deployment_conflict_guard.py --dry-run"}, "params": []},
+                {"id": "deployment-conflict-guard-apply", "title": "Deployment Conflict Guard (Apply)", "description": "Quarantine legacy conflicts into TrashDump and patch stale references", "executor": {"kind": "shell", "value": "python3 Scripts/deployment_conflict_guard.py"}, "params": []},
+                {"id": "system-diagnostics", "title": "System Diagnostics", "description": "Run system checker", "executor": {"kind": "shell", "value": "python3 Tools/system_checker.py"}, "params": []},
+                {"id": "python-env", "title": "View Python Environment", "description": "Print Python executable and version", "executor": {"kind": "shell", "value": "python3 -c 'import sys; print(sys.executable); print(sys.version)'"}, "params": []},
+                {"id": "start-scheduler", "title": "Start Task Scheduler", "description": "Start auto-update scheduler daemon", "executor": {"kind": "shell", "value": "python3 Auto_Update/task_scheduler.py --daemon"}, "params": []},
+                {"id": "stop-scheduler", "title": "Stop Task Scheduler", "description": "Stop auto-update scheduler daemon", "executor": {"kind": "shell", "value": "pkill -f 'Auto_Update/task_scheduler.py' || true"}, "params": []},
+                {"id": "optimize-system", "title": "Optimize System", "description": "Run system optimization script", "executor": {"kind": "shell", "value": "python3 Scripts/optimize_system.py"}, "params": []},
+            ],
+        },
+        {
+            "id": "reports",
+            "title": "View Reports & Results",
+            "icon": "📈",
+            "actions": [
+                {"id": "list-results", "title": "List Detection Results", "description": "Show latest result CSV files", "executor": {"kind": "shell", "value": "ls -lht Results/*.csv | head -20"}, "params": []},
+                {"id": "list-threat-reports", "title": "List Threat Reports", "description": "List markdown/json reports", "executor": {"kind": "shell", "value": "ls -lht Results/*report*.md Results/*report*.json | head -20"}, "params": []},
+                {"id": "list-deep-scan-reports", "title": "List Deep Scan Reports", "description": "Show deep scan report files", "executor": {"kind": "shell", "value": "ls -lht Results/deep_scan*.json | head -20"}, "params": []},
+                {"id": "view-stress-test-reports", "title": "View Stress Test Reports", "description": "Show stress test result artifacts", "executor": {"kind": "shell", "value": "ls -lht Stress_Test_Results/*.json | head -20"}, "params": []},
+                {"id": "view-latest-report", "title": "View Latest Report", "description": "Display latest markdown report", "executor": {"kind": "shell", "value": "cat $(ls -t Results/*report*.md 2>/dev/null | head -1)"}, "params": []},
+                {"id": "view-system-logs", "title": "View System Logs", "description": "List system logs", "executor": {"kind": "shell", "value": "ls -lht Logs/ | head -20"}, "params": []},
+                {"id": "view-scheduler-logs", "title": "View Scheduler Logs", "description": "List scheduler logs", "executor": {"kind": "shell", "value": "ls -lht Auto_Update/logs/ | head -20"}, "params": []},
+                {"id": "list-all-reports", "title": "List All Reports", "description": "List report directories and recent files", "executor": {"kind": "shell", "value": "ls -lht Reports/ Results/ Stress_Test_Results/ 2>/dev/null | head -50"}, "params": []},
+                {
+                    "id": "generate-threat-report",
+                    "title": "Generate New Threat Report",
+                    "description": "Generate report from detection CSV",
+                    "executor": {"kind": "shell", "value": "python3 Tools/report_generator.py {result_file}"},
+                    "params": [_param("result_file", "Detection Results CSV")],
+                },
+            ],
+        },
+        {
+            "id": "utilities",
+            "title": "Utilities & Tools",
+            "icon": "🔧",
+            "actions": [
+                {"id": "list-datasets", "title": "List Datasets", "description": "List datasets and archives", "executor": {"kind": "shell", "value": "ls -lh SecIDS-CNN/datasets/ Archives/"}, "params": []},
+                {"id": "list-models", "title": "List Models", "description": "List model files", "executor": {"kind": "shell", "value": "ls -lh SecIDS-CNN/*.h5 Models/ Model_Tester/models/"}, "params": []},
+                {"id": "list-captures", "title": "List Captures", "description": "List captured network files", "executor": {"kind": "shell", "value": "ls -lh Captures/"}, "params": []},
+                {"id": "view-whitelist", "title": "View Whitelist", "description": "Show whitelist entries", "executor": {"kind": "shell", "value": "cat Device_Profile/whitelists/whitelist_*.json | tail -50"}, "params": []},
+                {"id": "view-blacklist", "title": "View Blacklist", "description": "Show blacklist entries", "executor": {"kind": "shell", "value": "cat Device_Profile/Blacklist/blacklist_*.json | tail -50"}, "params": []},
+                {"id": "analyze-threat-origins", "title": "Analyze Threat Origins", "description": "Run threat origin analysis script", "executor": {"kind": "shell", "value": "python3 Scripts/analyze_threat_origins.py"}, "params": []},
+                {"id": "threat-reviewer-tool", "title": "Threat Reviewer", "description": "Review threat profiles and patterns", "executor": {"kind": "shell", "value": "python3 Tools/threat_reviewer.py"}, "params": []},
+                {"id": "update-lists", "title": "Update Device Lists", "description": "Refresh whitelist/blacklist data", "executor": {"kind": "shell", "value": "python3 Device_Profile/list_manager.py --update"}, "params": []},
+                {"id": "view-archives", "title": "View Archives", "description": "List archive files", "executor": {"kind": "shell", "value": "ls -lh Archives/"}, "params": []},
+                {"id": "launch-passive-ui", "title": "Launch Passive Countermeasure UI", "description": "Run passive countermeasure terminal UI", "executor": {"kind": "shell", "value": "python3 Countermeasures/passive_ui.py"}, "params": []},
+                {"id": "launch-active-ui", "title": "Launch Active Countermeasure UI", "description": "Run active countermeasure terminal UI", "executor": {"kind": "shell", "value": "python3 Countermeasures/active_ui.py"}, "params": []},
+                {"id": "clean-temp", "title": "Clean Temp Files", "description": "Remove temporary capture files", "executor": {"kind": "shortcut", "value": "clean-temp"}, "params": []},
+                {"id": "view-command-library", "title": "View Command Library", "description": "List all command shortcuts", "executor": {"kind": "shell", "value": "python3 Tools/command_library.py list"}, "params": []},
+            ],
+        },
+        {
+            "id": "identification-listing",
+            "title": "Identification Listing",
+            "icon": "🧾",
+            "actions": [
+                {"id": "id-list-whitelist", "title": "Whitelist", "description": "Show trusted devices", "executor": {"kind": "internal", "value": "identification_view"}, "params": []},
+                {"id": "id-list-blacklist", "title": "Blacklist", "description": "Show blocked devices", "executor": {"kind": "internal", "value": "identification_view"}, "params": []},
+                {"id": "id-list-greylist", "title": "Greylist", "description": "Show review-required devices", "executor": {"kind": "internal", "value": "identification_view"}, "params": []},
+                {"id": "id-list-intruder", "title": "Intruder", "description": "Show active threat devices", "executor": {"kind": "internal", "value": "identification_view"}, "params": []},
+                {"id": "id-list-unidentified", "title": "Unidentified", "description": "Show not-yet-classified devices", "executor": {"kind": "internal", "value": "identification_view"}, "params": []},
+                {"id": "id-list-identify", "title": "Identify", "description": "Analyze unidentified devices and auto-tag", "executor": {"kind": "internal", "value": "identification_identify"}, "params": []},
+            ],
+        },
+        {
+            "id": "history",
+            "title": "Command History",
+            "icon": "📚",
+            "actions": [
+                {"id": "history-view", "title": "View History", "description": "Load command history from config", "executor": {"kind": "internal", "value": "history_view"}, "params": []},
+                {"id": "history-clear", "title": "Clear History", "description": "Clear saved command history", "executor": {"kind": "internal", "value": "history_clear"}, "params": []},
+                {"id": "history-rerun-last", "title": "Rerun Last Command", "description": "Execute last recorded command", "executor": {"kind": "internal", "value": "history_rerun_last"}, "params": []},
+            ],
+        },
+        {
+            "id": "settings",
+            "title": "Settings & Configuration",
+            "icon": "💾",
+            "actions": [
+                {
+                    "id": "settings-change-interface",
+                    "title": "Change Default Interface",
+                    "description": "Update default interface in UI config",
+                    "executor": {"kind": "internal", "value": "settings_update"},
+                    "params": [_param("last_interface", "Default Interface", "eth0")],
+                },
+                {
+                    "id": "settings-change-duration",
+                    "title": "Change Default Duration",
+                    "description": "Update default capture duration",
+                    "executor": {"kind": "internal", "value": "settings_update"},
+                    "params": [_param("last_duration", "Default Duration (seconds)", "60")],
+                },
+                {
+                    "id": "settings-change-window",
+                    "title": "Change Default Window",
+                    "description": "Update default detection window",
+                    "executor": {"kind": "internal", "value": "settings_update"},
+                    "params": [_param("last_window", "Default Window (seconds)", "5")],
+                },
+                {
+                    "id": "settings-change-interval",
+                    "title": "Change Default Interval",
+                    "description": "Update default detection interval",
+                    "executor": {"kind": "internal", "value": "settings_update"},
+                    "params": [_param("last_interval", "Default Interval (seconds)", "2")],
+                },
+                {
+                    "id": "settings-save-all",
+                    "title": "Save & Apply Settings",
+                    "description": "Save all defaults in one step",
+                    "executor": {"kind": "internal", "value": "settings_update"},
+                    "params": [
+                        _param("last_interface", "Default Interface", "eth0"),
+                        _param("last_duration", "Default Duration (seconds)", "60"),
+                        _param("last_window", "Default Window (seconds)", "5"),
+                        _param("last_interval", "Default Interval (seconds)", "2"),
+                    ],
+                },
+            ],
+        },
+    ]

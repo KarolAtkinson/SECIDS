@@ -1,0 +1,63 @@
+#!/bin/bash
+# SecIDS-CNN public WebUI launcher (production mode)
+# Binds on all interfaces and prints shareable URLs for local/LAN/public access.
+
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+
+SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT" || exit 1
+
+VENV_PYTHON="$PROJECT_ROOT/.venv_test/bin/python"
+if [ ! -x "$VENV_PYTHON" ]; then
+    echo "Missing Python environment: $VENV_PYTHON"
+    echo "Run: python3 -m venv .venv_test && .venv_test/bin/pip install -r requirements.txt"
+    exit 1
+fi
+
+HOST="${SECIDS_WEB_HOST:-0.0.0.0}"
+PORT="${SECIDS_WEB_PORT:-8080}"
+SESSION_TIMEOUT="${SECIDS_SESSION_TIMEOUT_SECONDS:-86400}"
+
+LOGIN_PATH="$($VENV_PYTHON - <<'PY'
+from WebUI.app import create_app
+app = create_app()
+print(app.config.get("SECIDS_LOGIN_PATH", "/login"))
+PY
+)"
+
+LAN_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+PUBLIC_IP="$(curl -4 -s ifconfig.me 2>/dev/null || curl -4 -s api.ipify.org 2>/dev/null || true)"
+
+echo "[webui-public] Session timeout: ${SESSION_TIMEOUT}s"
+echo "[webui-public] Login path: ${LOGIN_PATH}"
+echo "[webui-public] Local URL:   http://127.0.0.1:${PORT}${LOGIN_PATH}"
+if [ -n "${LAN_IP:-}" ]; then
+        echo "[webui-public] LAN URL:     http://${LAN_IP}:${PORT}${LOGIN_PATH}"
+fi
+if [ -n "${PUBLIC_IP:-}" ]; then
+        echo "[webui-public] Public URL:  http://${PUBLIC_IP}:${PORT}${LOGIN_PATH}"
+        echo "[webui-public] Note: Public URL requires router/NAT forwarding TCP ${PORT} -> this host."
+fi
+
+echo "[webui-public] Starting production WebUI on ${HOST}:${PORT}"
+
+if ss -ltn | grep -q ":${PORT}\b"; then
+        echo "[webui-public] Port ${PORT} is already in use. Reusing existing WebUI listener."
+        echo "[webui-public] ready"
+        exit 0
+fi
+
+exec env \
+    SECIDS_WEB_HOST="${HOST}" \
+    SECIDS_WEB_PORT="${PORT}" \
+    SECIDS_WEB_OPEN_BROWSER="0" \
+    SECIDS_SESSION_TIMEOUT_SECONDS="${SESSION_TIMEOUT}" \
+    "$VENV_PYTHON" WebUI/production_server.py

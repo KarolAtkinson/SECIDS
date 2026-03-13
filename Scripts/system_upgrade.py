@@ -7,6 +7,7 @@ Performs safe system-wide upgrades without crashing the system
 import sys
 import subprocess
 import os
+import json
 from pathlib import Path
 from datetime import datetime
 import shutil
@@ -24,6 +25,7 @@ class SystemUpgrader:
         self.venv_python = self.project_root / '.venv_test' / 'bin' / 'python'
         self.venv_pip = self.project_root / '.venv_test' / 'bin' / 'pip'
         self.backup_dir = self.project_root / 'Backups' / f'upgrade_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
+        self.webui_versions_db = self.project_root / 'ServerDB' / 'webuiVersionsDB'
         self.upgrade_log = []
         
     def log(self, message, level="INFO"):
@@ -55,14 +57,15 @@ class SystemUpgrader:
             critical_files = [
                 'requirements.txt',
                 'pyrightconfig.json',
-                'secids_main.py',
-                'system_integrator.py',
+                'Root/secids_main.py',
+                'Root/system_integrator.py',
             ]
             
             for file in critical_files:
                 src = self.project_root / file
                 if src.exists():
                     dst = self.backup_dir / file
+                    dst.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(src, dst)
                     self.log(f"  ✓ Backed up: {file}", "SUCCESS")
             
@@ -80,6 +83,37 @@ class SystemUpgrader:
             
         except Exception as e:
             self.log(f"Backup failed: {e}", "ERROR")
+            return False
+
+    def snapshot_webui_version(self):
+        """Create WebUI rollback snapshot in ServerDB/webuiVersionsDB."""
+        self.log("Snapshotting WebUI version to ServerDB/webuiVersionsDB...")
+
+        try:
+            self.webui_versions_db.mkdir(parents=True, exist_ok=True)
+            webui_root = self.project_root / 'WebUI'
+            if not webui_root.exists() or not webui_root.is_dir():
+                self.log("  ✗ WebUI folder not found", "ERROR")
+                return False
+
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            archive_base = self.webui_versions_db / f'webui_version_{stamp}'
+            archive_path = shutil.make_archive(str(archive_base), 'gztar', root_dir=str(webui_root))
+
+            manifest_file = self.webui_versions_db / 'webui_versions_manifest.jsonl'
+            record = {
+                'created_at': datetime.utcnow().isoformat(),
+                'archive': str(Path(archive_path).relative_to(self.project_root)),
+                'source': str(webui_root.relative_to(self.project_root)),
+                'upgrade_backup': str(self.backup_dir.relative_to(self.project_root)),
+            }
+            with open(manifest_file, 'a', encoding='utf-8') as handle:
+                handle.write(json.dumps(record) + "\n")
+
+            self.log(f"  ✓ WebUI snapshot created: {Path(archive_path).name}", "SUCCESS")
+            return True
+        except Exception as e:
+            self.log(f"  ✗ WebUI snapshot failed: {e}", "ERROR")
             return False
     
     def check_python_version(self):
@@ -194,7 +228,14 @@ class SystemUpgrader:
         for module, name in critical_imports:
             try:
                 result = subprocess.run(
-                    [str(self.venv_python), '-c', f'import {module}; print({module}.__version__)'],
+                    [
+                        str(self.venv_python),
+                        '-c',
+                        (
+                            f"import {module}; "
+                            f"print(getattr({module}, '__version__', 'unknown'))"
+                        ),
+                    ],
                     capture_output=True,
                     text=True,
                     timeout=10
@@ -265,8 +306,9 @@ class SystemUpgrader:
                 
                 checked += 1
                 
-            except Exception:
-                pass
+            except SyntaxError as e:
+                # Syntax error found - add to errors list
+                errors.append((py_file.name, str(e)))
         
         if errors:
             self.log(f"  Found {len(errors)} syntax errors in {checked} files checked", "WARNING")
@@ -301,6 +343,7 @@ class SystemUpgrader:
         
         steps = [
             ("Backup", self.create_backup),
+            ("Snapshot WebUI Version", self.snapshot_webui_version),
             ("Python Version Check", self.check_python_version),
             ("Update pip", self.update_pip),
             ("Upgrade Packages", lambda: self.upgrade_packages(safe_mode)),

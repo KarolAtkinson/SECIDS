@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: secids-cnn-webui
+    env: python
+    plan: starter
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: python WebUI/production_server.py
+    envVars:
+      - key: SECIDS_WEB_HOST
+        value: 0.0.0.0
+      - key: SECIDS_WEB_PORT
+        value: 8080
+      - key: SECIDS_WEB_OPEN_BROWSER
+        value: "0"
+      - key: SECIDS_SESSION_TIMEOUT_SECONDS
+        value: "1800"
+      - key: SECIDS_AUTH_MAX_ATTEMPTS
+        value: "5"
+      - key: SECIDS_AUTH_LOCKOUT_SECONDS
+        value: "900"
+      - key: SECIDS_WEB_SECRET
+        generateValue: true

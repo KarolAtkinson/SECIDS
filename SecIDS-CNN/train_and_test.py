@@ -15,6 +15,8 @@ import warnings
 import sys
 from pathlib import Path
 
+from ml_feature_utils import build_feature_frame, find_target_column
+
 warnings.filterwarnings('ignore')
 
 # Import progress utilities
@@ -33,11 +35,15 @@ print("="*80)
 
 # Load DDoS training dataset
 import os
+env_dataset_path = os.getenv('SECIDS_DATASET_PATH', '').strip()
 # Use master dataset if available, fallback to archived ddos dataset
 master_dataset_path = os.path.join(os.path.dirname(__file__), 'datasets', 'MD_1.csv')
 archive_dataset_path = os.path.join(os.path.dirname(__file__), '..', 'Archives', 'ddos_training_dataset.csv')
 
-if os.path.exists(master_dataset_path):
+if env_dataset_path and os.path.exists(env_dataset_path):
+    data_path = env_dataset_path
+    print("\n✓ Using workflow-provided retraining dataset")
+elif os.path.exists(master_dataset_path):
     data_path = master_dataset_path
     print("\n✓ Using master dataset")
 elif os.path.exists(archive_dataset_path):
@@ -85,14 +91,7 @@ try:
     print(f"  ✓ Records after cleaning: {len(df):,}")
     
     # Identify target column
-    target_col = None
-    possible_targets = ['is_attack', 'Attack', 'attack', 'Label', 'Class', 'label', 
-                       'class', 'Type', 'type', 'threat', 'Threat', 'Intrusion']
-    
-    for col in possible_targets:
-        if col in df.columns:
-            target_col = col
-            break
+    target_col = find_target_column(df)
     
     # If no target found, create one based on statistical anomalies
     if target_col is None:
@@ -115,7 +114,7 @@ try:
         print(f"  - Target values: {sorted(df[target_col].unique().tolist())}")
     
     # Separate features and target
-    X = df.drop(columns=[target_col])
+    X = build_feature_frame(df, target_col=target_col, drop_targets=False, prefer_core_columns=True)
     y = df[target_col]
     
     # Encode categorical variables
@@ -210,8 +209,8 @@ try:
         print(f"  - Output classes: {num_classes}")
         try:
             print(f"  - Total parameters: {model.count_params():,}")
-        except Exception as e:
-            pass  # Skip on error
+        except AttributeError:
+            print("  - Total parameters: unavailable")
         # Train model
         print(f"\n[5/5] Training Model")
         print(f"{'='*80}")
@@ -311,7 +310,9 @@ try:
     class_names_list = [str(c) for c in class_names]
     try:
         print(classification_report(y_test, y_pred_classes, target_names=class_names_list))
-    except Exception:
+    except ValueError as e:
+        # Mismatch in class names - use default
+        print(f"Warning: Could not use custom class names: {e}")
         print(classification_report(y_test, y_pred_classes))
 
     # Confusion matrix
@@ -366,8 +367,8 @@ try:
     try:
         params_info = model.count_params() if USE_TF else 'N/A (sklearn model)'
         print(f"  ✓ Model parameters: {params_info}")
-    except Exception as e:
-            pass  # Skip on error
+    except AttributeError:
+        print("  ✓ Model parameters: unavailable")
     # Save model
     try:
         if USE_TF:

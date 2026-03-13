@@ -1,128 +1,125 @@
-# SecIDS-CNN Master Manual
-**Complete Documentation & Reference Guide**
+# SecIDS-CNN Instruction Manual
+**Operations, Deployment, and Development Reference**
 
-**Version:** 5.1  
-**Date:** February 7, 2026  
-**Status:** ✅ Production Ready - Fully Upgraded System with Root Folder Organization  
-**Last Updated:** February 7, 2026 (13:35 UTC)
+## Document Control
+- **Manual ID:** SECIDS-MAN-001
+- **Current Version:** 5.10
+- **Release Date:** March 11, 2026
+- **Classification:** Internal Technical Manual
+- **Status:** Production Ready
+- **Maintained In:** `Master-Manual.md`
 
-## 🆕 Version 5.1 Highlights
+## Purpose and Scope
+This manual defines how to install, operate, secure, maintain, and extend the SecIDS-CNN platform.
 
-**Root Folder Organization & System Updates:**
-- ✅ **Root Folder Structure** - Main Python files organized into Root/ directory
-- ✅ **Path Resolution Fixed** - File-based detection path bug resolved
-- ✅ **UI Command Integration** - Front-end controls fully responsive and linked
-- ✅ **Package Updates** - TensorFlow 2.20.0, Rich 14.3.2, tqdm 4.67.3, protobuf 6.33.5
-- ✅ **Test Suite Updates** - All test paths updated for Root/ folder structure
-- ✅ **Launcher Updates** - All scripts updated to reference Root/ modules
-- ✅ **9/9 System Checks** - All verification passing after reorganization
-- ✅ **Fast Scan Verified** - 90,105 records processed at 10,680 records/sec
+This document covers:
+- Platform setup and first use
+- Live/file detection operations
+- WebUI operations and role boundaries
+- Automation, scheduling, and maintenance
+- Model lifecycle (train, test, validate, deploy)
+- Troubleshooting and technical reference
 
-**Previous Version 5.0:**
-- ✅ **System-Wide Upgrade** - All 34 compilation errors fixed, packages updated
-- ✅ **TensorFlow 2.20.0 + Keras 3.12.1** - Latest stable versions with compatibility patches
-- ✅ **Automated Upgrade Tool** - Safe, reversible system upgrades with backups
-- ✅ **Enhanced Cleanup** - Integrated upgrade function in project_cleanup.sh
-- ✅ **Zero Downtime** - All upgrades completed without system crashes
-- ✅ **Full Verification** - 7/7 post-upgrade tests passing
+## Intended Audience
+- **Operators:** run detections, monitor alerts, handle incidents.
+- **Administrators:** manage users, scheduler, server DB, and deployments.
+- **Engineers:** improve pipelines, models, and integrations.
+- **Auditors/Reviewers:** verify behavior, logs, and policy compliance.
 
-**Previous Version 4.0:**
-- ✅ **Unified Entry Point** - `secids_main.py` centralizes all operations
-- ✅ **System Integrator** - Links all components seamlessly
-- ✅ **Package Structure** - All modules properly initialized with `__init__.py`
-- ✅ **Project Requirements** - Comprehensive `requirements.txt` at root
-- ✅ **Enhanced Launchers** - Smart auto-detection and fallback
-- ✅ **9/9 System Checks** - All diagnostics passing
-- ✅ **Full API Access** - Programmatic control over all components
+## Safety and Operational Notices
+- Run privileged capture/blocking actions with approved sudo policy only.
+- Do not expose admin interfaces publicly without authentication and access controls.
+- Validate model and dataset provenance before retraining in production.
+- Use simulation mode for testing attack-response workflows.
 
-**Quick Start (New Way):**
+## Manual Conventions
+- **MUST / SHALL:** mandatory requirement.
+- **SHOULD:** recommended practice.
+- **MAY:** optional behavior.
+- Paths and commands are shown in monospace.
+
+## System-at-a-Glance
+- **Detection engines:** SecIDS-CNN and unified model stack.
+- **Interfaces:** Terminal UI + Browser WebUI.
+- **Automation:** Scheduler, command library, orchestration pipeline.
+- **Storage:** Project files + ServerDB tagged data domains.
+- **Validation:** stress tests, debug scanners, integration checks.
+
+## Current Release Context (v5.9)
+Major points introduced or stabilized in this release cycle:
+- Private-guarded Git auto-sync policy and enforcement.
+- Tagged project-to-ServerDB sync and API data distribution.
+- Expanded WebUI onboarding, model registry, packet log, simulation controls.
+- NIST-CSW feed ingestion, conversion, and scheduled refresh flow.
+- Multi-user panel support (guest/viewer/operator/admin) with role-aware behavior.
+
+## Quick Start (Operator Path)
 ```bash
-# Interactive UI (Recommended)
-.venv_test/bin/python Root/secids_main.py ui
-
-# System Check
-.venv_test/bin/python Root/secids_main.py check
-
-# File Detection - Fast Scan
-.venv_test/bin/python SecIDS-CNN/run_model.py file datasets/YOUR_FILE.csv
-
-# Live Detection
-sudo .venv_test/bin/python SecIDS-CNN/run_model.py live --iface eth0
-
-# Run All Tests
-bash Root/run_all_tests.sh
-
-# System Upgrade & Maintenance
-./Launchers/project_cleanup.sh --upgrade  # Full cleanup + upgrade
-bash Scripts/verify_upgrade.sh             # Verify system health
+cd /home/kali/Documents/Code/SECIDS-CNN
+source .venv_test/bin/activate
+python3 UI/terminal_ui.py
 ```
 
-**See:** 
-- [Root/README.md](Root/README.md) - Root folder documentation and usage
-- [FRONTEND_BACKEND_UPGRADE_REPORT.md](FRONTEND_BACKEND_UPGRADE_REPORT.md) - UI integration details
-- [SYSTEM_UPGRADE_REPORT_20260131.md](Reports/SYSTEM_UPGRADE_REPORT_20260131.md) - System upgrade details
+## Quick Start (WebUI Path)
+```bash
+cd /home/kali/Documents/Code/SECIDS-CNN
+source .venv_test/bin/activate
+python3 WebUI/live_server.py
+```
+
+## How to Use This Manual
+1. Start with Part I for onboarding and setup.
+2. Use Part II for automation/command workflows.
+3. Use Part III for day-to-day operations.
+4. Use Part IV for engineering and quality workflows.
+5. Use Part V and appendices for deep technical reference.
+
+## References
+### Internal Project References
+- `Root/README.md`
+- `WebUI/app.py`
+- `WebUI/templates/index.html`
+- `WebUI/static/app.js`
+- `Auto_Update/task_scheduler.py`
+- `Auto_Update/git_auto_sync.py`
+- `Scripts/sync_project_data_to_serverdb.py`
+- `Scripts/update_nist_csw_sources.py`
+- `Scripts/convert_nist_csw_to_model_format.py`
+- `Reports/WORKFLOW_CHART.md`
+- `Reports/SYSTEM_UPGRADE_REPORT_20260131.md`
+
+### External Technology References
+- TensorFlow Documentation: https://www.tensorflow.org/
+- Flask Documentation: https://flask.palletsprojects.com/
+- Scapy Documentation: https://scapy.readthedocs.io/
+- NVD Data Feeds: https://nvd.nist.gov/vuln/data-feeds
+- CISA KEV Catalog: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+
+## Change and Revision Policy
+- Significant release changes are captured in this manual and in `Reports/` artifacts.
+- Behavior-changing updates to auth, role access, scheduler, and model pipelines MUST include validation notes.
+
+## Document Structure
+- Part I: Getting Started
+- Part II: Automation and Commands
+- Part III: Operations
+- Part IV: Development and Quality
+- Part V: Technical Reference
+- Appendices: file maps, glossary, quick tables, revisions
 
 ---
 
-## 📋 Recent Changes (v5.1 - February 7, 2026)
-
-### Root Folder Organization
-**Major restructuring for better project organization:**
-
-1. **Created Root/ Directory**
-   - Moved 9 main Python files from project root to `Root/`
-   - Created `Root/README.md` with usage documentation
-   - Updated all paths in scripts and launchers
-
-2. **Files Moved to Root/**
-   - ✅ `secids_main.py` - Main entry point
-   - ✅ `system_integrator.py` - System integration
-   - ✅ `integrated_workflow.py` - Workflow orchestration
-   - ✅ `test_greylist.py`, `test_integration.py`, `test_validation.py` - Test suite
-   - ✅ `run_all_tests.sh` - Test runner (auto-switches to project root)
-   - ✅ `pyrightconfig.json` - Type checking config
-   - ✅ `__init__.py` - Package initialization
-
-3. **Updated Scripts & Launchers**
-   - ✅ `Root/run_all_tests.sh` - Updated all test paths, auto-detects project root
-   - ✅ `Root/test_validation.py` - Fixed PROJECT_ROOT path resolution
-   - ✅ `Launchers/project_cleanup.sh` - Added Root/ to directory structure
-   - ✅ `Launchers/post_upgrade_menu.sh` - Updated system_integrator.py path
-   - ✅ `Launchers/QUICK_START_V2.sh` - Updated secids_main.py path
-
-### System Updates & Fixes
-
-1. **Package Updates**
-   - ✅ TensorFlow 2.20.0 (latest stable)
-   - ✅ Rich 14.3.2 (UI library)
-   - ✅ tqdm 4.67.3 (progress bars)
-   - ✅ protobuf 6.33.5, grpcio 1.78.0
-   - ✅ 7 core packages upgraded
-
-2. **Bug Fixes**
-   - ✅ Fixed path resolution in `SecIDS-CNN/run_model.py` (file detection paths)
-   - ✅ Fixed IndentationError in `Tools/command_library.py` (line 161)
-   - ✅ UI command integration - all controls responsive and reactive
-
-3. **System Verification**
-   - ✅ 9/9 system checks passing
-   - ✅ Fast scan test: 90,105 records @ 10,680 records/sec
-   - ✅ Threat detection: 22.37% malicious traffic identified
-   - ✅ All module imports working correctly
-   - ✅ Test suite functional with new paths
-
-### Performance Results
-**Fast Scan Test (MD_20260129_145407.csv):**
-- Records Analyzed: 90,105
-- Threats Detected: 20,159 (22.4%)
-- Processing Speed: 10,680 records/second
-- Total Time: 10.25s (including reports)
-- Status: ✅ All systems operational
-
-**Threat Analysis:**
-- Most targeted ports: 80 (13,619), 443 (2,882), 53 (156)
-- Threat Level: 🟠 HIGH (22.37%)
-- Reports generated: CSV + Markdown + JSON
+## Release Notes Archive (Condensed)
+- **v5.10:** WebUI Identification Listing menu, unified color-coded list panel, in-panel list editor (add/remove/change-tag), and optional Deep Identify model-test pass.
+- **v5.9:** ServerDB distribution, privacy-guarded git policy, NIST-CSW ingestion/conversion updates.
+- **v5.8:** WebUI synchronization and operator flow alignment.
+- **v5.7:** Global operation progress and packet log workflow in WebUI.
+- **v5.6:** WebUI runtime hardening and sudo/session usability updates.
+- **v5.5:** Dynamic login URL, timeout auto-logout, model registry DB panel.
+- **v5.4:** Safe simulation workflow and retrain handoff pipeline.
+- **v5.3:** Adaptive workflow loop and permanent workflow chart automation.
+- **v5.2:** WebUI control plane hardening and full QA closure.
+- **v5.1:** Root folder organization, path fixes, and launcher/test updates.
 
 ---
 
@@ -519,7 +516,8 @@ cp Config/.env.backup .env  # Copy from backup
 The project includes pre-trained models:
 - **SecIDS-CNN.h5** - TensorFlow CNN model (root directory)
 - **SecIDS-CNN/SecIDS-CNN.h5** - Backup model location
-- **Model_Tester/Code/models/** - Unified model components
+- **Model_Tester/models/** - Unified model components
+- **Model_Tester/logs/** - Model tester execution logs
 
 If models are missing, train them:
 ```bash
@@ -701,7 +699,7 @@ The **Terminal UI** provides an interactive, menu-driven interface for easy acce
 ```bash
 # Method 1: Direct execution
 cd /home/kali/Documents/Code/SECIDS-CNN
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
 # Method 2: Using launcher
 bash Launchers/secids-ui
@@ -716,71 +714,37 @@ secids-ui
 **Press these keys to navigate:**
 
 ```
-1 → Live Detection & Monitoring
-    - Standard/Fast/Slow detection modes
-    - Deep Scan (comprehensive multi-layer analysis)
-    - Custom parameters
-    - Quick test detection
-    - Stop detection
+1 → Active
+  - Full legacy SecIDS-CNN menu set:
+    Detection, Capture, Analysis, Training, Setup, Reports,
+    Utilities, History, Settings
+  - Auto-starts background live traffic acquisition + analysis loop
 
-2 → Network Capture Operations
-    - Quick (60s), Standard (2min), Extended (5min)
-    - Custom duration
-    - List interfaces
-    - View captured files
-
-3 → File-Based Analysis
-    - Analyze specific CSV files
-    - Test datasets (Test1, Test2, Master)
-    - Batch analysis
-    - PCAP to CSV conversion
-    - Dataset enhancement
-
-4 → Model Training & Testing
-    - Train SecIDS-CNN, Unified, or All models
-    - Test model performance
-    - Smoke tests (4 tests)
-    - Full test suite (22 tests)
-    - Stress testing
-
-5 → System Configuration & Setup
-    - Verify system setup
-    - Install dependencies
-    - Check network interfaces
-    - Create master dataset
-    - File organization
-    - Task scheduler management
-
-6 → View Reports & Results
-    - Detection results
-    - Stress test reports
-    - Threat analysis
-    - All reports listing
-    - System logs
-    - Scheduler logs
-
-7 → Utilities & Tools
-    - Threat origin analysis
-    - Whitelist/Blacklist review
-    - Dataset/Model listing
-    - Archive viewing
-    - Clean temporary files
-
-8 → Command History
-    - View last 10 commands
-    - Re-run any previous command
-    - Track execution times
-
-9 → Settings & Configuration
-    - Change default interface
-    - Set default duration
-    - Configure window/interval
-    - Clear history
-    - Reset to defaults
-    - Save settings
+2 → Passive
+  - Passive countermeasure operations menu
+  - Passive log viewing and passive monitor controls
+  - Auto-starts background live traffic acquisition + analysis loop
 
 0 → Exit
 ```
+
+### 5.3.1 Traffic Counter (New)
+
+The terminal UI now displays a **Traffic Counter** panel during Active/Passive operation.
+
+It shows:
+- Live monitor status (`RUNNING`/`STOPPED`)
+- Interface in use
+- Current window flow/threat counts
+- Cumulative totals (flows, threats)
+- Latest update timestamp
+- Current pipeline status
+
+This panel confirms the operational cycle is active:
+1. Gather Data
+2. Analyze Data (lists + models)
+3. Identify Threat
+4. Countermeasure + repeat
 
 ### 5.4 Usage Examples
 
@@ -799,10 +763,11 @@ python3 UI/terminal_ui.py
 **Example 2: Start Live Detection**
 ```bash
 # Launch UI
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
+# Press 1 (Active)
 # Press 1 (Detection)
-# Press 1 (Standard Detection)
+# Press 1 (Live Detection Standard)
 # Enter interface (e.g., eth0)
 # Detection starts automatically
 # Press Ctrl+C to stop
@@ -811,8 +776,9 @@ python3 UI/terminal_ui.py
 **Example 2b: Deep Scan Analysis**
 ```bash
 # Launch UI
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
+# Press 1 (Active)
 # Press 1 (Detection)
 # Press 4 (Deep Scan)
 # Select 'file' for dataset analysis or 'live' for network monitoring
@@ -826,8 +792,9 @@ python3 UI/terminal_ui.py
 ```bash
 # After capturing traffic...
 # Launch UI
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
+# Press 1 (Active)
 # Press 3 (Analysis)
 # Press 1 (Analyze CSV File)
 # Enter file path
@@ -837,8 +804,9 @@ python3 UI/terminal_ui.py
 **Example 4: Train Models**
 ```bash
 # Launch UI
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
+# Press 1 (Active)
 # Press 4 (Training)
 # Press 3 (Train All Models)
 # Wait for training to complete
@@ -847,8 +815,9 @@ python3 UI/terminal_ui.py
 **Example 5: View Results**
 ```bash
 # Launch UI
-python3 UI/terminal_ui.py
+python3 UI/terminal_ui_enhanced.py
 
+# Press 1 (Active)
 # Press 6 (Reports)
 # Press 1 (Latest Detection Results)
 # Or Press 2 (Stress Test Reports)
@@ -1039,6 +1008,81 @@ Day 5: Review Reports (Menu 6)
 - SSH/remote access
 - Advanced workflows
 
+### 5.13 Browser WebUI Interface (v5.4)
+
+The project now includes a browser-based operational control plane that mirrors core terminal workflows while enforcing API-safe action execution.
+
+**Primary Components:**
+- `WebUI/app.py` - Flask backend/API
+- `WebUI/templates/index.html` - Main dashboard
+- `WebUI/templates/login.html` - Dedicated login page
+- `WebUI/static/app.js` + `WebUI/static/style.css` - UI logic and styling
+- `WebUI/live_server.py` - Auto-reload live runner
+
+**Run Commands:**
+```bash
+# Standard WebUI backend
+.venv_test/bin/python WebUI/app.py
+
+# Live view mode (auto-reload)
+.venv_test/bin/python WebUI/live_server.py
+```
+
+**Authentication Behavior:**
+- Unauthenticated root access (`/`) redirects to `/login`
+- Single-admin mode is enabled for this deployment profile
+- Login accepted only for the configured admin identity
+- Protected API endpoints require authenticated session (or token flow if configured)
+- Guest sessions are represented on the control surface as `whitelist` devices (`interface: webui`, `state: WEBUI-GUEST`) for live operator visibility
+
+**Topology Modes:**
+- **Realtime**: renders only detected/active device nodes based on current operations/log signals
+- **Simulation**: renders full network/control topology and all modeled links
+
+**Operational Controls (WebUI):**
+- Queue operations: pause, resume, clear, cancel, retry
+- Execution Logs belt controls: `Pause`, `Resume`, `Cancel`, `Retry`
+- `Cancel` on a running job now requests graceful stop and auto-completes using currently collected data; queued jobs are removed immediately
+- Models chooser now supports `Auto` and `Manual` live-model modes with an `Apply` action; `Auto` ignores manual path/backend overrides until switched back to `Manual`
+- Verified live behavior: the same `live-detect` action injects `--model/--backend` only in `Manual` mode and suppresses them in `Auto` mode
+- Scheduler operations: start, stop, status
+- History rerun and settings persistence
+- Audit feed and export
+- Session sudo password save for privileged action execution
+
+**Identification Listing Workspace (v5.10):**
+- A new main menu section `Identification Listing` is available in the left menu scroll area.
+- Sub-menu actions: `Whitelist`, `Blacklist`, `Greylist`, `Intruder`, `Unidentified`, `Identify`.
+- The control surface now hosts a single unified, scrollable identification list panel with color-coded tags.
+- Existing list actions (`View Whitelist`, `View Blacklist`, `Update Device Lists`) redirect to this unified workspace.
+- When `Identification Listing` is active, the control-surface belt switches to:
+  - `Add to List`
+  - `Remove from List`
+  - `Change Tag`
+  - `Return`
+- `Return` exits the identification workspace and restores the previous main control-surface section.
+
+**Identify Logic (v5.10):**
+- `Identify` scans unidentified runtime entries and classifies targets into whitelist/greylist/intruder using live control-surface and packet/model signals.
+- `Deep Identify (model testing)` can be enabled inside the panel to run an additional model-testing probe before final tag assignment.
+
+**Runtime Execution Policy (v5.6):**
+- WebUI action commands are normalized to use project virtualenv executables (`.venv_test/bin/python`, `.venv_test/bin/pip`)
+- This prevents interpreter drift to system Python and resolves TensorFlow import mismatch during WebUI task runs
+
+**Interaction Feedback (v5.6):**
+- Clicked controls flash-highlight immediately (`.btn`, `.menu-item`, `.action-card`, `.mode-btn`)
+- Last pressed button remains persistently selected until another button is pressed
+
+**Validation Snapshot (2026-02-24):**
+- Production debug scan: clean (88/88 files, 0 errors)
+- Comprehensive debug scan: clean (88/88 files, 0 errors)
+- Realtime API job lifecycle validated end-to-end
+
+**Troubleshooting Notes:**
+- If WebUI fails to start on `8080`, check for an existing process already bound to the port.
+- Scheduler status reporting now uses a non-self-matching process pattern in `WebUI/app.py`.
+
 ---
 
 # Part II: Automation & Commands
@@ -1108,12 +1152,14 @@ sudo ./secids.sh capture eth0 120
 ./secids.sh pipeline-train
 ```
 
-### 5.3 Automated File Organization (NEW)
+### 5.3 Automated File Organization (v5.4)
 
 **System Components:**
 - `Scripts/organize_files.py` - Auto-organizer for loose files
 - `Launchers/project_cleanup.sh` - Daily cleanup script (7 steps)
 - `Auto_Update/task_scheduler.py` - Daemon for scheduled tasks
+- `Auto_Update/monitors/update_workflow_chart.py` - Permanent workflow chart updater
+- `Reports/WORKFLOW_CHART.md` - Auto-generated live workflow chart
 
 **What Gets Organized:**
 - `.md` files → `Reports/` (except Master-Manual.md)
@@ -1132,7 +1178,7 @@ bash Launchers/project_cleanup.sh
 ```
 
 **Automatic Scheduling:**
-The task scheduler daemon runs `project_cleanup.sh` every 24 hours:
+The task scheduler daemon runs maintenance tasks on intervals (including workflow chart refresh every 12 hours):
 ```bash
 # Check daemon status
 python3 Auto_Update/task_scheduler.py --status
@@ -1140,7 +1186,16 @@ python3 Auto_Update/task_scheduler.py --status
 # Restart daemon
 pkill -f "task_scheduler.py --daemon"
 python3 Auto_Update/task_scheduler.py --daemon
+
+# Force immediate chart refresh
+python3 Auto_Update/task_scheduler.py --run workflow_chart_update
 ```
+
+**Workflow Chart (Permanent / Auto-Updated):**
+- File: `Reports/WORKFLOW_CHART.md`
+- Generated by: `Auto_Update/monitors/update_workflow_chart.py`
+- Scheduler task: `workflow_chart_update`
+- Privileges: Synced to match `Master-Manual.md` on each generation
 
 **Cleanup Steps:**
 1. [1/7] Ensure folder structure exists
@@ -1151,7 +1206,7 @@ python3 Auto_Update/task_scheduler.py --daemon
 6. [6/7] Manage documentation
 7. [7/7] Check redundant documentation
 
-### 5.4 Dataset Management System (NEW)
+### 5.4 Dataset Management System (v5.4)
 
 **Master Dataset:**
 - Location: `SecIDS-CNN/datasets/MD_1.csv` (formerly master_dataset_20260129.csv)
@@ -2871,7 +2926,7 @@ python3 train_unified_model.py
 **Expected Output:**
 ```
 Loading datasets...
-  - Model_Tester/Code/datasets/: 5 files
+  - Model_Tester/datasets/: 5 files
   - Model_Tester/Threat_Detection_Model_1/: 8 files
 Total rows: 2,654,321
 
@@ -3193,7 +3248,7 @@ The project integrates two main detection systems:
 class UnifiedModelWrapper:
     def __init__(self, model_dir=None):
         # Find latest trained models
-        self.model_dir = model_dir or Path('Model_Tester/Code/models')
+    self.model_dir = model_dir or Path('Model_Tester/models')
         self.rf_model = self._load_latest('rf_*.pkl')
         self.gb_model = self._load_latest('gb_*.pkl')
         self.scaler = self._load_latest('scaler_*.pkl')
@@ -3480,7 +3535,7 @@ echo $VIRTUAL_ENV
 - **Output:** Binary (Attack/Benign)
 
 **Unified Model:**
-- **Files:** `Model_Tester/Code/models/*.pkl`
+- **Files:** `Model_Tester/models/*.pkl`
 - **Type:** Scikit-learn Ensemble
 - **Components:** RF + GB + Scaler
 - **Input:** 10-19 features
@@ -3528,7 +3583,8 @@ python3 pipeline_orchestrator.py \
 **Models:** 
 - `SecIDS-CNN.h5` (root)
 - `SecIDS-CNN/SecIDS-CNN.h5` (backup)
-- `Model_Tester/Code/models/` (unified models)
+- `Model_Tester/models/` (unified models)
+- `ServerDB/modelDB/` (synced model registry and staged artifacts)
 
 **Results:**
 - `SecIDS-CNN/file_detection_results.csv` - Detection results
@@ -3538,7 +3594,8 @@ python3 pipeline_orchestrator.py \
 
 **Logs:**
 - `pipeline_run_*.log` - Pipeline logs
-- `Master ML_AI/Code/threat_detection.log` - ML logs
+- `Model_Tester/logs/threat_detection.log` - threat detection pipeline log
+- `Model_Tester/logs/unified_training.log` - unified training log
 
 ### 18.5 Network Configuration
 
@@ -3594,6 +3651,28 @@ pip install tensorflow
 # Or install all dependencies
 pip install -r SecIDS-CNN/requirements.txt
 ```
+
+**If this appears in WebUI execution logs:**
+- Ensure WebUI is launched from project root with virtualenv Python:
+
+```bash
+.venv_test/bin/python WebUI/live_server.py
+```
+
+- Confirm TensorFlow from the same runtime:
+
+```bash
+.venv_test/bin/python -c "import tensorflow as tf; print(tf.__version__)"
+```
+
+- Run WebUI validation suite:
+
+```bash
+.venv_test/bin/python Scripts/webui_full_validation.py
+```
+
+**Expected (v5.6+):**
+- WebUI command execution normalizes `python/python3` to `.venv_test/bin/python`, preventing TensorFlow import mismatch with system Python.
 
 #### Issue: "Permission denied" during capture
 **Solution:**
@@ -4260,108 +4339,505 @@ python3 TrashDump/cleanup_manager.py --action empty-trash
 ## 23. Countermeasures System
 
 ### 23.1 Overview
-Real-time DDoS attack mitigation system that runs alongside threat detection.
+Real-time DDoS attack mitigation system with dual-mode operation: **Active** (manual control) and **Passive** (automated response).
 
-### 23.2 Features
-- Real-time threat response - Acts immediately when attacks are detected
-- Multi-method blocking - IP blocking, port blocking, rate limiting
-- Thread-safe operation - Runs in parallel with detection
-- Configurable thresholds - Customize when actions are taken
-- Automatic cleanup - Option to clear blocks after capture
-- Detailed logging - Full audit trail of all actions
+**Architecture:** The system uses a modular design with three core components:
+- **countermeasure_core.py** - Base functionality shared by both modes
+- **countermeasure_active.py** - Manual intervention with detailed controls
+- **countermeasure_passive.py** - Automated operation with minimal intervention
 
-### 23.3 Quick Start
+**Integration:** Works seamlessly with Device_Profile ListManager for whitelist/blacklist/greylist management.
 
-**Enable Countermeasures (Default):**
+### 23.2 Mode Comparison
+
+| Feature | Active Mode | Passive Mode |
+|---------|-------------|--------------|
+| **Operation** | Manual control | Fully automated |
+| **Thresholds** | 5 threats / 60s | 3 threats / 30s (faster) |
+| **UI** | Full-featured menu | Minimal (Start/Pause/Stop) |
+| **Logging** | Console + File (verbose) | File only (silent) |
+| **Auto-start** | Manual start required | Auto-starts on init |
+| **Intervention** | Manual block/unblock controls | Automatic only |
+| **Use Case** | Detailed monitoring, analysis | Hands-off protection |
+
+### 23.3 Passive Mode
+
+**Overview:** Passive mode runs autonomously with minimal user intervention, designed for continuous background protection.
+
+**Quick Start:**
 ```bash
-# Countermeasures are enabled by default
-sudo python3 SecIDS-CNN/run_model.py live --iface eth0
+# Run Passive Mode UI
+python3 Countermeasures/passive_ui.py
 ```
 
-**Disable Countermeasures:**
-```bash
-# Use --no-countermeasure flag
-sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --no-countermeasure
+**Features:**
+- ✓ Auto-start on initialization
+- ✓ Fast response (3 threats in 30 seconds)
+- ✓ Silent operation (no console output)
+- ✓ Real-time statistics display
+- ✓ Minimal UI (3 controls only)
+
+**UI Controls:**
+1. **Start** - Begin monitoring and automatic blocking
+2. **Pause** - Stop blocking but continue monitoring
+3. **Stop** - Complete shutdown with final statistics
+
+**Display Format:**
 ```
-
-**Test Countermeasure System:**
-```bash
-python3 Countermeasures/test_countermeasure.py
+[Runtime] In: X | Out: Y | Threats: Z | Blocked: N | W:X B:Y G:Z | ✓/⚠️/❌ Errors: N
 ```
+- **In/Out:** Input/output traffic packets
+- **Threats:** Total threats detected
+- **Blocked:** Countermeasures deployed
+- **W/B/G:** Whitelist/Blacklist/Greylist counts
+- **✓/⚠️/❌:** Health status (healthy/warning/error)
 
-### 23.4 How It Works
-
-**Detection Flow:**
-1. Live traffic captured
-2. Threat detected by ML model
-3. Threat data sent to countermeasure system
-4. Countermeasure analyzes threat history
-5. If threshold exceeded → Take action
-6. Action executed via iptables
-7. Continue monitoring
-
-**Block Threshold:** 5 threats from same IP within 60 seconds
-
-**Actions Taken:**
-- Block source IP via iptables
-- Block destination port if applicable
-- Rate limit connections
-- Log all actions
-- Alert administrator
-
-### 23.5 Configuration
-
-**Thresholds:**
+**Programmatic Usage:**
 ```python
-# In ddos_countermeasure.py
-THREAT_THRESHOLD = 5        # Threats before blocking
-TIME_WINDOW = 60            # Time window in seconds
-BLOCK_DURATION = 3600       # Block duration (1 hour)
+from countermeasures.countermeasure_passive import PassiveCountermeasure
+
+# Auto-starts on initialization
+cm = PassiveCountermeasure()
+
+# Pause automatic blocking (still monitors)
+cm.pause()
+
+# Resume automatic blocking
+cm.resume()
+
+# Get simple statistics
+stats = cm.get_simple_stats()
+# Returns: {'input_traffic': X, 'output_traffic': Y, 
+#           'countermeasures_deployed': Z, 'whitelist_count': N,
+#           'blacklist_count': M, 'greylist_count': P}
+
+# Check health
+status = cm.get_health_status()  # 'healthy', 'warning', or 'error'
+
+# Stop
+cm.stop()
 ```
 
-**Enable/Disable:**
+### 23.4 Active Mode
+
+**Overview:** Active mode provides full manual control with detailed logging, reporting, and step-by-step workflow guidance.
+
+**Quick Start:**
 ```bash
-# Enable (default)
-sudo python3 SecIDS-CNN/run_model.py live --iface eth0
-
-# Disable
-sudo python3 SecIDS-CNN/run_model.py live --iface eth0 --no-countermeasure
+# Run Active Mode UI
+python3 Countermeasures/active_ui.py
 ```
 
-### 23.6 Cleanup After Detection
-
-When stopping live detection, you'll be prompted:
+**Main Menu:**
 ```
-Clear iptables blocks? (y/n):
+SYSTEM CONTROLS:
+  1. Initialize System      - Configure and start
+  2. View Status            - Detailed status display
+  3. Start Monitoring       - Begin threat detection
+  4. Stop Monitoring        - Stop detection
+
+MANUAL INTERVENTION:
+  5. Block IP Address       - Manually block specific IP
+  6. Unblock IP Address     - Remove IP block
+  7. Block Port             - Manually block port
+  8. Unblock Port           - Remove port block
+  9. Clear All Blocks       - Remove all blocks
+
+REPORTING & ANALYSIS:
+  10. Export Report         - Generate JSON report
+  11. View Blocked Items    - List current blocks
+  12. Configure Thresholds  - Adjust settings
+
+HELP & DOCUMENTATION:
+  13. Show Workflow Manual  - Step-by-step guide
+  14. Toggle Auto-Block     - Enable/disable auto-blocking
 ```
-- **y** - Remove all blocks, restore normal traffic
-- **n** - Keep blocks active for continued protection
 
-**Manual Cleanup:**
-```bash
-# Clear all blocks
-python3 Countermeasures/ddos_countermeasure.py --clear-blocks
+**Recommended Workflow:**
+1. **Initialize System** (option 1)
+   - Configure thresholds (default: 5 threats in 60s)
+   - Set auto-blocking preference
+   - System ready for operation
 
-# View current blocks
-sudo iptables -L -n -v
+2. **Review Workflow Manual** (option 13)
+   - Displays 8-step process
+   - Operational guidelines
+   - Best practices
+
+3. **Start Monitoring** (option 3)
+   - Begins threat detection
+   - Processes threats based on configuration
+   - Auto-blocks if enabled
+
+4. **Monitor and Intervene**
+   - View Status (option 2) for real-time statistics
+   - Manual block/unblock as needed (options 5-8)
+   - Adjust thresholds if necessary (option 12)
+
+5. **Export Report** (option 10)
+   - Generates detailed JSON report
+   - Includes all statistics, blocked items, manual actions
+   - Saved to Countermeasures/logs/
+
+6. **Shutdown**
+   - Stop Monitoring (option 4)
+   - Optionally clear all blocks
+   - Exit (option 0)
+
+**Programmatic Usage:**
+```python
+from countermeasures.countermeasure_active import ActiveCountermeasure
+
+# Initialize with custom configuration
+cm = ActiveCountermeasure(
+    block_threshold=5,      # 5 threats
+    time_window=60,         # in 60 seconds
+    auto_block=True,        # enable auto-blocking
+    interactive=False       # disable prompts
+)
+
+# Start monitoring
+cm.start()
+
+# Process a threat (automatic)
+threat_data = {'src_ip': '192.168.1.100', 'dst_port': 80}
+cm.process_threat(threat_data)
+
+# Manual intervention
+cm.manual_block_ip('192.168.1.150', 'Suspicious activity')
+cm.manual_block_port(23, 'Telnet access attempt')
+
+# Get detailed statistics
+stats = cm.get_detailed_stats()
+# Includes: threats_detected, ips_blocked, ports_blocked, 
+#           manual_actions, blocked_ips, blocked_ports, uptime
+
+# Print formatted status
+cm.print_detailed_status()
+
+# Export report
+report_path = cm.export_report()  # Auto-generates filename
+
+# Cleanup
+cm.manual_unblock_ip('192.168.1.150')
+cm.clear_all_blocks()
+cm.stop()
 ```
 
-### 23.7 Monitoring
+### 23.5 Core Architecture
 
-**View Logs:**
-```bash
-tail -f Countermeasures/countermeasure.log
+**Base Class (countermeasure_core.py):**
+All modes inherit from `CountermeasureCore` which provides:
+- Thread-safe queue-based action processing
+- IP/port blocking via iptables
+- Whitelist/blacklist/greylist integration
+- Statistics tracking
+- Configurable thresholds
+- Worker thread management
+
+**Shared Methods:**
+- `start()` - Start threat monitoring
+- `stop()` - Stop monitoring and cleanup
+- `process_threat(threat_data)` - Process detected threat
+- `get_statistics()` - Get basic statistics
+- `get_status()` - Get current status
+- `clear_all_blocks()` - Remove all iptables blocks
+
+**Integration with ListManager:**
+```python
+# Automatic list management
+- Whitelisted IPs: Never blocked
+- Blacklisted IPs: Blocked immediately
+- Greylisted IPs: Monitored closely, lower threshold
 ```
+
+### 23.6 Configuration
+
+**Passive Mode Defaults:**
+```python
+PassiveCountermeasure(
+    block_threshold=3,      # Faster response
+    time_window=30,         # Shorter window
+    auto_block=True,        # Always enabled
+    mode="passive"          # Silent logging
+)
+```
+
+**Active Mode Defaults:**
+```python
+ActiveCountermeasure(
+    block_threshold=5,      # Standard threshold
+    time_window=60,         # Standard window
+    auto_block=True,        # Configurable
+    interactive=True,       # Prompts enabled
+    mode="active"           # Verbose logging
+)
+```
+
+**Custom Configuration:**
+```python
+# High-security environment (aggressive)
+cm = PassiveCountermeasure(block_threshold=2, time_window=20)
+
+# Low-false-positive environment (cautious)
+cm = ActiveCountermeasure(block_threshold=10, time_window=120)
+```
+
+### 23.7 Logging
+
+**Passive Mode:**
+- **Location:** `Countermeasures/logs/countermeasure_passive.log`
+- **Format:** Timestamp | Level | Message
+- **Output:** File only (no console)
+- **Contents:** Starts, stops, blocks, errors
+
+**Active Mode:**
+- **Location:** `Countermeasures/logs/countermeasure_active.log`
+- **Format:** Timestamp | Level | Message | Details
+- **Output:** Console + File
+- **Contents:** Full audit trail including manual actions
+
+**Example Log Entries:**
+```
+2025-02-03 18:30:45 | INFO | Passive mode started (threshold: 3/30s)
+2025-02-03 18:31:12 | WARNING | Blocking IP 192.168.1.100 (threshold exceeded: 4 threats in 28s)
+2025-02-03 18:32:05 | INFO | IP already blacklisted: 10.0.0.50
+2025-02-03 18:33:20 | ERROR | Failed to block port 80: Permission denied
+```
+
+### 23.8 Monitoring
 
 **Check Active Blocks:**
 ```bash
+# View all iptables blocks
 sudo iptables -L -n -v | grep DROP
+
+# Count blocked IPs
+sudo iptables -L -n -v | grep -c "192.168"
 ```
+
+**View Logs:**
+```bash
+# Passive mode
+tail -f Countermeasures/logs/countermeasure_passive.log
+
+# Active mode
+tail -f Countermeasures/logs/countermeasure_active.log
+```
+
+**Real-time Statistics:**
+- **Passive Mode:** Displayed in UI (updates every 2s)
+- **Active Mode:** Option 2 in menu (View Status)
+
+### 23.9 Cleanup and Maintenance
+
+**Manual Block Removal:**
+```bash
+# Active Mode UI - option 9 (Clear All Blocks)
+# or programmatic:
+python3 -c "
+from countermeasures.countermeasure_active import ActiveCountermeasure
+cm = ActiveCountermeasure()
+cm.clear_all_blocks()
+"
+```
+
+**Direct iptables Cleanup:**
+```bash
+# Remove all DROP rules
+sudo iptables -F
+
+# Remove specific IP block
+sudo iptables -D INPUT -s 192.168.1.100 -j DROP
+```
+
+**Log Rotation:**
+```bash
+# Logs automatically rotate at 10MB
+# Keep 5 backup files
+# Located in Countermeasures/logs/
+```
+
+### 23.10 Testing
+
+**Test Passive Mode:**
+```bash
+# Run unit tests
+python3 -m pytest Countermeasures/test_countermeasure.py -k passive
+
+# Manual test
+python3 Countermeasures/passive_ui.py
+# Press 1 to start, monitor display, press 3 to stop
+```
+
+**Test Active Mode:**
+```bash
+# Run unit tests
+python3 -m pytest Countermeasures/test_countermeasure.py -k active
+
+# Manual test
+python3 Countermeasures/active_ui.py
+# Follow menu options, test manual blocking
+```
+
+### 23.11 Migration from Legacy
+
+**Old System (ddos_countermeasure.py):**
+```python
+# Legacy usage
+from countermeasures.ddos_countermeasure import DDoSCountermeasure
+cm = DDoSCountermeasure()
+```
+
+**New System (Active Mode equivalent):**
+```python
+# New usage
+from countermeasures.countermeasure_active import ActiveCountermeasure
+cm = ActiveCountermeasure()
+```
+
+**Key Changes:**
+- Split into Active/Passive modes
+- Enhanced ListManager integration
+- Improved threading and queue processing
+- Better logging and statistics
+- UI interfaces for both modes
+- Workflow documentation included
 
 **Test System:**
 ```bash
 python3 Countermeasures/test_countermeasure.py
 ```
+
+### 23.12 Sudo Configuration & Troubleshooting
+
+**⚠️ IMPORTANT: Countermeasures require sudo privileges for iptables**
+
+#### The Password Prompt Issue
+
+If you experience timeouts or can't input your password when running countermeasures:
+
+**Problem:** Subprocess calls use `capture_output=True`, preventing interactive password entry. Password prompts timeout after 5 seconds.
+
+**Symptoms:**
+- "Timeout blocking IP" in logs
+- "sudo: a password is required" errors
+- Can't type password before terminal resets
+- Immediate timeout when trying to block IPs/ports
+
+#### Solution 1: Configure Passwordless Sudo (Recommended)
+
+Run the automated setup script:
+
+```bash
+cd /home/kali/Documents/Code/SECIDS-CNN
+sudo bash Countermeasures/setup_passwordless_sudo.sh
+```
+
+**What it does:**
+- Creates `/etc/sudoers.d/secids-countermeasures`
+- Allows your user to run iptables without password
+- Only affects specific iptables commands (minimal security impact)
+- Can be easily removed later
+
+**After setup:**
+```bash
+# Works without password prompts
+python3 Countermeasures/passive_ui.py
+python3 Countermeasures/active_ui.py
+```
+
+**To remove later:**
+```bash
+sudo rm /etc/sudoers.d/secids-countermeasures
+```
+
+#### Solution 2: Run with Sudo
+
+Always prefix commands with sudo:
+
+```bash
+sudo python3 Countermeasures/passive_ui.py
+sudo python3 Countermeasures/active_ui.py
+```
+
+**Caveat:** Must enter password each time.
+
+#### Solution 3: Monitor-Only Mode
+
+Run without sudo to monitor threats without blocking:
+
+```bash
+# Run normally
+python3 Countermeasures/passive_ui.py
+
+# When warned about missing sudo, choose 'y' to continue
+# Threats detected and logged, but not blocked
+```
+
+#### Verification
+
+Check if passwordless sudo is working:
+
+```bash
+# Should work without password prompt
+sudo iptables -L
+sudo iptables -A INPUT -s 192.168.1.100 -j DROP
+sudo iptables -D INPUT -s 192.168.1.100 -j DROP
+```
+
+#### Updated System Behavior
+
+The countermeasure system now:
+
+1. **Checks sudo availability on startup** - No surprise timeouts
+2. **Warns immediately if sudo unavailable** - Clear instructions provided
+3. **Allows monitor-only mode** - Still useful for threat detection
+4. **Provides helpful error messages** - Shows exactly how to fix issues
+5. **Handles timeouts gracefully** - Better logging and error handling
+
+#### Common Issues
+
+**"Timeout blocking IP" in logs:**
+```bash
+# Configure passwordless sudo
+sudo bash Countermeasures/setup_passwordless_sudo.sh
+```
+
+**"Permission denied" even with sudo:**
+```bash
+# Check iptables is installed
+which iptables
+
+# Install if missing
+sudo apt-get install iptables
+```
+
+**System warns "sudo not available":**
+```bash
+# Either run with sudo
+sudo python3 Countermeasures/passive_ui.py
+
+# Or configure passwordless sudo
+sudo bash Countermeasures/setup_passwordless_sudo.sh
+```
+
+**Want to test without blocking:**
+```bash
+# Run normally and choose 'y' when prompted
+python3 Countermeasures/passive_ui.py
+# Monitors threats but won't block (safe for testing)
+```
+
+#### Quick Reference
+
+| Scenario | Command | Password Required? |
+|----------|---------|-------------------|
+| **Passwordless sudo configured** | `python3 Countermeasures/passive_ui.py` | No |
+| **No configuration** | `sudo python3 Countermeasures/passive_ui.py` | Yes (once) |
+| **Monitor-only mode** | `python3 Countermeasures/passive_ui.py` → 'y' | No |
+
+**See also:** [SUDO_FIX.md](Countermeasures/SUDO_FIX.md) for detailed explanation
 
 ---
 
@@ -7155,3 +7631,219 @@ The system is now production-ready with professional-grade threat detection capa
 **Report Generated:** February 7, 2026  
 **System Version:** SecIDS-CNN 2.0.0 Enhanced  
 **Status:** ✅ All upgrades completed successfully
+
+
+---
+
+# Sudo Password Timeout Fix - Summary
+*Consolidated from: SUDO_PASSWORD_FIX_SUMMARY.md*
+*Date: 2026-03-10*
+
+**Date:** 2026-02-23  
+**Issue:** Terminal password prompt resets before user can input password  
+**Status:** ✅ FIXED
+
+## Problem Description
+
+Users reported that when running countermeasure UIs, they couldn't input their sudo password before the terminal reset. This was causing:
+- Immediate timeouts (5 seconds)
+- "Timeout blocking IP" errors in logs
+- Frustration and unusable blocking functionality
+
+## Root Cause
+
+The countermeasure code used:
+```python
+subprocess.run(['sudo', 'iptables', ...], capture_output=True, timeout=5)
+```
+
+With `capture_output=True`, the subprocess captures stdin/stdout/stderr, preventing interactive password entry. When sudo asks for a password, there's no way to provide it, causing the 5-second timeout.
+
+## Solution Implemented
+
+### 1. Added Sudo Privilege Check
+**File:** `Countermeasures/countermeasure_core.py`
+
+```python
+def _check_sudo_privileges(self) -> bool:
+    """Check if sudo privileges are available for iptables"""
+    try:
+        result = subprocess.run(
+            ['sudo', '-n', 'iptables', '-L'],  # -n = non-interactive
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        return result.returncode == 0
+    except:
+        return False
+```
+
+This check runs during initialization and sets `self.sudo_available`.
+
+### 2. Updated Blocking Methods
+**Files:** `countermeasure_core.py`
+
+Both `_block_ip()` and `_block_port()` now:
+- Check `self.sudo_available` before attempting to block
+- Skip blocking with clear warning if sudo not available
+- Provide better error messages for timeouts
+
+```python
+def _block_ip(self, ip: str, reason: str):
+    if not self.sudo_available:
+        self._log(f"SKIPPED blocking IP {ip}: sudo not available", "WARNING")
+        return
+    # ... rest of blocking code
+```
+
+### 3. Updated User Interfaces
+**Files:** `passive_ui.py`, `active_ui.py`
+
+Both UIs now:
+- Check sudo status after initialization
+- Show clear warning message if sudo unavailable
+- Provide actionable solutions
+- Allow user to continue in monitor-only mode
+
+```python
+if not self.cm.sudo_available:
+    print("⚠️  WARNING: Sudo privileges not available!")
+    print("To enable blocking, either:")
+    print("  1. Run with sudo")
+    print("  2. Configure passwordless sudo: sudo bash setup_passwordless_sudo.sh")
+    # ...allow choice to continue without blocking
+```
+
+### 4. Created Passwordless Sudo Setup Script
+**File:** `Countermeasures/setup_passwordless_sudo.sh`
+
+Automated script that:
+- Creates `/etc/sudoers.d/secids-countermeasures`
+- Allows specific iptables commands without password
+- Validates configuration
+- Tests that it works
+
+**Usage:**
+```bash
+sudo bash Countermeasures/setup_passwordless_sudo.sh
+```
+
+### 5. Comprehensive Documentation
+**Files Created:**
+- `Countermeasures/SUDO_FIX.md` - Detailed explanation and solutions
+- `Master-Manual.md` Section 23.12 - Added sudo troubleshooting section
+
+## Files Modified
+
+1. ✅ `Countermeasures/countermeasure_core.py` - Added sudo checking
+2. ✅ `Countermeasures/passive_ui.py` - Added sudo warning
+3. ✅ `Countermeasures/active_ui.py` - Added sudo warning
+4. ✅ `Master-Manual.md` - Added Section 23.12
+
+## Files Created
+
+1. ✅ `Countermeasures/setup_passwordless_sudo.sh` - Automated setup
+2. ✅ `Countermeasures/SUDO_FIX.md` - Detailed documentation
+3. ✅ `SUDO_PASSWORD_FIX_SUMMARY.md` - This file
+
+## User Options Now Available
+
+### Option 1: Passwordless Sudo (Recommended)
+```bash
+sudo bash Countermeasures/setup_passwordless_sudo.sh
+python3 Countermeasures/passive_ui.py  # No password needed!
+```
+
+### Option 2: Run with Sudo
+```bash
+sudo python3 Countermeasures/passive_ui.py  # Password once per run
+```
+
+### Option 3: Monitor-Only Mode
+```bash
+python3 Countermeasures/passive_ui.py  # Choose 'y' when prompted
+# Monitors but doesn't block
+```
+
+## Testing Results
+
+```bash
+# Test 1: Sudo check functionality
+python3 -c "from Countermeasures.countermeasure_active import ActiveCountermeasure; 
+cm = ActiveCountermeasure(auto_block=False, interactive=False); 
+print(f'Sudo available: {cm.sudo_available}')"
+
+Result: ✓ Correctly detects sudo availability
+Output: "Sudo available: False" (expected when not running with sudo)
+```
+
+## Verification Commands
+
+```bash
+# Check if passwordless sudo is configured
+sudo -n iptables -L
+
+# Should work without password prompt after setup
+# Should ask for password if not configured
+```
+
+## Benefits
+
+1. **No More Timeouts** - System checks sudo upfront, no surprises
+2. **Clear Feedback** - Users immediately know if sudo is needed
+3. **Multiple Solutions** - Three options to fit different use cases
+4. **Better UX** - Helpful error messages with exact fix instructions
+5. **Safe Testing** - Monitor-only mode allows testing without blocking
+6. **Easy Setup** - One-command automated configuration
+
+## Backward Compatibility
+
+- ✅ Existing code still works
+- ✅ Can still run with sudo as before
+- ✅ No breaking changes
+- ✅ New features are additive only
+
+## Security Considerations
+
+**Passwordless sudo configuration:**
+- Only allows specific iptables commands
+- Does NOT grant full root access
+- Limited to current user
+- Can be easily removed
+- Uses standard sudoers.d best practices
+- Configuration validated before applying
+
+## Next Steps for Users
+
+1. **Read the documentation:**
+   - `Countermeasures/SUDO_FIX.md`
+   - `Master-Manual.md` Section 23.12
+
+2. **Choose your approach:**
+   - Quick: Run passwordless sudo setup
+   - Manual: Always use sudo
+   - Testing: Use monitor-only mode
+
+3. **Test it works:**
+   ```bash
+   python3 Countermeasures/passive_ui.py
+   ```
+
+## Support
+
+If issues persist:
+1. Check logs in `Countermeasures/logs/`
+2. Verify iptables is installed: `which iptables`
+3. Test sudo manually: `sudo iptables -L`
+4. See SUDO_FIX.md for detailed troubleshooting
+
+---
+
+**Issue:** Password prompt timeout  
+**Root Cause:** subprocess.run with capture_output prevents password input  
+**Solution:** Upfront sudo checking + passwordless sudo setup script  
+**Status:** ✅ RESOLVED  
+
+**Tested By:** GitHub Copilot  
+**Date:** 2026-02-23

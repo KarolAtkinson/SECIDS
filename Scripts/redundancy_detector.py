@@ -59,7 +59,8 @@ class RedundancyDetector:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_md5.update(chunk)
             return hash_md5.hexdigest()
-        except Exception:
+        except (OSError, IOError):
+            # Cannot read file
             return None
     
     def find_pycache_dirs(self):

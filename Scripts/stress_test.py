@@ -28,17 +28,23 @@ Usage:
     
     # Performance benchmark
     python3 stress_test.py --mode performance
+
+    # Strict TensorFlow warning enforcement
+    python3 stress_test.py --mode comprehensive --strict-tf-warnings
 """
 
 import os
 import sys
 import time
 import json
+import re
+import io
 import tempfile
 import shutil
 import threading
 import subprocess
 import traceback
+import contextlib
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
@@ -63,9 +69,9 @@ class TestResult:
         self.name = name
         self.category = category
         self.passed = False
-        self.error = None
+        self.error: Optional[str] = None
         self.duration = 0.0
-        self.details = {}
+        self.details: Dict[str, object] = {}
     
     def to_dict(self):
         # Convert non-serializable types
@@ -94,13 +100,30 @@ class TestResult:
 class StressTestSuite:
     """Main stress test suite"""
     
-    def __init__(self):
+    def __init__(self, strict_tf_warnings: bool = False):
         self.results: List[TestResult] = []
         self.start_time = None
         self.end_time = None
         self.temp_dir = Path(tempfile.mkdtemp(prefix='secids_test_'))
+        self.strict_tf_warnings = strict_tf_warnings
+        self.tf_warning_patterns = [
+            re.compile(r"WARNING:absl:", re.IGNORECASE),
+            re.compile(r"WARNING:tensorflow", re.IGNORECASE),
+            re.compile(r"tf\.function retracing", re.IGNORECASE),
+            re.compile(r"compiled metrics have yet to be built", re.IGNORECASE),
+        ]
         
         print(f"Test temporary directory: {self.temp_dir}")
+        if self.strict_tf_warnings:
+            print("Strict TensorFlow warning mode: ENABLED")
+
+    def _extract_tf_warning_lines(self, stderr_text: str) -> List[str]:
+        lines = [line.strip() for line in stderr_text.splitlines() if line.strip()]
+        matches: List[str] = []
+        for line in lines:
+            if any(pattern.search(line) for pattern in self.tf_warning_patterns):
+                matches.append(line)
+        return matches
     
     def cleanup(self):
         """Cleanup test resources"""
@@ -116,8 +139,21 @@ class StressTestSuite:
         print(f"{'─'*80}")
         
         start_time = time.time()
+        stderr_buffer = io.StringIO()
         try:
-            test_func(result)
+            with contextlib.redirect_stderr(stderr_buffer):
+                test_func(result)
+
+            tf_warning_lines = self._extract_tf_warning_lines(stderr_buffer.getvalue())
+            if tf_warning_lines:
+                result.details['tf_warnings'] = tf_warning_lines[:20]
+                result.details['tf_warning_count'] = len(tf_warning_lines)
+                if self.strict_tf_warnings:
+                    raise AssertionError(
+                        f"TensorFlow warnings detected ({len(tf_warning_lines)}). "
+                        f"Example: {tf_warning_lines[0]}"
+                    )
+
             result.passed = True
             print(f"✅ PASSED")
         except AssertionError as e:
@@ -434,6 +470,8 @@ class StressTestSuite:
     def test_pipeline_orchestrator_exists(self, result: TestResult):
         """Test pipeline orchestrator exists and is executable"""
         orchestrator = PROJECT_ROOT / 'pipeline_orchestrator.py'
+        if not orchestrator.exists():
+            orchestrator = TOOLS_DIR / 'pipeline_orchestrator.py'
         
         assert orchestrator.exists(), "Pipeline orchestrator not found"
         
@@ -452,6 +490,8 @@ class StressTestSuite:
     def test_command_library_exists(self, result: TestResult):
         """Test command library exists and is functional"""
         library = PROJECT_ROOT / 'command_library.py'
+        if not library.exists():
+            library = TOOLS_DIR / 'command_library.py'
         
         assert library.exists(), "Command library not found"
         
@@ -579,7 +619,8 @@ class StressTestSuite:
         try:
             predictions = model.predict(single_row)
             result.details['prediction_count'] = len(predictions) if hasattr(predictions, '__len__') else 1
-        except Exception:
+        except AttributeError:
+            # predict not available, try predict_proba
             probs = model.predict_proba(single_row)
             result.details['prediction_count'] = len(probs) if hasattr(probs, '__len__') else 1
         
@@ -826,6 +867,7 @@ class StressTestSuite:
                 'failed': failed_tests,
                 'success_rate': (passed_tests / total_tests * 100) if total_tests > 0 else 0,
                 'total_duration': total_duration,
+                'strict_tf_warnings': self.strict_tf_warnings,
             },
             'categories': categories,
             'results': [r.to_dict() for r in self.results],
@@ -894,11 +936,14 @@ def main():
                        choices=['comprehensive', 'smoke', 'integrity', 'processing', 
                                'models', 'pipeline', 'error', 'edge', 'concurrency'],
                        help='Test mode to run')
+
+    parser.add_argument('--strict-tf-warnings', action='store_true',
+                       help='Fail tests when TensorFlow/absl warning lines are detected')
     
     args = parser.parse_args()
     
     # Create test suite
-    suite = StressTestSuite()
+    suite = StressTestSuite(strict_tf_warnings=args.strict_tf_warnings)
     
     try:
         # Run selected tests

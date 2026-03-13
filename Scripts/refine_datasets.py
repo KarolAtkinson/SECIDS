@@ -222,8 +222,8 @@ if __name__ == '__main__':
     # Process datasets from multiple locations
     dataset_directories = [
         'SecIDS-CNN/datasets',
-        'Model_Tester/Code/datasets',
-        'Threat_Detection_Model_1'
+        'Model_Tester/datasets',
+        'Model_Tester/Threat_Detection_Model_1'
     ]
     
     # Process all datasets

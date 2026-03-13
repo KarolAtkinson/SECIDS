@@ -25,7 +25,7 @@ class CSVWorkflowManager:
     def __init__(self, project_root=None):
         """Initialize workflow manager"""
         if project_root is None:
-            project_root = Path(__file__).parent
+            project_root = Path(__file__).resolve().parent.parent
         else:
             project_root = Path(project_root)
         
@@ -33,7 +33,7 @@ class CSVWorkflowManager:
         
         # Define key directories
         self.training_dir = project_root / "Model_Tester" / "Threat_Detection_Model_1"
-        self.datasets_dir = project_root / "Model_Tester" / "Code" / "datasets"
+        self.datasets_dir = project_root / "Model_Tester" / "datasets"
         self.secids_datasets_dir = project_root / "SecIDS-CNN" / "datasets"
         
         # Workflow tracking

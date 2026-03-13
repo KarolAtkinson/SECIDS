@@ -121,8 +121,9 @@ class VMScanner:
                         'name': tool,
                         'path': path
                     })
-            except Exception as e:
-                pass  # Skip on error
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                # Tool not found or command failed
+                continue
         self.results['network_tools'] = found_tools
         print(f"   Found {len(found_tools)} network tools")
     
@@ -307,8 +308,8 @@ def main():
         response = input().strip().lower()
         if response == 'y':
             print(f"\n{json.dumps(results, indent=2)}")
-    except Exception as e:
-            pass  # Skip on error
+    except (KeyboardInterrupt, EOFError):
+        print("\nDetailed output skipped")
     return 0
 
 

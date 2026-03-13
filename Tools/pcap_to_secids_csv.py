@@ -157,7 +157,8 @@ def process_pcap(pcap_path: Path):
             # flags may be integer or scapy Flags object
             try:
                 s = str(flags)
-            except Exception:
+            except (ValueError, TypeError):
+                # Cannot convert flags to string
                 s = ''
             if 'F' in s:
                 fin_count += 1

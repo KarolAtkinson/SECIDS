@@ -106,9 +106,10 @@ class TensorFlowSetup:
             
             # Test model creation
             print("\n   Testing model creation...")
-            from tensorflow import keras
+            keras = tf.keras
             model = keras.Sequential([
-                keras.layers.Dense(10, activation='relu', input_shape=(5,)),
+                keras.Input(shape=(5,)),
+                keras.layers.Dense(10, activation='relu'),
                 keras.layers.Dense(1, activation='sigmoid')
             ])
             print("   ✅ Model creation successful")

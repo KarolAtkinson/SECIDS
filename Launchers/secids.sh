@@ -70,6 +70,7 @@ if [ $# -eq 0 ]; then
     echo "  list-captures     - List captured files"
     echo "  list-datasets     - List datasets"
     echo "  list-models       - List trained models"
+    echo "  workflow-chart    - Refresh auto workflow chart"
     echo ""
     echo "Custom Command:"
     echo "  exec <shortcut> [--param key=value ...]  - Execute command library shortcut"
@@ -205,6 +206,11 @@ case "$ACTION" in
     
     list-models)
         python3 "$SCRIPT_DIR/command_library.py" exec list-models
+        ;;
+
+    workflow-chart)
+        echo "Refreshing workflow chart..."
+        python3 "$SCRIPT_DIR/../Auto_Update/task_scheduler.py" --run workflow_chart_update
         ;;
     
     exec)

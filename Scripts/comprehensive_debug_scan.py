@@ -9,6 +9,7 @@ import sys
 import ast
 import json
 import subprocess
+import importlib.util
 from pathlib import Path
 from typing import Dict, List, Tuple
 from datetime import datetime
@@ -18,6 +19,7 @@ class DebugScanner:
     
     def __init__(self, project_root: str):
         self.project_root = Path(project_root)
+        self.local_module_names = self._build_local_module_index()
         self.errors = {
             'syntax_errors': [],
             'import_errors': [],
@@ -34,6 +36,24 @@ class DebugScanner:
             'files_with_errors': 0,
             'total_errors': 0
         }
+
+    def _build_local_module_index(self) -> set[str]:
+        """Build a set of local importable module/package names in the repo."""
+        module_names = set()
+        exclude_dirs = {'.venv', '.venv_test', '__pycache__', 'TrashDump', '.git'}
+
+        for root, dirs, files in os.walk(self.project_root):
+            dirs[:] = [d for d in dirs if d not in exclude_dirs]
+            root_path = Path(root)
+
+            for file in files:
+                if file.endswith('.py'):
+                    if file == '__init__.py':
+                        module_names.add(root_path.name)
+                    else:
+                        module_names.add(Path(file).stem)
+
+        return module_names
         
     def find_python_files(self) -> List[Path]:
         """Find all Python files in project"""
@@ -97,6 +117,11 @@ class DebugScanner:
         """Check for import errors"""
         errors = []
         try:
+            module_search_paths = [
+                str(self.project_root),
+                str(file_path.parent),
+                str(file_path.parent.parent),
+            ]
             with open(file_path, 'r', encoding='utf-8') as f:
                 code = f.read()
                 tree = ast.parse(code, filename=str(file_path))
@@ -104,48 +129,67 @@ class DebugScanner:
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
                         for alias in node.names:
-                            # Try to import the module
-                            try:
-                                __import__(alias.name)
-                            except ImportError as e:
-                                # Check if it's a local module
-                                if not self.is_local_module(alias.name):
-                                    errors.append({
-                                        'file': str(file_path),
-                                        'type': 'import_error',
-                                        'line': node.lineno,
-                                        'message': f'Cannot import {alias.name}: {e}',
-                                        'text': alias.name
-                                    })
-                            except Exception:
-                                pass  # Skip other import issues
+                            if self.is_local_module(alias.name):
+                                continue
+
+                            spec_found = self.find_module_spec(alias.name, module_search_paths)
+                            if not spec_found:
+                                errors.append({
+                                    'file': str(file_path),
+                                    'type': 'import_error',
+                                    'line': node.lineno,
+                                    'message': f'Cannot resolve import: {alias.name}',
+                                    'text': alias.name
+                                })
                     
                     elif isinstance(node, ast.ImportFrom):
+                        if getattr(node, 'level', 0) and node.level > 0:
+                            continue
+
                         if node.module:
-                            try:
-                                __import__(node.module)
-                            except ImportError as e:
-                                if not self.is_local_module(node.module):
-                                    errors.append({
-                                        'file': str(file_path),
-                                        'type': 'import_error',
-                                        'line': node.lineno,
-                                        'message': f'Cannot import from {node.module}: {e}',
-                                        'text': node.module
-                                    })
-                            except Exception:
-                                pass  # Skip other import issues
-        except Exception as e:
-            # If we can't parse, it will be caught by syntax check
-            pass
+                            if self.is_local_module(node.module):
+                                continue
+
+                            spec_found = self.find_module_spec(node.module, module_search_paths)
+                            if not spec_found:
+                                errors.append({
+                                    'file': str(file_path),
+                                    'type': 'import_error',
+                                    'line': node.lineno,
+                                    'message': f'Cannot resolve import from: {node.module}',
+                                    'text': node.module
+                                })
+        except Exception:
+            return errors
         
         return errors
+
+    def find_module_spec(self, module_name: str, search_paths: List[str]) -> bool:
+        """Return True if module appears import-resolvable."""
+        spec = None
+        try:
+            spec = importlib.util.find_spec(module_name)
+        except Exception:
+            spec = None
+
+        if spec is not None:
+            return True
+
+        parent = module_name.split('.')[0]
+        for base in search_paths:
+            base_path = Path(base)
+            if (base_path / f"{parent}.py").exists() or (base_path / parent).is_dir():
+                return True
+
+        return False
     
     def is_local_module(self, module_name: str) -> bool:
         """Check if module is a local project module"""
-        local_modules = ['secids_cnn', 'unified_threat_model', 'threat_detector', 
-                        'data_analyzer', 'command_library', 'deep_scan']
-        return any(module_name.startswith(m) for m in local_modules)
+        if not module_name:
+            return False
+
+        root_name = module_name.split('.')[0]
+        return root_name in self.local_module_names
     
     def check_with_pylint(self, file_path: Path) -> List[Dict]:
         """Run pylint on file for deeper analysis"""
@@ -172,15 +216,20 @@ class DebugScanner:
                                 'text': issue.get('symbol', '')
                             })
                 except json.JSONDecodeError:
-                    pass
+                    return errors
         
         except subprocess.TimeoutExpired:
-            pass
+            return errors
         except FileNotFoundError:
-            # Pylint not installed, skip
-            pass
+            return errors
         except Exception as e:
-            pass  # Skip on error
+            errors.append({
+                'file': str(file_path),
+                'type': 'pylint_error',
+                'line': 0,
+                'message': f'Pylint execution failed: {e}',
+                'text': ''
+            })
         return errors
     
     def scan_file(self, file_path: Path) -> Dict:
@@ -334,7 +383,7 @@ class DebugScanner:
 def main():
     """Main entry point"""
     project_root = Path(__file__).parent.parent
-    scanner = DebugScanner(project_root)
+    scanner = DebugScanner(str(project_root))
     scanner.scan_all_files()
 
 

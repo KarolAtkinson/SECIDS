@@ -1,0 +1,28 @@
+[2026-03-10 17:45:34] [INFO] Starting system upgrade (Safe Mode: True)
+[2026-03-10 17:45:34] [INFO] Creating backup of critical files...
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: requirements.txt
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: pyrightconfig.json
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: Root/secids_main.py
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: Root/system_integrator.py
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: Auto_Update/__init__.py
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Backed up: Scripts/__init__.py
+[2026-03-10 17:45:34] [SUCCESS] Backup completed: /home/kali/Documents/Code/SECIDS-CNN/Backups/upgrade_20260310_174534
+[2026-03-10 17:45:34] [INFO] Checking Python version...
+[2026-03-10 17:45:34] [SUCCESS]   ✓ Python 3.10.13 is compatible
+[2026-03-10 17:45:34] [INFO] Updating pip...
+[2026-03-10 17:45:35] [SUCCESS]   ✓ pip updated successfully
+[2026-03-10 17:45:35] [INFO] Upgrading Python packages...
+[2026-03-10 17:45:35] [INFO]   Installing packages from requirements.txt (safe mode)...
+[2026-03-10 17:46:29] [SUCCESS]   ✓ Packages upgraded successfully
+[2026-03-10 17:46:29] [INFO] Verifying critical imports...
+[2026-03-10 17:46:37] [SUCCESS]   ✓ TensorFlow: 2.21.0
+[2026-03-10 17:46:42] [SUCCESS]   ✓ Keras: 3.12.1
+[2026-03-10 17:46:43] [SUCCESS]   ✓ NumPy: 2.2.6
+[2026-03-10 17:46:43] [SUCCESS]   ✓ Pandas: 2.3.3
+[2026-03-10 17:46:44] [SUCCESS]   ✓ scikit-learn: 1.7.2
+[2026-03-10 17:46:44] [SUCCESS]   ✓ Scapy: 2.7.0
+[2026-03-10 17:46:44] [SUCCESS]   ✓ Rich: unknown
+[2026-03-10 17:46:44] [INFO] Checking model files...
+[2026-03-10 17:46:44] [SUCCESS]   ✓ SecIDS-CNN.h5: 0.33 MB
+[2026-03-10 17:46:44] [INFO] Running syntax checks...
+[2026-03-10 17:46:48] [SUCCESS]   ✓ All 50 files passed syntax check

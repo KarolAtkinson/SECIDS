@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecIDS-CNN Admin Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app-shell">
+    <section class="jobs-panel" style="max-width: 420px; margin: 80px auto;">
+      <div class="jobs-header">
+        <h3>Admin Login</h3>
+        <span class="pill">{{ 'single-user mode' if single_admin_mode else 'multi-user mode' }}</span>
+      </div>
+      {% if single_admin_mode %}
+      <p class="pill" style="display: inline-block; margin-top: 6px;">Allowed username: {{ username }}</p>
+      {% else %}
+      <p class="pill" style="display: inline-block; margin-top: 6px;">Use configured WebUI account credentials.</p>
+      {% endif %}
+      <div style="margin-top: 10px; font-size: 12px; line-height: 1.5; color: var(--muted);">
+        <div>Repository: <a href="https://github.com/KarolAtkinson/SECIDS" target="_blank" rel="noopener noreferrer">github.com/KarolAtkinson/SECIDS</a></div>
+        <div style="margin-top: 6px;"><strong>Run on Linux/Kali:</strong> <code>python3 -m venv .venv_test && source .venv_test/bin/activate && pip install -r requirements.txt && python3 WebUI/production_server.py</code></div>
+        <div style="margin-top: 6px;"><strong>Run on Windows:</strong> <code>python -m venv .venv_test && .venv_test\Scripts\activate && pip install -r requirements.txt && python WebUI/production_server.py</code></div>
+        <div style="margin-top: 6px;"><strong>Login:</strong> open <code>/login</code>, enter username/password, press <strong>Login</strong>.</div>
+      </div>
+      <form id="login-form" style="margin-top: 12px; display: grid; gap: 8px;">
+        <label for="username">Username</label>
+        <input id="username" name="username" value="{{ username if single_admin_mode else '' }}" autocomplete="username" />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" />
+        <button class="btn btn-run" type="submit">Login</button>
+      </form>
+      <pre id="login-message" style="margin-top: 10px; min-height: 26px;">Ready.</pre>
+    </section>
+  </div>
+
+  <script>
+    const form = document.getElementById("login-form");
+    const msg = document.getElementById("login-message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        msg.textContent = data.error || "Login failed";
+        return;
+      }
+
+      msg.textContent = "Login successful. Redirecting...";
+      window.location.href = "{{ index_path }}";
+    });
+  </script>
+</body>
+</html>

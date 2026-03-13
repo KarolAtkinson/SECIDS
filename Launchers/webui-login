@@ -1,0 +1,48 @@
+#!/bin/bash
+# SecIDS-CNN WebUI login launcher
+# Starts production WebUI (if not running) and opens dynamic login URL.
+
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+
+SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT" || exit 1
+
+VENV_PYTHON="$PROJECT_ROOT/.venv_test/bin/python"
+if [ ! -x "$VENV_PYTHON" ]; then
+    echo "❌ Missing Python environment: $VENV_PYTHON"
+    echo "   Run: python3 -m venv .venv_test && .venv_test/bin/pip install -r requirements.txt"
+    exit 1
+fi
+
+HOST="${SECIDS_WEB_HOST:-127.0.0.1}"
+PORT="${SECIDS_WEB_PORT:-8080}"
+
+LOGIN_PATH="$($VENV_PYTHON - <<'PY'
+from WebUI.app import create_app
+app = create_app()
+print(app.config.get("SECIDS_LOGIN_PATH", "/login"))
+PY
+)"
+
+URL="http://${HOST}:${PORT}${LOGIN_PATH}"
+
+if ! pgrep -f "WebUI/production_server.py" >/dev/null 2>&1; then
+    echo "[webui-login] starting WebUI production server..."
+    SECIDS_WEB_OPEN_BROWSER=0 nohup "$VENV_PYTHON" WebUI/production_server.py >/tmp/secids_webui_public.log 2>&1 &
+    sleep 1.4
+fi
+
+echo "[webui-login] opening: $URL"
+if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$URL" >/dev/null 2>&1 || true
+fi
+
+echo "[webui-login] ready"

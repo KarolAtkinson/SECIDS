@@ -43,7 +43,8 @@ class BlacklistManager:
             try:
                 with open(self.blocked_ips_file, 'r') as f:
                     return json.load(f)
-            except Exception:
+            except (json.JSONDecodeError, OSError) as e:
+                print(f"Warning: Could not load blocked IPs: {e}")
                 return {}
         return {}
     
@@ -58,7 +59,8 @@ class BlacklistManager:
             try:
                 with open(self.attack_patterns_file, 'r') as f:
                     return json.load(f)
-            except Exception:
+            except (json.JSONDecodeError, OSError) as e:
+                print(f"Warning: Could not load attack patterns: {e}")
                 return []
         return []
     
@@ -364,8 +366,8 @@ class BlacklistManager:
                         false_positive_count += 1
                     else:
                         confirmed_count += 1
-            except Exception:  # Fixed: bare except
-                pass
+            except Exception:
+                continue
         
         return {
             'total_blocked_ips': total_ips,
@@ -414,8 +416,8 @@ class BlacklistManager:
                     profile = json.load(f)
                     if profile.get('tracking', {}).get('false_positive') is None:
                         unverified.append(profile)
-            except Exception:  # Fixed: bare except
-                pass
+            except Exception:
+                continue
         return unverified
     
     def unblock_ip(self, ip_address):

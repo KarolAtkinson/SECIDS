@@ -45,7 +45,7 @@ class GreylistManager:
     GREYLIST_HIGH = 0.75           # Greylist range end
     BLACKLIST_THRESHOLD = 0.75     # Above this = definite threat (auto-blacklist)
     
-    def __init__(self, greylist_dir: Path = None):
+    def __init__(self, greylist_dir: Optional[Path] = None):
         """
         Initialize greylist manager
         
@@ -215,7 +215,7 @@ class GreylistManager:
         with self.lock:
             return list(self.greylist.keys())
     
-    def record_decision(self, ip: str, decision: str, reason: str = None):
+    def record_decision(self, ip: str, decision: str, reason: Optional[str] = None):
         """
         Record a user decision about a greylisted IP
         
@@ -282,7 +282,7 @@ class GreylistManager:
         
         return classification, False  # Auto-handle (whitelist or blacklist)
     
-    def get_pending_decision(self, timeout: float = None) -> Optional[Dict]:
+    def get_pending_decision(self, timeout: Optional[float] = None) -> Optional[Dict]:
         """
         Get next pending decision from queue
         
@@ -308,7 +308,7 @@ class GreylistManager:
         """Get number of pending decisions"""
         return self.decision_queue.qsize()
     
-    def apply_decision(self, ip: str, decision: str, reason: str = None) -> Dict:
+    def apply_decision(self, ip: str, decision: str, reason: Optional[str] = None) -> Dict:
         """
         Apply user decision to greylisted IP
         
@@ -426,7 +426,7 @@ class GreylistManager:
         print(f"  Total decisions: {stats['total_history']}")
         print("="*80 + "\n")
     
-    def export_report(self, output_file: Path = None) -> Path:
+    def export_report(self, output_file: Optional[Path] = None) -> Path:
         """
         Export greylist report
         

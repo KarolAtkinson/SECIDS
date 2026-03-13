@@ -16,13 +16,16 @@ sys.path.insert(0, str(code_dir))
 from data_analyzer import DataAnalyzer
 from dataset_creator import DatasetCreator
 from threat_detector import ThreatDetectionModel
+from path_config import CODE_DIR, DATASETS_DIR, LOGS_DIR, MODELS_DIR, TRAINING_DATA_DIR, ensure_model_tester_dirs
+
+ensure_model_tester_dirs()
 
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(code_dir, 'threat_detection.log')),
+        logging.FileHandler(LOGS_DIR / 'threat_detection.log'),
         logging.StreamHandler()
     ]
 )
@@ -34,16 +37,17 @@ class ThreatDetectionPipeline:
     
     def __init__(self):
         # Initialize the threat detection pipeline
-        self.base_dir = Path(__file__).parent.parent
-        self.dataset_dir = self.base_dir / "Threat_Detection_Model_1"
-        self.code_dir = self.base_dir / "Code"
-        # Use temp directories to avoid OneDrive file locking issues
-        self.datasets_dir = Path("C:/Temp/ml_ai_datasets")
-        self.models_dir = Path("C:/Temp/ml_ai_models")
+        self.base_dir = CODE_DIR.parent
+        self.dataset_dir = TRAINING_DATA_DIR
+        self.code_dir = CODE_DIR
+        self.datasets_dir = DATASETS_DIR
+        self.models_dir = MODELS_DIR
+        self.logs_dir = LOGS_DIR
         
         # Create necessary directories
-        self.datasets_dir.mkdir(exist_ok=True)
-        self.models_dir.mkdir(exist_ok=True)
+        self.datasets_dir.mkdir(parents=True, exist_ok=True)
+        self.models_dir.mkdir(parents=True, exist_ok=True)
+        self.logs_dir.mkdir(parents=True, exist_ok=True)
         
         self.analyzer = None
         self.creator = None
@@ -169,7 +173,7 @@ class ThreatDetectionPipeline:
             logger.info("\nOutput files:")
             logger.info(f"  - Training datasets: {self.datasets_dir}")
             logger.info(f"  - Trained models: {self.models_dir}")
-            logger.info(f"  - Log file: {os.path.join(self.code_dir, 'threat_detection.log')}")
+            logger.info(f"  - Log file: {self.logs_dir / 'threat_detection.log'}")
             
             return True
             

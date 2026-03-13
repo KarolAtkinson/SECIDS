@@ -227,6 +227,9 @@ class DataAnalyzer:
 
 # Example usage
 if __name__ == "__main__":
-    dataset_dir = r"c:\Users\karol\OneDrive\Pulpit\Master ML_AI\Threat_Detection_Model_1"
+    from path_config import TRAINING_DATA_DIR, ensure_model_tester_dirs
+
+    ensure_model_tester_dirs()
+    dataset_dir = str(TRAINING_DATA_DIR)
     analyzer = DataAnalyzer(dataset_dir)
     datasets = analyzer.run_complete_analysis()

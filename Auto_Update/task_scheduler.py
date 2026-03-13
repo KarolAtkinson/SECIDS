@@ -7,6 +7,8 @@ Monitors system and triggers sub-routines when needed
 import time
 import json
 import subprocess
+import copy
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from collections import defaultdict
@@ -40,20 +42,38 @@ class TaskScheduler:
     
     def _load_config(self):
         """Load task configuration"""
+        default_config = self._default_config()
+
         if self.config_file.exists():
             try:
                 with open(self.config_file, 'r') as f:
-                    return json.load(f)
-            except Exception as e:
-                pass  # Skip on error
-        # Default configuration
-        default_config = {
+                    loaded = json.load(f)
+                merged = self._merge_with_defaults(loaded, default_config)
+                if merged != loaded:
+                    self.config_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(self.config_file, 'w') as f:
+                        json.dump(merged, f, indent=2)
+                    self.log("Task config updated with new default entries", "INFO")
+                return merged
+            except (json.JSONDecodeError, OSError) as exc:
+                self.log(f"Config load failed ({exc}); using defaults", "WARNING")
+
+        # Save default config
+        self.config_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.config_file, 'w') as f:
+            json.dump(default_config, f, indent=2)
+
+        return default_config
+
+    def _default_config(self):
+        """Default configuration template."""
+        return {
             'tasks': {
-                'dataset_cleanup': {
+                'git_sync': {
                     'enabled': True,
-                    'interval_hours': 24,
-                    'script': 'Launchers/project_cleanup.sh',
-                    'description': 'Clean up and organize files'
+                    'interval_hours': 6,  # Every 6 hours
+                    'script': 'Auto_Update/git_auto_sync.py',
+                    'description': 'Sync repository with GitHub (pull and push changes)'
                 },
                 'whitelist_update': {
                     'enabled': True,
@@ -67,16 +87,41 @@ class TaskScheduler:
                     'script': 'Scripts/refine_datasets.py',
                     'description': 'Refine datasets with whitelist rules'
                 },
+                'dataset_cleanup': {
+                    'enabled': True,
+                    'interval_hours': 24,
+                    'script': 'Launchers/project_cleanup.sh',
+                    'description': 'Clean up and organize project files'
+                },
                 'model_validation': {
                     'enabled': True,
                     'interval_hours': 48,
                     'script': 'Scripts/test_enhanced_model.py',
                     'description': 'Validate model performance'
                 },
-                'blacklist_cleanup': {
+                'workflow_chart_update': {
                     'enabled': True,
-                    'interval_hours': 168,  # Weekly
-                    'description': 'Remove old blacklist entries'
+                    'interval_hours': 12,
+                    'script': 'Auto_Update/monitors/update_workflow_chart.py',
+                    'description': 'Regenerate workflow chart documentation'
+                },
+                'server_db_data_sync': {
+                    'enabled': True,
+                    'interval_hours': 24,
+                    'script': 'Scripts/sync_project_data_to_serverdb.py',
+                    'description': 'Sync tagged project data into ServerDB folders'
+                },
+                'nist_csw_feed_update': {
+                    'enabled': True,
+                    'interval_hours': 24,
+                    'script': 'Scripts/update_nist_csw_sources.py',
+                    'description': 'Fetch open-source NIST/CISA threat data into ServerDB/NIST-CSW'
+                },
+                'nist_csw_convert': {
+                    'enabled': True,
+                    'interval_hours': 24,
+                    'script': 'Scripts/convert_nist_csw_to_model_format.py',
+                    'description': 'Convert NIST-CSW source feeds to SECIDS model-style dataset format'
                 }
             },
             'thresholds': {
@@ -85,13 +130,40 @@ class TaskScheduler:
                 'max_blacklist_age_days': 90
             }
         }
-        
-        # Save default config
-        self.config_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.config_file, 'w') as f:
-            json.dump(default_config, f, indent=2)
-        
-        return default_config
+
+    def _merge_with_defaults(self, current, defaults):
+        """Merge loaded config with defaults so newly added tasks auto-appear."""
+        merged = copy.deepcopy(defaults)
+        if not isinstance(current, dict):
+            return merged
+
+        for key, value in current.items():
+            if key not in merged:
+                merged[key] = value
+                continue
+
+            if isinstance(merged[key], dict) and isinstance(value, dict):
+                merged[key].update(value)
+            else:
+                merged[key] = value
+
+        default_tasks = defaults.get('tasks', {})
+        current_tasks = current.get('tasks', {}) if isinstance(current.get('tasks', {}), dict) else {}
+        merged_tasks = merged.get('tasks', {})
+
+        for task_name, task_defaults in default_tasks.items():
+            if task_name not in merged_tasks:
+                merged_tasks[task_name] = copy.deepcopy(task_defaults)
+            elif isinstance(merged_tasks[task_name], dict):
+                for item_key, item_value in task_defaults.items():
+                    merged_tasks[task_name].setdefault(item_key, item_value)
+
+        for task_name, task_value in current_tasks.items():
+            if task_name not in merged_tasks:
+                merged_tasks[task_name] = task_value
+
+        merged['tasks'] = merged_tasks
+        return merged
     
     def _should_run_task(self, task_name, task_config):
         """Check if task should run"""
@@ -115,7 +187,7 @@ class TaskScheduler:
             # Determine how to run the script
             if script_path.endswith('.py'):
                 result = subprocess.run(
-                    ['python3', str(full_path)],
+                    [sys.executable, str(full_path)],
                     cwd=str(self.project_root),
                     capture_output=True,
                     text=True,
@@ -183,7 +255,10 @@ class TaskScheduler:
         if result['success']:
             self.log(f"✓ Task completed: {task_name}")
         else:
-            self.log(f"✗ Task failed: {task_name} - {result.get('error', 'Unknown error')}")
+            error_msg = result.get('error')
+            if not error_msg:
+                error_msg = result.get('stderr') or f"returncode={result.get('returncode', 'unknown')}"
+            self.log(f"✗ Task failed: {task_name} - {error_msg}")
         
         return result
     
@@ -224,14 +299,14 @@ class TaskScheduler:
         # Check for special conditions
         if self._check_csv_files():
             self.log("⚠️  Too many CSV files detected, triggering cleanup")
-            results['emergency_cleanup'] = self.run_task('dataset_cleanup')
+            results['emergency_cleanup'] = self.run_task('dataset_refinement')
         
         return results
     
-    def log(self, message):
+    def log(self, message, level="INFO"):
         """Log message to file and console"""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_message = f"[{timestamp}] {message}"
+        log_message = f"[{timestamp}] [{level}] {message}"
         
         print(log_message)
         
@@ -289,6 +364,7 @@ if __name__ == '__main__':
     parser.add_argument('--daemon', action='store_true', help='Run as daemon')
     parser.add_argument('--status', action='store_true', help='Show task status')
     parser.add_argument('--run', type=str, help='Run specific task')
+    parser.add_argument('--run-all', action='store_true', help='Run all enabled tasks once')
     parser.add_argument('--interval', type=int, default=3600, help='Check interval for daemon (seconds)')
     args = parser.parse_args()
     
@@ -306,6 +382,18 @@ if __name__ == '__main__':
     elif args.run:
         result = scheduler.run_task(args.run)
         print(f"\nTask Result: {result}")
+
+    elif args.run_all:
+        print("\nRunning all enabled tasks once:")
+        print("="*60)
+        results = {}
+        for task_name, task_config in scheduler.config['tasks'].items():
+            if task_config.get('enabled', False):
+                results[task_name] = scheduler.run_task(task_name)
+        print(f"\nRun-all summary: {len(results)} task(s) executed")
+        for task_name, result in results.items():
+            status = 'PASS' if result.get('success') else 'FAIL'
+            print(f"  {status} - {task_name}")
     
     elif args.daemon:
         scheduler.run_daemon(check_interval=args.interval)
@@ -316,6 +404,7 @@ if __name__ == '__main__':
         print("Usage:")
         print("  --status         Show all tasks status")
         print("  --run TASK       Run specific task")
+        print("  --run-all        Run all enabled tasks once")
         print("  --daemon         Run as background daemon")
         print("  --interval N     Daemon check interval (seconds)")
         print("\nAvailable tasks:")

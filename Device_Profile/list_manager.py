@@ -23,7 +23,7 @@ class ListManager:
     Handles transitions and maintains consistency
     """
     
-    def __init__(self, device_profile_dir: Path = None):
+    def __init__(self, device_profile_dir: Optional[Path] = None):
         """
         Initialize list manager
         
@@ -111,7 +111,7 @@ class ListManager:
         else:
             return 'unknown'
     
-    def add_to_whitelist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def add_to_whitelist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Add IP to whitelist and remove from other lists
         
@@ -134,7 +134,7 @@ class ListManager:
         self.save_list(self.whitelist, self.whitelist_file)
         print(f"✓ Added {ip} to whitelist")
     
-    def add_to_blacklist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def add_to_blacklist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Add IP to blacklist and remove from other lists
         
@@ -157,7 +157,7 @@ class ListManager:
         self.save_list(self.blacklist, self.blacklist_file)
         print(f"✓ Added {ip} to blacklist")
     
-    def add_to_greylist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def add_to_greylist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Add IP to greylist and remove from other lists
         
@@ -198,7 +198,7 @@ class ListManager:
             del self.greylist[ip]
             self.save_list(self.greylist, self.greylist_file)
     
-    def move_to_whitelist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def move_to_whitelist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Move IP from current list to whitelist
         
@@ -231,7 +231,7 @@ class ListManager:
         self.add_to_whitelist(ip, reason, existing_metadata)
         print(f"→ Moved {ip} from {current_status} to whitelist")
     
-    def move_to_blacklist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def move_to_blacklist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Move IP from current list to blacklist
         
@@ -264,7 +264,7 @@ class ListManager:
         self.add_to_blacklist(ip, reason, existing_metadata)
         print(f"→ Moved {ip} from {current_status} to blacklist")
     
-    def move_to_greylist(self, ip: str, reason: str = None, metadata: Dict = None):
+    def move_to_greylist(self, ip: str, reason: Optional[str] = None, metadata: Optional[Dict] = None):
         """
         Move IP from current list to greylist
         
@@ -317,7 +317,7 @@ class ListManager:
             'greylist_ips': list(self.greylist.keys())
         }
     
-    def export_report(self, output_file: Path = None) -> Path:
+    def export_report(self, output_file: Optional[Path] = None) -> Path:
         """Export comprehensive list report"""
         if output_file is None:
             output_file = self.device_profile_dir / f'lists_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'

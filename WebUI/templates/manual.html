@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecIDS-CNN Master Manual</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(180deg, #0a0f1f 0%, #0f1729 100%);
+      color: #b7d4ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-kerning: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .manual-page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .manual-page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #1a3a52;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .manual-page-header h1 {
+      color: #3ea6ff;
+      font-size: 28px;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .manual-page-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .zoom-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(26, 58, 82, 0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #1a3a52;
+    }
+    
+    .zoom-controls button {
+      padding: 6px 10px !important;
+      width: auto !important;
+      min-width: 36px;
+      font-size: 14px !important;
+      font-weight: 600;
+    }
+    
+    .zoom-controls #zoom-label {
+      min-width: 50px;
+      text-align: center;
+      color: #3ea6ff;
+      font-weight: 500;
+      font-size: 13px;
+    }
+    
+    #zoom-auto.active-switch {
+      background: #3ea6ff !important;
+      color: #0a0f1f !important;
+    }
+    
+    .manual-page-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .manual-page-controls a,
+    .manual-page-controls button {
+      padding: 8px 16px;
+      background: #1a3a52;
+      color: #3ea6ff;
+      text-decoration: none;
+      border-radius: 6px;
+      border: 1px solid #3ea6ff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .manual-page-controls a:hover,
+    .manual-page-controls button:hover {
+      background: #3ea6ff;
+      color: #0a0f1f;
+    }
+    
+    .manual-page-toc {
+      background: rgba(26, 58, 82, 0.3);
+      border: 1px solid #1a3a52;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .manual-page-toc h3 {
+      color: #3ea6ff;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 16px;
+      letter-spacing: 0.3px;
+    }
+    
+    .manual-page-toc ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .manual-page-toc li {
+      margin: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .manual-page-toc li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #3ea6ff;
+    }
+    
+    .manual-page-toc a {
+      color: #7dd3fc;
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s ease;
+      display: inline-block;
+    }
+    
+    .manual-page-toc a:hover {
+      color: #3ea6ff;
+    }
+    
+    .manual-page-toc li.toc-nested {
+      padding-left: 40px;
+      font-size: 12px;
+    }
+    
+    .manual-page-toc li.toc-nested::before {
+      content: "‣";
+    }
+    
+    .manual-page-content {
+      line-height: 1.75;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+      word-spacing: 0.05em;
+    }
+    
+    .manual-page-content h1,
+    .manual-page-content h2,
+    .manual-page-content h3,
+    .manual-page-content h4,
+    .manual-page-content h5,
+    .manual-page-content h6 {
+      color: #3ea6ff;
+      margin-top: 28px;
+      margin-bottom: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      scroll-margin-top: 80px;
+    }
+    
+    .manual-page-content h1 {
+      font-size: 32px;
+      border-bottom: 2px solid #1a3a52;
+      padding-bottom: 12px;
+      margin-top: 32px;
+    }
+    
+    .manual-page-content h2 {
+      font-size: 24px;
+      border-left: 4px solid #3ea6ff;
+      padding-left: 12px;
+    }
+    
+    .manual-page-content h3 {
+      font-size: 20px;
+      color: #a0c4ff;
+    }
+    
+    .manual-page-content h4 {
+      font-size: 16px;
+      color: #a0c4ff;
+    }
+    
+    .manual-page-content h5 {
+      font-size: 15px;
+      color: #b7d4ff;
+    }
+    
+    .manual-page-content h6 {
+      font-size: 14px;
+      color: #b7d4ff;
+    }
+    
+    .manual-page-content p {
+      margin: 14px 0;
+      color: #b7d4ff;
+      line-height: 1.8;
+    }
+    
+    .manual-page-content ul,
+    .manual-page-content ol {
+      margin: 14px 0;
+      padding-left: 32px;
+      line-height: 1.8;
+    }
+    
+    .manual-page-content li {
+      margin: 9px 0;
+      color: #b7d4ff;
+    }
+    
+    .manual-page-content code {
+      background: #0f1729;
+      color: #7dd3fc;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', Courier, monospace;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+    
+    .manual-page-content pre {
+      background: #0f1729;
+      border: 1px solid #1a3a52;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 18px 0;
+      color: #7dd3fc;
+      line-height: 1.6;
+    }
+    
+    .manual-page-content pre code {
+      background: none;
+      color: #7dd3fc;
+      padding: 0;
+      border-radius: 0;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    
+    .manual-page-content blockquote {
+      border-left: 4px solid #3ea6ff;
+      margin: 16px 0;
+      padding-left: 16px;
+      color: #a0c4ff;
+      font-style: italic;
+    }
+    
+    .manual-page-content strong {
+      color: #3ea6ff;
+      font-weight: 700;
+    }
+    
+    .manual-page-content em {
+      color: #a0c4ff;
+    }
+    
+    .manual-page-content a {
+      color: #3ea6ff;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .manual-page-content a:hover {
+      border-bottom-color: #3ea6ff;
+      color: #7dd3fc;
+    }
+    
+    .manual-page-footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 2px solid #1a3a52;
+      text-align: center;
+      color: #6b8fcf;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+    }
+    
+    .pdf-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #1a3a52;
+      color: #7dd3fc;
+      border-radius: 4px;
+      border: 1px solid #1a3a52;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    @media (max-width: 768px) {
+      .manual-page-shell {
+        padding: 10px;
+      }
+      
+      .manual-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .manual-page-controls {
+        width: 100%;
+      }
+      
+      .manual-page-toc {
+        max-height: 300px;
+      }
+      
+      .manual-page-content {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="manual-page-shell">
+    <div class="manual-page-header">
+      <h1>Master-Manual</h1>
+      <div class="manual-page-controls">
+        <div class="zoom-controls" style="display: flex; gap: 8px; align-items: center;">
+          <button id="zoom-out" title="Decrease text size" style="padding: 6px 10px; width: auto;">−</button>
+          <span id="zoom-label" style="min-width: 50px; text-align: center; color: #3ea6ff; font-weight: 500;">100%</span>
+          <button id="zoom-in" title="Increase text size" style="padding: 6px 10px; width: auto;">+</button>
+          <button id="zoom-auto" title="Auto-adjust for screen size" style="padding: 6px 10px;">Auto</button>
+        </div>
+        <button id="download-pdf">📥 Download PDF</button>
+        <a href="javascript:window.close()">Close</a>
+      </div>
+    </div>
+    
+    <div class="manual-page-toc" id="toc-container">
+      <h3>📋 Table of Contents</h3>
+      <div id="toc-list" style="text-align: center; color: #6b8fcf;">Loading...</div>
+    </div>
+    
+    <div class="manual-page-content" id="manual-content">
+      Loading Master-Manual...
+    </div>
+    
+    <div class="manual-page-footer">
+      <p>SecIDS-CNN Master Manual - Last Updated: March 11, 2026</p>
+    </div>
+  </div>
+
+  <script>
+    // ===== ZOOM STATE AND FUNCTIONS =====
+    let manualPageZoom = 1;
+    let manualAutoAdjust = false;
+    let manualDeviceProfile = 'desktop';
+    
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomAutoBtn = document.getElementById('zoom-auto');
+    const zoomLabel = document.getElementById('zoom-label');
+    
+    function getDeviceProfile() {
+      const width = window.innerWidth || document.documentElement.clientWidth || 1280;
+      if (width <= 768) return 'mobile';
+      if (width <= 1100) return 'tablet';
+      return 'desktop';
+    }
+    
+    function applyManualZoom() {
+      if (manualDeviceProfile === 'mobile') {
+        document.body.style.zoom = '100%';
+        if (zoomLabel) zoomLabel.textContent = '100%';
+        if (zoomAutoBtn) zoomAutoBtn.classList.remove('active-switch');
+        return;
+      }
+      
+      const clamped = Math.max(0.7, Math.min(1.5, manualPageZoom || 1));
+      manualPageZoom = clamped;
+      document.body.style.zoom = `${Math.round(clamped * 100)}%`;
+      if (zoomLabel) {
+        zoomLabel.textContent = `${Math.round(clamped * 100)}%`;
+      }
+      if (zoomAutoBtn) {
+        zoomAutoBtn.classList.toggle('active-switch', Boolean(manualAutoAdjust));
+      }
+    }
+    
+    function updateDeviceProfile() {
+      const profile = getDeviceProfile();
+      manualDeviceProfile = profile;
+      
+      if (profile === 'mobile') {
+        manualAutoAdjust = false;
+        manualPageZoom = 1;
+        if (zoomAutoBtn) zoomAutoBtn.disabled = true;
+      } else if (profile === 'tablet') {
+        if (zoomAutoBtn) zoomAutoBtn.disabled = false;
+        if (!manualAutoAdjust) {
+          manualPageZoom = Math.max(0.9, Math.min(1.1, manualPageZoom || 1));
+        }
+      } else {
+        if (zoomAutoBtn) zoomAutoBtn.disabled = false;
+      }
+      
+      applyManualZoom();
+    }
+    
+    // ===== ZOOM BUTTON HANDLERS =====
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', () => {
+        manualPageZoom = Math.max(0.7, manualPageZoom - 0.1);
+        manualAutoAdjust = false;
+        applyManualZoom();
+      });
+    }
+    
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        manualPageZoom = Math.min(1.5, manualPageZoom + 0.1);
+        manualAutoAdjust = false;
+        applyManualZoom();
+      });
+    }
+    
+    if (zoomAutoBtn) {
+      zoomAutoBtn.addEventListener('click', () => {
+        manualAutoAdjust = !manualAutoAdjust;
+        if (manualAutoAdjust) {
+          updateDeviceProfile();
+        } else {
+          manualPageZoom = 1;
+          applyManualZoom();
+        }
+      });
+    }
+    
+    // ===== RESPONSIVE ZOOM =====
+    window.addEventListener('resize', () => {
+      if (manualAutoAdjust) {
+        updateDeviceProfile();
+      }
+    });
+    
+    // ===== MARKDOWN AND PDF FUNCTIONS =====
+    let markdownContent = '';
+    let parsedHeaders = [];
+    let usedHeaderIds = new Set();
+    
+    // Convert basic Markdown to HTML with improved parsing
+    function markdownToHtml(markdown) {
+      const lines = markdown.split('\n');
+      let html = '';
+      let inCodeBlock = false;
+      let codeLanguage = '';
+      let codeBuffer = [];
+      
+      parsedHeaders = [];
+      usedHeaderIds = new Set();
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // Handle code blocks
+        if (line.trim().startsWith('```')) {
+          if (!inCodeBlock) {
+            inCodeBlock = true;
+            codeLanguage = line.trim().replace('```', '').trim();
+            codeBuffer = [];
+          } else {
+            inCodeBlock = false;
+            html += '<pre><code>' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            codeBuffer = [];
+          }
+          continue;
+        }
+        
+        if (inCodeBlock) {
+          codeBuffer.push(line);
+          continue;
+        }
+        
+        // Handle headers (# through ######)
+        const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          const text = headingMatch[2].trim();
+          const id = generateUniqueId(text);
+          parsedHeaders.push({ level, text, id });
+          html += `<h${level} id="${id}">${escapeHtml(text)}</h${level}>\n`;
+          continue;
+        }
+        
+        // Skip empty lines
+        if (!line.trim()) {
+          if (html && !html.endsWith('\n\n')) html += '\n';
+          continue;
+        }
+        
+        // Handle unordered lists
+        if (line.trim().match(/^[\*\-]\s/)) {
+          html += '<li>' + escapeHtml(line.replace(/^[\*\-]\s/, '').trim()) + '</li>\n';
+          continue;
+        }
+        
+        // Handle ordered lists
+        if (line.trim().match(/^\d+\.\s/)) {
+          html += '<li>' + escapeHtml(line.replace(/^\d+\.\s/, '').trim()) + '</li>\n';
+          continue;
+        }
+        
+        // Regular paragraphs
+        if (line.trim()) {
+          let content = line.trim();
+          // Apply inline formatting
+          content = applyInlineFormatting(content);
+          html += '<p>' + content + '</p>\n';
+        }
+      }
+      
+      // Wrap lists
+      html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (match) => {
+        if (match.includes('<ul>') || match.includes('<ol>')) return match;
+        return '<ul>' + match + '</ul>';
+      });
+      
+      // Remove duplicate list wrappers
+      html = html.replace(/<\/ul>\s*<ul>/g, '');
+      html = html.replace(/<\/ol>\s*<ol>/g, '');
+      
+      return html;
+    }
+    
+    // Apply inline formatting (bold, italic, code, links)
+    function applyInlineFormatting(text) {
+      // Code blocks
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Bold
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+      // Italic
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+      // Links
+      text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+      return text;
+    }
+    
+    // Generate URL-safe IDs from text
+    function generateId(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .substring(0, 60);
+    }
+
+    function generateUniqueId(text) {
+      const base = generateId(text) || 'section';
+      let candidate = base;
+      let counter = 2;
+
+      while (usedHeaderIds.has(candidate)) {
+        candidate = `${base}-${counter}`;
+        counter += 1;
+      }
+
+      usedHeaderIds.add(candidate);
+      return candidate;
+    }
+    
+    // Escape HTML special characters
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Build table of contents from headers
+    function buildToc() {
+      const tocList = document.getElementById('toc-list');
+      if (!parsedHeaders.length) {
+        tocList.innerHTML = '<p style="color: #6b8fcf;">No sections found</p>';
+        return;
+      }
+      
+      let html = '<ul>';
+      let currentLevel = 1;
+      
+      parsedHeaders.forEach((header) => {
+        if (header.level === 1) return; // Skip main title
+        
+        if (header.level > currentLevel) {
+          for (let i = currentLevel; i < header.level; i++) {
+            html += '<ul>';
+          }
+        } else if (header.level < currentLevel) {
+          for (let i = currentLevel; i > header.level; i--) {
+            html += '</ul>';
+          }
+        }
+        
+        currentLevel = header.level;
+        const nestClass = header.level > 2 ? ' toc-nested' : '';
+        html += `<li class="${nestClass}"><a href="#${header.id}">${escapeHtml(header.text)}</a></li>`;
+      });
+      
+      // Close all open lists
+      for (let i = currentLevel; i > 1; i--) {
+        html += '</ul>';
+      }
+      html += '</ul>';
+      
+      tocList.innerHTML = html;
+    }
+    
+    // Download manual as PDF
+    async function downloadPdf() {
+      const button = document.getElementById('download-pdf');
+      const originalText = button.textContent;
+      button.textContent = '⏳ Generating PDF...';
+      button.disabled = true;
+      
+      try {
+        const response = await fetch('/api/manual/pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ html: document.getElementById('manual-content').innerHTML })
+        });
+        
+        if (!response.ok) throw new Error('PDF generation failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'SecIDS-CNN-Master-Manual.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('PDF download error:', error);
+        alert('Failed to generate PDF: ' + error.message);
+      } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    }
+    
+    // Load and render Master-Manual
+    async function loadManual() {
+      try {
+        const response = await fetch('/Master-Manual.md');
+        if (!response.ok) throw new Error('Failed to load Master-Manual.md');
+        markdownContent = await response.text();
+        
+        const htmlContent = markdownToHtml(markdownContent);
+        document.getElementById('manual-content').innerHTML = htmlContent;
+        
+        buildToc();
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('#toc-list a').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        });
+      } catch (error) {
+        console.error('Error loading Master-Manual:', error);
+        document.getElementById('manual-content').innerHTML = '<p style="color: #ef4444; font-size: 16px;">Error loading Master-Manual.md: ' + error.message + '</p>';
+      }
+    }
+    
+    // Initialize
+    document.getElementById('download-pdf').addEventListener('click', downloadPdf);
+    updateDeviceProfile();
+    loadManual();
+  </script>
+</body>
+</html>

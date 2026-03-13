@@ -9,6 +9,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR" || exit 1
+PYTHON_BIN="$PROJECT_DIR/.venv_test/bin/python"
 
 echo "================================================================================"
 echo "  SecIDS-CNN Complete System Test Suite"
@@ -31,7 +32,7 @@ FAILED_TESTS=0
 # Test function
 run_test() {
     local test_name="$1"
-    local test_command="$2"
+    shift
     
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     
@@ -40,7 +41,7 @@ run_test() {
     echo "Test $TOTAL_TESTS: $test_name"
     echo "--------------------------------------------------------------------------------"
     
-    if eval "$test_command"; then
+    if "$@"; then
         echo -e "${GREEN}✓ PASSED${NC}: $test_name"
         PASSED_TESTS=$((PASSED_TESTS + 1))
         return 0
@@ -51,43 +52,40 @@ run_test() {
     fi
 }
 
-# Change to project directory
-cd "$(dirname "$0")" || exit 1
-
 echo "Project directory: $(pwd)"
 echo ""
 
 # Test 1: Greylist System Test
 run_test "Greylist System Test" \
-    "python3 Root/test_greylist.py > /tmp/test_greylist.log 2>&1 && grep -q 'All core tests passed' /tmp/test_greylist.log"
+    bash -c "python3 '$PROJECT_DIR/Root/test_greylist.py' > /tmp/test_greylist.log 2>&1 && grep -q 'All core tests passed' /tmp/test_greylist.log"
 
 # Test 2: Integration Test (with venv)
 run_test "Integration Test" \
-    ".venv_test/bin/python Root/test_integration.py > /tmp/test_integration.log 2>&1 && grep -q 'ALL SYSTEMS OPERATIONAL' /tmp/test_integration.log"
+    bash -c "'$PYTHON_BIN' '$PROJECT_DIR/Root/test_integration.py' > /tmp/test_integration.log 2>&1 && grep -q 'ALL SYSTEMS OPERATIONAL' /tmp/test_integration.log"
 
 # Test 3: Final Validation Test (with venv)
 run_test "Final Validation Test" \
-    ".venv_test/bin/python Root/test_validation.py > /tmp/test_validation.log 2>&1 && grep -q 'ALL SYSTEMS READY FOR DEPLOYMENT' /tmp/test_validation.log"
+    bash -c "'$PYTHON_BIN' '$PROJECT_DIR/Root/test_validation.py' > /tmp/test_validation.log 2>&1 && grep -q 'ALL SYSTEMS READY FOR DEPLOYMENT' /tmp/test_validation.log"
 
 # Test 4: Check for Python syntax errors
 run_test "Python Syntax Check" \
-    "python3 -m py_compile Root/integrated_workflow.py && python3 -m py_compile Device_Profile/greylist_manager.py && python3 -m py_compile Device_Profile/list_manager.py"
+    "$PYTHON_BIN" -m py_compile "$PROJECT_DIR/Root/integrated_workflow.py" "$PROJECT_DIR/Device_Profile/greylist_manager.py" "$PROJECT_DIR/Device_Profile/list_manager.py"
 
 # Test 5: Check imports
 run_test "Import Check" \
-    ".venv_test/bin/python -c 'import sys; sys.path.insert(0, "Root"); from integrated_workflow import IntegratedWorkflow; from Device_Profile.greylist_manager import GreylistManager; from Device_Profile.list_manager import ListManager; print("All imports successful")' > /tmp/test_imports.log 2>&1"
+    bash -c "'$PYTHON_BIN' -c \"import sys; sys.path.insert(0, 'Root'); from integrated_workflow import IntegratedWorkflow; from Device_Profile.greylist_manager import GreylistManager; from Device_Profile.list_manager import ListManager; print('All imports successful')\" > /tmp/test_imports.log 2>&1"
 
 # Test 6: Verify model file exists
 run_test "Model File Check" \
-    "test -f Models/SecIDS-CNN.h5 && [ $(stat -c%s Models/SecIDS-CNN.h5) -gt 100000 ]"
+    bash -c "test -f \"$PROJECT_DIR/Models/SecIDS-CNN.h5\" && [ \$(stat -c%s \"$PROJECT_DIR/Models/SecIDS-CNN.h5\") -gt 100000 ]"
 
 # Test 7: Verify directory structure
 run_test "Directory Structure Check" \
-    "test -d Device_Profile/greylist && test -d Device_Profile/whitelists && test -d Device_Profile/Blacklist && test -d Captures && test -d Results && test -d Logs"
+    bash -c "test -d '$PROJECT_DIR/Device_Profile/greylist' && test -d '$PROJECT_DIR/Device_Profile/whitelists' && test -d '$PROJECT_DIR/Device_Profile/Blacklist' && test -d '$PROJECT_DIR/Captures' && test -d '$PROJECT_DIR/Results' && test -d '$PROJECT_DIR/Logs'"
 
 # Test 8: Check documentation (updated for Reports/ location)
 run_test "Documentation Check" \
-    "test -f Reports/GREYLIST_GUIDE.md && test -f Reports/GREYLIST_IMPLEMENTATION.md && test -f Reports/GREYLIST_QUICK_REFERENCE.md && test -f Reports/INTEGRATION_TEST_SUMMARY.md"
+    bash -c "test -f '$PROJECT_DIR/Reports/GREYLIST_GUIDE.md' && test -f '$PROJECT_DIR/Reports/GREYLIST_IMPLEMENTATION.md' && test -f '$PROJECT_DIR/Reports/GREYLIST_QUICK_REFERENCE.md' && test -f '$PROJECT_DIR/Reports/INTEGRATION_TEST_SUMMARY.md'"
 
 # Summary
 echo ""

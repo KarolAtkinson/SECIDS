@@ -6,7 +6,7 @@ Tests the complete integrated workflow system including:
 - Component initialization
 - Greylist system
 - Threat classification
-- Countermeasure integration
+- Countermeasure integration (Active/Passive modes)
 """
 
 import sys
@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 
 # Setup paths
-PROJECT_ROOT = Path(__file__).parent
+PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / 'SecIDS-CNN'))
 sys.path.insert(0, str(PROJECT_ROOT / 'Device_Profile'))
 sys.path.insert(0, str(PROJECT_ROOT / 'Countermeasures'))
@@ -35,7 +35,7 @@ try:
     print("  ✓ SecIDSModel imported")
 except Exception as e:
     components_failed.append(("SecIDSModel", str(e)))
-    print(f"  ✗ SecIDSModel failed: {e}")
+    print(f"  ⚠️  SecIDSModel not available: {e}")
 
 # Greylist Manager
 try:
@@ -44,7 +44,7 @@ try:
     print("  ✓ GreylistManager imported")
 except Exception as e:
     components_failed.append(("GreylistManager", str(e)))
-    print(f"  ✗ GreylistManager failed: {e}")
+    print(f"  ⚠️  GreylistManager not available: {e}")
 
 # List Manager
 try:
@@ -53,16 +53,27 @@ try:
     print("  ✓ ListManager imported")
 except Exception as e:
     components_failed.append(("ListManager", str(e)))
-    print(f"  ✗ ListManager failed: {e}")
+    print(f"  ⚠️  ListManager not available: {e}")
 
-# Countermeasures
+# Countermeasures - New Architecture
+countermeasure_available = False
 try:
-    from ddos_countermeasure import DDoSCountermeasure
-    components_loaded.append("DDoSCountermeasure")
-    print("  ✓ DDoSCountermeasure imported")
+    from countermeasure_active import ActiveCountermeasure
+    from countermeasure_passive import PassiveCountermeasure
+    components_loaded.append("ActiveCountermeasure")
+    components_loaded.append("PassiveCountermeasure")
+    countermeasure_available = True
+    print("  ✓ ActiveCountermeasure imported (new architecture)")
+    print("  ✓ PassiveCountermeasure imported (new architecture)")
 except Exception as e:
-    components_failed.append(("DDoSCountermeasure", str(e)))
-    print(f"  ⚠️  DDoSCountermeasure not available: {e}")
+    # Try legacy countermeasure
+    try:
+        from ddos_countermeasure import DDoSCountermeasure
+        components_loaded.append("DDoSCountermeasure")
+        print("  ✓ DDoSCountermeasure imported (legacy)")
+    except Exception as e2:
+        components_failed.append(("Countermeasures", str(e)))
+        print(f"  ⚠️  Countermeasures not available: {e}")
 
 # Test 2: Initialize components
 print("\n[Test 2] Initializing components...")
@@ -75,7 +86,7 @@ if "SecIDSModel" in components_loaded:
         print("  ✓ SecIDS-CNN model loaded")
         print(f"    Model type: {type(model.model)}")
     except Exception as e:
-        print(f"  ✗ Model initialization failed: {e}")
+        print(f"  ⚠️  Model initialization skipped: {e}")
 
 # Initialize greylist manager
 greylist_mgr = None

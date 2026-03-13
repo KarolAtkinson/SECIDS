@@ -64,7 +64,8 @@ class SystemChecker:
                     print(f"   Python {version.major}.{version.minor}.{version.micro}")
                 return True
             return False
-        except Exception:
+        except AttributeError:
+            # sys.version_info not available
             return False
     
     def _check_dependencies(self):
@@ -116,8 +117,8 @@ class SystemChecker:
                                       timeout=2)
                 if result.returncode == 0:
                     available.append(tool)
-            except Exception as e:
-                pass  # Skip on error
+            except Exception:
+                continue
         if self.verbose and available:
             print(f"   Available: {', '.join(available)}")
         
@@ -145,8 +146,8 @@ class SystemChecker:
                     print(f"   Found: {', '.join(interfaces[:3])}")
                 
                 return len(interfaces) > 0
-        except Exception as e:
-            pass  # Skip on error
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            return False
         return False
     
     def _check_countermeasures(self):
@@ -160,7 +161,8 @@ class SystemChecker:
                 if countermeasure_file.exists():
                     return True
             return False
-        except Exception:
+        except (OSError, IOError):
+            # File system error
             return False
     
     def _check_progress(self):
@@ -175,7 +177,8 @@ class SystemChecker:
                 if progress_file.exists():
                     return True
             return False
-        except Exception:
+        except (OSError, IOError):
+            # File system error
             return False
     
     def _check_file_structure(self):
@@ -203,7 +206,8 @@ class SystemChecker:
                                   capture_output=True,
                                   timeout=2)
             return result.returncode == 0
-        except Exception:
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            # Command failed or not available
             return False
 
 

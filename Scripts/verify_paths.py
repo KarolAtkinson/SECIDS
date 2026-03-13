@@ -63,10 +63,15 @@ def verify_folder_structure() -> Tuple[List[str], List[str]]:
 def verify_ui_files() -> Tuple[List[str], List[str]]:
     """Verify UI files exist"""
     ui_files = [
-        "UI/terminal_ui.py",
+        "UI/terminal_ui_enhanced.py",
         "UI/ui_config.json",
         "UI/README.md",
-        "Launchers/secids-ui"
+        "Launchers/secids-ui",
+        "WebUI/app.py",
+        "WebUI/menu_actions.py",
+        "WebUI/templates/index.html",
+        "WebUI/static/app.js",
+        "WebUI/static/style.css"
     ]
     
     passed = []
@@ -171,7 +176,7 @@ def verify_config_files() -> Tuple[List[str], List[str]]:
         "Config/command_shortcuts.json",
         "Config/command_history.json",
         "UI/ui_config.json",
-        "SecIDS-CNN/requirements.txt",
+        "requirements.txt",
         "Master-Manual.md"
     ]
     
@@ -288,23 +293,36 @@ def check_ui_integration():
     print("🔗 Checking UI Integration Points...")
     print("=" * 60)
     
-    ui_script = PROJECT_ROOT / "UI" / "terminal_ui.py"
+    ui_script = PROJECT_ROOT / "UI" / "terminal_ui_enhanced.py"
+    webui_script = PROJECT_ROOT / "WebUI" / "app.py"
     
     if not ui_script.exists():
-        print("❌ UI script not found")
-        return [], ["UI not found"]
+        print("❌ Enhanced terminal UI script not found")
+        return [], ["Terminal UI not found"]
+    if not webui_script.exists():
+        print("❌ Web UI backend script not found")
+        return [], ["Web UI not found"]
     
     # Read UI script and check for integration points
     with open(ui_script, 'r') as f:
         content = f.read()
+    with open(webui_script, 'r') as f:
+        web_content = f.read()
     
     integration_points = [
-        ("secids.sh", "Main launcher integration"),
+        ("command_library", "Command library integration"),
         ("command_library.py", "Command library integration"),
         ("run_model.py", "Model execution integration"),
         ("stress_test.py", "Testing integration"),
         ("analyze_threat_origins.py", "Analysis integration"),
         ("ui_config.json", "Configuration persistence")
+    ]
+
+    web_integration_points = [
+        ("/api/menu", "Web API menu exposure"),
+        ("/api/run", "Web command execution endpoint"),
+        ("/api/settings", "Web settings persistence endpoint"),
+        ("/api/history", "Web history endpoint"),
     ]
     
     passed = []
@@ -315,6 +333,12 @@ def check_ui_integration():
             passed.append(f"✅ {description}")
         else:
             failed.append(f"❌ {description} (not found in UI)")
+
+    for component, description in web_integration_points:
+        if component in web_content:
+            passed.append(f"✅ {description}")
+        else:
+            failed.append(f"❌ {description} (not found in Web UI)")
     
     for item in passed:
         print(item)

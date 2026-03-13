@@ -2,6 +2,7 @@
 """
 Test script for DDoS Countermeasure System
 Verifies that countermeasures work correctly with live detection
+Tests both legacy and new Active/Passive modes
 """
 
 import sys
@@ -9,19 +10,31 @@ from pathlib import Path
 
 # Add Countermeasures to path
 sys.path.insert(0, str(Path(__file__).parent))
-from ddos_countermeasure import DDoSCountermeasure
+
+# Import both old and new implementations
+try:
+    from ddos_countermeasure import DDoSCountermeasure as LegacyCountermeasure
+    LEGACY_AVAILABLE = True
+except ImportError:
+    LEGACY_AVAILABLE = False
+    print("Warning: Legacy ddos_countermeasure not available")
+
+from countermeasure_active import ActiveCountermeasure
+from countermeasure_passive import PassiveCountermeasure
+
 
 def test_basic_functionality():
-    """Test basic countermeasure functionality"""
+    """Test basic countermeasure functionality (using Active mode)"""
     print("=" * 80)
-    print("TESTING: Basic Countermeasure Functionality")
+    print("TESTING: Basic Countermeasure Functionality (Active Mode)")
     print("=" * 80)
     print()
     
-    cm = DDoSCountermeasure(
+    cm = ActiveCountermeasure(
         block_threshold=3,
         time_window=10,
-        auto_block=False  # Disable actual blocking for test
+        auto_block=False,  # Disable actual blocking for test
+        interactive=False
     )
     
     cm.start()
@@ -49,7 +62,11 @@ def test_basic_functionality():
     cm.action_queue.join()
     
     # Show statistics
-    cm.print_statistics()
+    stats = cm.get_detailed_stats()
+    print(f"\nStatistics:")
+    print(f"  Threats detected: {stats['threats_detected']}")
+    print(f"  IPs blocked: {stats['ips_blocked']}")
+    print(f"  Actions taken: {stats['actions_taken']}")
     
     cm.stop()
     
@@ -58,16 +75,17 @@ def test_basic_functionality():
 
 
 def test_threat_tracking():
-    """Test threat history tracking"""
+    """Test threat history tracking (using Active mode)"""
     print("=" * 80)
-    print("TESTING: Threat History Tracking")
+    print("TESTING: Threat History Tracking (Active Mode)")
     print("=" * 80)
     print()
     
-    cm = DDoSCountermeasure(
+    cm = ActiveCountermeasure(
         block_threshold=3,
         time_window=5,
-        auto_block=False
+        auto_block=False,
+        interactive=False
     )
     
     cm.start()
@@ -96,19 +114,20 @@ def test_threat_tracking():
 
 
 def test_concurrent_processing():
-    """Test thread-safe concurrent threat processing"""
+    """Test thread-safe concurrent threat processing (using Active mode)"""
     import threading
     import time
     
     print("=" * 80)
-    print("TESTING: Concurrent Threat Processing")
+    print("TESTING: Concurrent Threat Processing (Active Mode)")
     print("=" * 80)
     print()
     
-    cm = DDoSCountermeasure(
+    cm = ActiveCountermeasure(
         block_threshold=5,
         time_window=10,
-        auto_block=False
+        auto_block=False,
+        interactive=False
     )
     
     cm.start()
@@ -135,12 +154,64 @@ def test_concurrent_processing():
     
     cm.action_queue.join()
     
-    print(f"Total threats processed: {cm.stats['threats_detected']}")
-    print(f"Actions taken: {cm.stats['actions_taken']}")
+    stats = cm.get_detailed_stats()
+    print(f"Total threats processed: {stats['threats_detected']}")
+    print(f"Actions taken: {stats['actions_taken']}")
     
     cm.stop()
     
     print("\n✅ Concurrent processing test completed")
+    return True
+
+
+def test_passive_mode():
+    """Test Passive mode auto-operation"""
+    import time
+    
+    print("=" * 80)
+    print("TESTING: Passive Mode Auto-Operation")
+    print("=" * 80)
+    print()
+    
+    # Passive mode auto-starts
+    cm = PassiveCountermeasure(
+        block_threshold=3,
+        time_window=5
+    )
+    
+    print(f"Running: {cm.running}")
+    print(f"Mode: {cm.mode}")
+    
+    # Process some threats
+    for i in range(5):
+        cm.process_threat({
+            'src_ip': '192.168.1.200',
+            'dst_port': 443,
+            'probability': 0.95
+        })
+    
+    time.sleep(0.5)
+    cm.action_queue.join()
+    
+    # Get simple stats
+    stats = cm.get_simple_stats()
+    print(f"\nPassive Mode Statistics:")
+    print(f"  Runtime: {stats['runtime']:.1f}s")
+    print(f"  Threats: {stats['threats_detected']}")
+    print(f"  Countermeasures: {stats['countermeasures_deployed']}")
+    print(f"  Health: {cm.get_health_status()}")
+    
+    # Test pause/resume
+    cm.pause()
+    print("\n✅ Paused successfully")
+    
+    cm.resume()
+    print("✅ Resumed successfully")
+    
+    cm.stop()
+    print("✅ Stopped cleanly")
+    
+    print("\n✅ Passive mode test completed")
     return True
 
 
@@ -149,13 +220,15 @@ def run_all_tests():
     print()
     print("=" * 80)
     print("COUNTERMEASURE SYSTEM TEST SUITE")
+    print("Updated for Active/Passive Architecture")
     print("=" * 80)
     print()
     
     tests = [
-        ("Basic Functionality", test_basic_functionality),
-        ("Threat Tracking", test_threat_tracking),
-        ("Concurrent Processing", test_concurrent_processing),
+        ("Basic Functionality (Active)", test_basic_functionality),
+        ("Threat Tracking (Active)", test_threat_tracking),
+        ("Concurrent Processing (Active)", test_concurrent_processing),
+        ("Passive Mode Auto-Operation", test_passive_mode),
     ]
     
     passed = 0

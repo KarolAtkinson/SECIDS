@@ -333,7 +333,6 @@ class FileOrganizer:
         # Find shell scripts in root
         launcher_scripts = [
             'csv_workflow.sh',
-            'project_cleanup.sh',
             'QUICK_START.sh',
             'secids.sh'
         ]
@@ -369,8 +368,9 @@ class FileOrganizer:
                 if not any(logs_lower.iterdir()):
                     logs_lower.rmdir()
                     self.moves.append("Removed empty logs/ directory")
-            except Exception:
-                self.skipped.append("Could not remove logs/ directory (not empty)")
+            except OSError as e:
+                # Directory not empty or permission error
+                self.skipped.append(f"Could not remove logs/ directory: {e}")
     
     def organize_detection_results(self):
         """Organize detection results in Results/ directory"""
@@ -487,25 +487,25 @@ class FileOrganizer:
                     try:
                         count = int(line.split(':')[1].split()[0])
                         self.stats['syntax_errors'] = count
-                    except Exception:
+                    except (ValueError, IndexError):
                         # Skip parsing errors
-                        pass
+                        continue
                 elif 'Warnings Found:' in line:
                     try:
                         count = int(line.split(':')[1].split()[0])
                         self.stats['bad_practices'] = count
-                    except Exception:
+                    except (ValueError, IndexError):
                         # Skip parsing errors
-                        pass
+                        continue
                 elif 'Files with Issues:' in line:
                     try:
                         count = int(line.split(':')[1].strip())
                         # Store in error_flags
                         if count > 0:
                             print(f"  ⚠️  {count} files have issues")
-                    except Exception:
+                    except (ValueError, IndexError):
                         # Skip parsing errors
-                        pass
+                        continue
             # Look for specific error flags in the output
             if 'SecurityRisk' in output:
                 self.stats['security_risks'] += output.count('SecurityRisk')
@@ -600,7 +600,8 @@ class FileOrganizer:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_md5.update(chunk)
             return hash_md5.hexdigest()
-        except Exception:
+        except (OSError, IOError):
+            # Cannot read file
             return None
     
     def cleanup_pycache(self):

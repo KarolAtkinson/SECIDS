@@ -1,4 +1,0 @@
-#!/bin/bash
-# Quick launcher - runs project cleanup
-cd "$(dirname "$0")"
-./Launchers/project_cleanup.sh "$@"

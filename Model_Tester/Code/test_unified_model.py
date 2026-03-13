@@ -10,9 +10,13 @@ import os
 import pickle
 from pathlib import Path
 
+from path_config import MODELS_DIR, ensure_model_tester_dirs
+
+ensure_model_tester_dirs()
+
 def load_trained_model():
     """Load the most recently trained unified model"""
-    model_dir = Path(__file__).parent / "models"
+    model_dir = MODELS_DIR
     
     # Find most recent unified model files
     unified_models = sorted(model_dir.glob("unified_threat_model_*.pkl"))

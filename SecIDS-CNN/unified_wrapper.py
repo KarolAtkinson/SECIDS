@@ -62,7 +62,8 @@ class UnifiedModelWrapper:
                 with open(metadata_file, 'rb') as f:
                     meta = pickle.load(f)
                 self.feature_names = meta.get('feature_names')
-            except Exception:
+            except (FileNotFoundError, pickle.UnpicklingError) as e:
+                print(f"Warning: Could not load metadata: {e}")
                 self.feature_names = None
 
         if self.rf is None or self.gb is None:

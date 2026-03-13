@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add paths
-PROJECT_ROOT = Path(__file__).parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / 'Device_Profile'))
 
 print("="*80)
@@ -82,7 +82,8 @@ greylisted_ips = greylist_mgr.get_all_greylisted_ips()
 print(f"  ✓ Greylisted IPs: {len(greylisted_ips)}")
 for ip in greylisted_ips:
     entry = greylist_mgr.get_greylist_entry(ip)
-    print(f"    - {ip}: {entry['occurrences']} occurrence(s)")
+    occurrences = entry['occurrences'] if entry is not None else 0
+    print(f"    - {ip}: {occurrences} occurrence(s)")
 
 # Test 6: List manager integration
 print("\n[Test 6] Testing list manager integration...")

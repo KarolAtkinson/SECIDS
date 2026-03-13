@@ -1,0 +1,164 @@
+#!/bin/bash
+# SecIDS-CNN guest access launcher (hotspot mode)
+# Starts WebUI (if needed), configures local Wi-Fi hotspot, and prints a verified guest URL.
+
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+
+SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT" || exit 1
+
+VENV_PYTHON="$PROJECT_ROOT/.venv_test/bin/python"
+URL_FILE="/tmp/secids_webui_tunnel_url.txt"
+HOTSPOT_URL_FILE="/tmp/secids_webui_hotspot_url.txt"
+HOTSPOT_CONN_NAME="${SECIDS_HOTSPOT_CONN_NAME:-secids-webui-hotspot}"
+HOTSPOT_IFACE="${SECIDS_HOTSPOT_IFACE:-wlan0}"
+HOTSPOT_SSID="${SECIDS_HOTSPOT_SSID:-SECIDS-GUEST}"
+HOTSPOT_PASSWORD="${SECIDS_HOTSPOT_PASSWORD:-SecIDSGuest26}"
+HOTSPOT_BAND="${SECIDS_HOTSPOT_BAND:-bg}"
+HOTSPOT_CHANNEL="${SECIDS_HOTSPOT_CHANNEL:-6}"
+
+if [ ! -x "$VENV_PYTHON" ]; then
+    echo "❌ Missing Python environment: $VENV_PYTHON"
+    echo "   Run: python3 -m venv .venv_test && .venv_test/bin/pip install -r requirements.txt"
+    exit 1
+fi
+
+if ! command -v nmcli >/dev/null 2>&1; then
+    echo "❌ Missing NetworkManager CLI (nmcli)."
+    echo "   Install/enable NetworkManager, then rerun this launcher."
+    exit 1
+fi
+
+if [ "${#HOTSPOT_PASSWORD}" -lt 8 ]; then
+    echo "❌ Hotspot password must be at least 8 characters."
+    echo "   Set SECIDS_HOTSPOT_PASSWORD with a stronger passphrase."
+    exit 1
+fi
+
+AVAILABLE_WIFI_IFACE="$(nmcli -t -f DEVICE,TYPE,STATE device | awk -F: '$2=="wifi" {print $1; exit}')"
+if [ -z "${AVAILABLE_WIFI_IFACE}" ]; then
+    echo "❌ No Wi-Fi interface detected. Hotspot mode requires a wireless adapter."
+    echo "   Available devices:"
+    nmcli device status || true
+    echo "   Connect/enable a Wi-Fi adapter, then rerun this launcher."
+    exit 1
+fi
+
+if ! nmcli -t -f DEVICE,TYPE device status | awk -F: '$1=="'"$HOTSPOT_IFACE"'" && $2=="wifi" {found=1} END {exit(found?0:1)}'; then
+    HOTSPOT_IFACE="$AVAILABLE_WIFI_IFACE"
+fi
+
+LOGIN_PATH="$($VENV_PYTHON - <<'PY'
+from WebUI.app import create_app
+app = create_app()
+print(app.config.get("SECIDS_LOGIN_PATH", "/login"))
+PY
+)"
+
+HOST="${SECIDS_WEB_HOST:-0.0.0.0}"
+PORT="${SECIDS_WEB_PORT:-8080}"
+SESSION_TIMEOUT="${SECIDS_SESSION_TIMEOUT_SECONDS:-86400}"
+
+# Start WebUI if port is not listening.
+if ! ss -ltn | grep -q ":${PORT}\\b"; then
+    echo "[webui-hotspot] Starting WebUI on ${HOST}:${PORT} (session=${SESSION_TIMEOUT}s)"
+    env \
+      SECIDS_WEB_HOST="${HOST}" \
+      SECIDS_WEB_PORT="${PORT}" \
+      SECIDS_WEB_OPEN_BROWSER="0" \
+      SECIDS_SESSION_TIMEOUT_SECONDS="${SESSION_TIMEOUT}" \
+      nohup "$VENV_PYTHON" WebUI/production_server.py >/tmp/secids_webui_public.log 2>&1 &
+    sleep 2
+fi
+
+HTTP_CODE="$(curl -s -o /tmp/secids_webui_local_check.html -w "%{http_code}" "http://127.0.0.1:${PORT}${LOGIN_PATH}" || true)"
+if [ "$HTTP_CODE" != "200" ]; then
+    echo "❌ Local WebUI health check failed: http://127.0.0.1:${PORT}${LOGIN_PATH} (status=${HTTP_CODE})"
+    exit 1
+fi
+
+# Retire legacy quick-tunnel process if present.
+pkill -f "cloudflared tunnel" >/dev/null 2>&1 || true
+rm -f /tmp/secids_cloudflared.log /tmp/secids_cloudflared_stdout.log
+
+echo "[webui-hotspot] Configuring hotspot connection: ${HOTSPOT_CONN_NAME} (${HOTSPOT_IFACE})"
+nmcli radio wifi on >/dev/null 2>&1 || true
+
+if nmcli -t -f NAME connection show | grep -Fxq "$HOTSPOT_CONN_NAME"; then
+    nmcli connection modify "$HOTSPOT_CONN_NAME" \
+        connection.interface-name "$HOTSPOT_IFACE" \
+        802-11-wireless.mode ap \
+        802-11-wireless.ssid "$HOTSPOT_SSID" \
+        802-11-wireless.band "$HOTSPOT_BAND" \
+        802-11-wireless.channel "$HOTSPOT_CHANNEL" \
+        802-11-wireless-security.key-mgmt wpa-psk \
+        802-11-wireless-security.psk "$HOTSPOT_PASSWORD" \
+        ipv4.method shared \
+        ipv6.method ignore >/dev/null
+else
+    nmcli connection add type wifi ifname "$HOTSPOT_IFACE" con-name "$HOTSPOT_CONN_NAME" ssid "$HOTSPOT_SSID" >/dev/null
+    nmcli connection modify "$HOTSPOT_CONN_NAME" \
+        802-11-wireless.mode ap \
+        802-11-wireless.band "$HOTSPOT_BAND" \
+        802-11-wireless.channel "$HOTSPOT_CHANNEL" \
+        802-11-wireless-security.key-mgmt wpa-psk \
+        802-11-wireless-security.psk "$HOTSPOT_PASSWORD" \
+        ipv4.method shared \
+        ipv6.method ignore >/dev/null
+fi
+
+nmcli connection down "$HOTSPOT_CONN_NAME" >/dev/null 2>&1 || true
+if ! nmcli connection up "$HOTSPOT_CONN_NAME" >/dev/null 2>&1; then
+    echo "❌ Failed to activate hotspot '${HOTSPOT_CONN_NAME}' on ${HOTSPOT_IFACE}."
+    echo "   Check adapter AP support and NetworkManager logs."
+    exit 1
+fi
+
+HOTSPOT_IP="$(nmcli -g IP4.ADDRESS connection show "$HOTSPOT_CONN_NAME" 2>/dev/null | head -n1 | cut -d/ -f1)"
+if [ -z "${HOTSPOT_IP}" ]; then
+    HOTSPOT_IP="$(ip -4 addr show "$HOTSPOT_IFACE" 2>/dev/null | awk '/inet / {print $2; exit}' | cut -d/ -f1)"
+fi
+
+if [ -z "${HOTSPOT_IP}" ]; then
+    echo "❌ Hotspot activated, but no IPv4 address was assigned on ${HOTSPOT_IFACE}."
+    exit 1
+fi
+
+FULL_URL="http://${HOTSPOT_IP}:${PORT}${LOGIN_PATH}"
+WEBUI_URL="http://${HOTSPOT_IP}:${PORT}${LOGIN_PATH%/login}"
+EXT_CODE="000"
+for _ in $(seq 1 20); do
+    EXT_CODE="$(curl -s -o /tmp/secids_webui_hotspot_check.html -w "%{http_code}" "$FULL_URL" || true)"
+    if [ "$EXT_CODE" = "200" ]; then
+        break
+    fi
+    sleep 1
+done
+
+if [ "$EXT_CODE" != "200" ]; then
+    echo "❌ Hotspot URL did not pass health check: $FULL_URL (status=${EXT_CODE})"
+    exit 1
+fi
+
+printf '%s\n' "$FULL_URL" > "$URL_FILE"
+printf '%s\n' "$FULL_URL" > "$HOTSPOT_URL_FILE"
+printf '%s\n' "$WEBUI_URL" > /tmp/secids_webui_hotspot_index_url.txt
+
+echo "[webui-hotspot] ✅ Guest login URL (verified):"
+echo "$FULL_URL"
+echo "[webui-hotspot] ✅ Guest WebUI URL:"
+echo "$WEBUI_URL"
+echo "[webui-hotspot] Login URL saved to: $URL_FILE"
+echo "[webui-hotspot] Login URL mirror saved to: $HOTSPOT_URL_FILE"
+echo "[webui-hotspot] WebUI URL saved to: /tmp/secids_webui_hotspot_index_url.txt"
+echo "[webui-hotspot] Hotspot SSID: ${HOTSPOT_SSID}"
+echo "[webui-hotspot] Hotspot password: ${HOTSPOT_PASSWORD}"
+echo "[webui-hotspot] Session timeout: ${SESSION_TIMEOUT}s (24h default)"

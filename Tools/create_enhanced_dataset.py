@@ -35,7 +35,8 @@ def is_private_ip(ip_str):
     try:
         ip = ipaddress.ip_address(ip_str)
         return ip.is_private
-    except Exception:
+    except ValueError:
+        # Invalid IP address
         return False
 
 def is_known_provider(ip_str):
@@ -46,8 +47,8 @@ def is_known_provider(ip_str):
             for cidr in ranges:
                 if ip in ipaddress.ip_network(cidr):
                     return provider
-    except Exception as e:
-            pass  # Skip on error
+    except Exception:
+        return None
     return None
 
 def is_legitimate_port(port):
@@ -167,8 +168,9 @@ def extract_enhanced_features(pcap_path):
                     fin_count += 1
                 if 'A' in flag_str:
                     ack_count += 1
-            except Exception as e:
-                pass  # Skip on error
+            except (ValueError, TypeError):
+                # Cannot convert flags to string
+                continue
         # NEW ENHANCED FEATURES
         src_is_private = 1 if is_private_ip(src_ip) else 0
         dst_is_private = 1 if is_private_ip(dst_ip) else 0

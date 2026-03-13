@@ -314,8 +314,11 @@ class ThreatDetectionModel:
 
 # Execute main function
 if __name__ == "__main__":
-    dataset_dir = r"c:\Users\karol\OneDrive\Pulpit\Master ML_AI\Code\datasets"
-    model_dir = r"c:\Users\karol\OneDrive\Pulpit\Master ML_AI\Code\models"
+    from path_config import DATASETS_DIR, MODELS_DIR, ensure_model_tester_dirs
+
+    ensure_model_tester_dirs()
+    dataset_dir = str(DATASETS_DIR)
+    model_dir = str(MODELS_DIR)
     
     threat_detector = ThreatDetectionModel(model_dir)
     

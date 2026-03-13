@@ -36,12 +36,12 @@ class SystemOptimizer:
                 for item in path.rglob('*'):
                     if item.is_file():
                         total += item.stat().st_size
-            except Exception as e:
-                pass  # Skip on error
+            except (OSError, PermissionError):
+                return total
             return total
         return 0
     
-    def format_size(self, bytes_size: int) -> str:
+    def format_size(self, bytes_size: float) -> str:
         """Format bytes to human readable"""
         for unit in ['B', 'KB', 'MB', 'GB']:
             if bytes_size < 1024.0:
@@ -233,8 +233,9 @@ class SystemOptimizer:
                 try:
                     if dir_path.is_dir() and not any(dir_path.iterdir()):
                         empty_dirs.append(dir_path)
-                except Exception as e:
-                    pass  # Skip on error
+                except (OSError, PermissionError):
+                    # Cannot access directory
+                    continue
         for empty_dir in empty_dirs:
             rel_path = empty_dir.relative_to(self.project_root)
             

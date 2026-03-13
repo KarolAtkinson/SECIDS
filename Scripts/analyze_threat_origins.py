@@ -13,7 +13,8 @@ def get_ip_info(ip_address):
     """Get hostname and attempt basic IP classification"""
     try:
         hostname = socket.gethostbyaddr(ip_address)[0]
-    except Exception:
+    except (socket.herror, socket.gaierror, OSError):
+        # Reverse DNS lookup failed
         hostname = "Unknown"
     
     # Basic IP classification

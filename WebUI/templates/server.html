@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecIDS-CNN Server Database</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app-shell server-page-shell">
+    <header class="toolbar">
+      <div class="tool-icons">
+        <span>🗄️</span><span>📂</span><span>🧾</span><span>📤</span><span>📥</span>
+      </div>
+      <div class="toolbar-status">
+        <span class="pill">Server Database</span>
+        <button id="return-main" class="btn btn-compact" data-index-path="{{ index_path }}">Return to Main WebUI</button>
+      </div>
+    </header>
+
+    <main class="server-db-main">
+      <section class="insight-panel">
+        <div class="jobs-header">
+          <h3>Server Controls</h3>
+          <button id="server-refresh" class="btn btn-compact">Refresh</button>
+        </div>
+        <div class="audit-filters">
+          <button id="server-add" class="btn btn-compact">Add</button>
+          <button id="server-remove" class="btn btn-compact">Remove</button>
+          <button id="server-import" class="btn btn-compact">Import</button>
+          <button id="server-export" class="btn btn-compact">Export</button>
+          <button id="server-sync-data" class="btn btn-compact">Sync Project Data</button>
+        </div>
+        <div id="server-sync-summary" class="pill">data sync: pending</div>
+        <div class="audit-filters">
+          <input id="import-folder" class="token-input" placeholder="import folder name" />
+          <input id="import-flag" class="token-input" placeholder="flag e.g. SERVER_IMPORT" />
+        </div>
+        <textarea id="import-data" class="server-import-data" placeholder="Paste JSON/text to import into selected folder"></textarea>
+        <ul class="quick-guide">
+          <li>Core task-panel data is persisted under dedicated ServerDB folders with flags.</li>
+          <li>Project data can be synced into tagged DB folders (modelDB, datasetDB, captureDB, webuiVersionsDB, etc.) without moving source code.</li>
+          <li>Packet logs, action logs, and history logs are retained for 30 days, then moved into TrashDump retention flow.</li>
+          <li>webuiVersionsDB stores upgrade-time WebUI archive snapshots for smoother rollback/transition between versions.</li>
+          <li>Use Add/Remove for custom folders only (core folders are protected).</li>
+        </ul>
+      </section>
+
+      <section class="insight-panel">
+        <div class="jobs-header">
+          <h3>Folder Overview</h3>
+          <span id="server-root-pill" class="pill">root: --</span>
+        </div>
+        <div class="audit-filters">
+          <select id="server-folder-select" class="token-input role-select"></select>
+          <select id="server-file-select" class="token-input"></select>
+          <button id="server-view-file" class="btn btn-compact">View</button>
+          <button id="server-view-return" class="btn btn-compact">Return</button>
+        </div>
+        <div class="history-table-wrap server-folders-wrap">
+          <table class="history-table">
+            <thead>
+              <tr><th>Folder</th><th>Path</th><th>Files</th><th>Latest Files</th></tr>
+            </thead>
+            <tbody id="server-folders-body"></tbody>
+          </table>
+        </div>
+        <div id="server-file-view-wrap" class="server-file-view-wrap hidden">
+          <div class="jobs-header">
+            <h3 id="server-file-path">Database File</h3>
+            <span id="server-file-lines" class="pill">lines: --</span>
+          </div>
+          <pre id="server-file-content" class="server-file-content">No file selected.</pre>
+        </div>
+      </section>
+
+      <section class="insight-panel">
+        <div class="jobs-header">
+          <h3>Custom Folders</h3>
+          <span id="server-trash-pill" class="pill">trash: --</span>
+        </div>
+        <div id="server-custom-list" class="server-custom-list"></div>
+      </section>
+
+      <section class="insight-panel">
+        <div class="jobs-header">
+          <h3>NIST-CSW Simulation Feed</h3>
+          <div>
+            <button id="nist-csw-update" class="btn btn-compact">Update Now</button>
+            <button id="nist-csw-convert" class="btn btn-compact">Convert to Model Style</button>
+          </div>
+        </div>
+        <div id="nist-csw-status" class="pill">status: pending</div>
+        <div id="nist-csw-convert-status" class="pill">convert: pending</div>
+        <div id="nist-csw-summary" class="server-nist-summary"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='server.js') }}"></script>
+</body>
+</html>

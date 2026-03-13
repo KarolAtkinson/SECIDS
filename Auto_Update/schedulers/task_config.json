@@ -1,10 +1,10 @@
 {
   "tasks": {
-    "dataset_cleanup": {
+    "git_sync": {
       "enabled": true,
-      "interval_hours": 24,
-      "script": "Launchers/project_cleanup.sh",
-      "description": "Clean up and organize files"
+      "interval_hours": 6,
+      "script": "Auto_Update/git_auto_sync.py",
+      "description": "Sync repository with GitHub (pull and push changes)"
     },
     "whitelist_update": {
       "enabled": true,
@@ -18,16 +18,41 @@
       "script": "Scripts/refine_datasets.py",
       "description": "Refine datasets with whitelist rules"
     },
+    "dataset_cleanup": {
+      "enabled": true,
+      "interval_hours": 24,
+      "script": "Launchers/project_cleanup.sh",
+      "description": "Clean up and organize project files"
+    },
     "model_validation": {
       "enabled": true,
       "interval_hours": 48,
       "script": "Scripts/test_enhanced_model.py",
       "description": "Validate model performance"
     },
-    "blacklist_cleanup": {
+    "workflow_chart_update": {
       "enabled": true,
-      "interval_hours": 168,
-      "description": "Remove old blacklist entries"
+      "interval_hours": 12,
+      "script": "Auto_Update/monitors/update_workflow_chart.py",
+      "description": "Regenerate workflow chart documentation"
+    },
+    "server_db_data_sync": {
+      "enabled": true,
+      "interval_hours": 24,
+      "script": "Scripts/sync_project_data_to_serverdb.py",
+      "description": "Sync tagged project data into ServerDB folders"
+    },
+    "nist_csw_feed_update": {
+      "enabled": true,
+      "interval_hours": 24,
+      "script": "Scripts/update_nist_csw_sources.py",
+      "description": "Fetch open-source NIST/CISA threat data into ServerDB/NIST-CSW"
+    },
+    "nist_csw_convert": {
+      "enabled": true,
+      "interval_hours": 24,
+      "script": "Scripts/convert_nist_csw_to_model_format.py",
+      "description": "Convert NIST-CSW source feeds to SECIDS model-style dataset format"
     }
   },
   "thresholds": {

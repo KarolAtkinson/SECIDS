@@ -1,0 +1,72 @@
+#!/bin/bash
+# SecIDS-CNN WebUI launcher (WSEC)
+# Starts production WebUI (if not running) and opens dynamic WebUI root/login URL.
+
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+
+SCRIPT_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT" || exit 1
+
+VENV_PYTHON="$PROJECT_ROOT/.venv_test/bin/python"
+if [ ! -x "$VENV_PYTHON" ]; then
+    echo "❌ Missing Python environment: $VENV_PYTHON"
+    echo "   Run: python3 -m venv .venv_test && .venv_test/bin/pip install -r requirements.txt"
+    exit 1
+fi
+
+HOST="${SECIDS_WEB_HOST:-127.0.0.1}"
+PORT="${SECIDS_WEB_PORT:-8080}"
+
+APP_PATHS="$($VENV_PYTHON - <<'PY'
+from WebUI.app import create_app
+app = create_app()
+access = app.config.get("SECIDS_ACCESS_PATH", "") or ""
+login = app.config.get("SECIDS_LOGIN_PATH", "/login") or "/login"
+print(f"{access}\n{login}")
+PY
+)"
+
+ACCESS_PATH="$(printf '%s\n' "$APP_PATHS" | sed -n '1p')"
+LOGIN_PATH="$(printf '%s\n' "$APP_PATHS" | sed -n '2p')"
+
+# Open WebUI root first (correct destination); unauthenticated users will be
+# redirected to LOGIN_PATH by Flask auth guards.
+WEBUI_URL="http://${HOST}:${PORT}${ACCESS_PATH}"
+LOGIN_URL="http://${HOST}:${PORT}${LOGIN_PATH}"
+
+if ! pgrep -f "WebUI/production_server.py" >/dev/null 2>&1; then
+    echo "[WSEC] starting WebUI production server..."
+    SECIDS_WEB_OPEN_BROWSER=0 nohup "$VENV_PYTHON" WebUI/production_server.py >/tmp/secids_webui_public.log 2>&1 &
+    sleep 1.6
+fi
+
+# Wait briefly for readiness; fallback to login URL if root probe fails.
+READY=""
+for _ in $(seq 1 20); do
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" "$WEBUI_URL" || true)
+    if [ "$CODE" = "200" ] || [ "$CODE" = "302" ]; then
+        READY="yes"
+        break
+    fi
+    sleep 0.2
+done
+
+TARGET_URL="$WEBUI_URL"
+if [ -z "$READY" ]; then
+    TARGET_URL="$LOGIN_URL"
+fi
+
+echo "[WSEC] opening: $TARGET_URL"
+if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$TARGET_URL" >/dev/null 2>&1 || true
+fi
+
+echo "[WSEC] ready"

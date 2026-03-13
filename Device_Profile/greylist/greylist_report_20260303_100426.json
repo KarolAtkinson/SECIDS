@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-03-03T10:04:26.646449",
+  "statistics": {
+    "total_greylist_alerts": 2,
+    "moved_to_blacklist": 0,
+    "moved_to_whitelist": 0,
+    "kept_on_greylist": 0,
+    "auto_expired": 0,
+    "current_greylist_size": 3,
+    "pending_decisions": 2,
+    "total_history": 0
+  },
+  "current_greylist": {
+    "20.0.0.2": {
+      "ip": "20.0.0.2",
+      "first_seen": "2026-02-27T15:09:58.070149",
+      "last_seen": "2026-02-27T15:09:58.070156",
+      "occurrences": 1,
+      "threat_data": [
+        {
+          "src_ip": "20.0.0.2",
+          "probability": 0.6,
+          "dst_port": 443,
+          "timestamp": "2026-02-03T17:00:01"
+        }
+      ],
+      "status": "pending_decision"
+    },
+    "10.0.0.50": {
+      "ip": "10.0.0.50",
+      "first_seen": "2026-03-03T10:04:26.642335",
+      "last_seen": "2026-03-03T10:04:26.642981",
+      "occurrences": 1,
+      "threat_data": [
+        {
+          "src_ip": "10.0.0.50",
+          "probability": 0.62,
+          "dst_port": 443
+        }
+      ],
+      "status": "pending_decision"
+    },
+    "192.168.1.200": {
+      "ip": "192.168.1.200",
+      "first_seen": "2026-03-03T10:04:26.644060",
+      "last_seen": "2026-03-03T10:04:26.644068",
+      "occurrences": 1,
+      "threat_data": [
+        {
+          "src_ip": "192.168.1.200",
+          "probability": 0.58,
+          "dst_port": 8080
+        }
+      ],
+      "status": "pending_decision"
+    }
+  },
+  "recent_history": []
+}

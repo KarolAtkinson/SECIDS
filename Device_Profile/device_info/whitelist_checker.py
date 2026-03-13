@@ -51,7 +51,7 @@ class WhitelistChecker:
                     try:
                         self.trusted_ip_ranges.append(ipaddress.ip_network(ip_range, strict=False))
                     except ValueError:
-                        pass
+                        continue
     
     def _load_json(self, path):
         """Load JSON file"""
@@ -91,7 +91,7 @@ class WhitelistChecker:
                 if ip_obj in ip_range:
                     return True
         except ValueError:
-            pass
+            return False
         
         return False
     

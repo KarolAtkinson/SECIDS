@@ -13,13 +13,16 @@ code_dir = Path(__file__).parent
 sys.path.insert(0, str(code_dir))
 
 from unified_threat_model import UnifiedThreatModel
+from path_config import CODE_DIR, DATASETS_DIR, LOGS_DIR, MODELS_DIR, TRAINING_DATA_DIR, ensure_model_tester_dirs
+
+ensure_model_tester_dirs()
 
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(code_dir / 'unified_training.log'),
+        logging.FileHandler(LOGS_DIR / 'unified_training.log'),
         logging.StreamHandler()
     ]
 )
@@ -42,14 +45,14 @@ def main():
     
     try:
         # Setup model directory
-        base_path = code_dir.parent
-        model_dir = code_dir / "models"
-        model_dir.mkdir(exist_ok=True)
+        base_path = CODE_DIR.parent
+        model_dir = MODELS_DIR
+        model_dir.mkdir(parents=True, exist_ok=True)
         
         # Dataset directories
         dataset_dirs = [
-            code_dir / "datasets",  # SecIDS-CNN datasets
-            base_path / "Threat_Detection_Model_1"  # Existing datasets
+            DATASETS_DIR,
+            TRAINING_DATA_DIR,
         ]
         
         logger.info("Dataset Directories:")
