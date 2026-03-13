@@ -54,6 +54,29 @@ Open:
 3. Click `Login`.
 4. Change password if prompted on first sign-in.
 
+## Default Credentials (First-Time Setup)
+
+When no user database exists yet, the system creates these temporary accounts.
+**You will be required to change all passwords on first login.**
+
+| Username   | Password      | Role     | Can Do                                  |
+|------------|---------------|----------|-----------------------------------------|
+| `admin`    | `admin123`    | admin    | Everything — manage users, all settings |
+| `operator` | `operator123` | operator | Run scans, countermeasures, simulations |
+| `viewer`   | `viewer123`   | viewer   | Read-only dashboards and results        |
+| `guest`    | `guest123`    | guest    | Limited view access                     |
+
+> **Important:** Change all passwords immediately after first login.
+> The admin account can add, remove, and reset passwords for all other users under **Settings → Users**.
+
+## Multi-User Access
+
+Multiple users can be logged in simultaneously. Each session is fully isolated.
+The admin can manage users at `/portal` → Settings → Users:
+- Add new users with any role
+- Reset or disable accounts
+- Upgrade/downgrade user roles at any time
+
 ## 5. Notes For Non-Kali Systems
 
 - Simulation and most WebUI workflows run on Windows/Linux/macOS.
